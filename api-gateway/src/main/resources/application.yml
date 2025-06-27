@@ -1,0 +1,31 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+
+  profiles:
+    active: local
+
+  cloud:
+    gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: true
+              lower-case-service-id: true
+          routes:
+            - id: user-service
+              uri: lb://user-service
+              predicates:
+                - Path=/api/auth/**, /api/user/**
+            - id: storage-service
+              uri: lb://storage-service
+              predicates:
+                - Path=/api/storage/**
+            - id: encoding-service
+              uri: lb://encoding-service
+              predicates:
+                - Path=/api/encode/**
