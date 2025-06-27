@@ -6,7 +6,7 @@ spring:
           issuer-uri: http://localhost:8070/realms/voyagrr/protocol/openid-connect/certs
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/user_service_database
+    url: jdbc:postgresql://localhost:5434/user_service_database
     username: postgres
     password: postgres
 
