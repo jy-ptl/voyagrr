@@ -3,7 +3,10 @@ package com.voyagrr.userservice.service.impl;
 import com.voyagrr.userservice.config.KeycloakProperties;
 import com.voyagrr.userservice.dto.UserCreateRequest;
 import com.voyagrr.userservice.dto.UserLoginRequest;
+import com.voyagrr.userservice.model.User;
 import com.voyagrr.userservice.service.AuthenticationService;
+import com.voyagrr.userservice.service.UserService;
+import com.voyagrr.userservice.utility.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -29,6 +32,10 @@ public class KeycloakAuthenticationService implements AuthenticationService {
 
     private final KeycloakProperties keycloakProperties;
 
+    private final UserService userService;
+
+    private final UserMapper userMapper;
+
     @Override
     public String register(UserCreateRequest request) {
 
@@ -53,9 +60,13 @@ public class KeycloakAuthenticationService implements AuthenticationService {
                     URI location = response.getHeaders().getLocation();
                     if (location != null) {
                         String[] parts = location.getPath().split("/");
-                        String userId = parts[parts.length - 1];
+                        String keycloakUserId = parts[parts.length - 1];
 
-                        return userId;
+                        User user = userMapper.userCreateRequestToUser(request);
+                        user.setKeycloakUserId(keycloakUserId);
+                        userService.save(user);
+
+                        return keycloakUserId;
                     }
                     return "Created but no user ID found";
                 })
