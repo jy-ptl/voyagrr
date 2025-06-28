@@ -19,3 +19,9 @@ eureka:
   client:
     service-url:
       defaultZone: http://eureka:8761/eureka
+
+minio:
+  url: http://minio:9000
+  access-key: minioadmin
+  secret-key: minioadmin123
+  bucket: voyagrr-media
