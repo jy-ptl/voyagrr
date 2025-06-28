@@ -9,6 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="api-gateway" />
         <module name="discovery-service" />
+        <module name="storage-service" />
       </profile>
       <profile name="Annotation profile for user-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -25,6 +26,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="api-gateway" options="-parameters" />
       <module name="discovery-service" options="-parameters" />
+      <module name="storage-service" options="-parameters" />
       <module name="user-service" options="-parameters" />
     </option>
   </component>

@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
   keycloak-database:
     image: postgres:17
@@ -77,6 +79,20 @@ services:
     networks:
       - voyagrr-net
 
+  minio:
+    image: minio/minio:latest
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    volumes:
+      - minio-data:/data
+    networks:
+      - voyagrr-net
+
   user-service:
     build: ./user-service
     ports:
@@ -94,10 +110,28 @@ services:
     networks:
       - voyagrr-net
 
+  storage-service:
+    build: ./storage-service
+    ports:
+      - '8082:8082'
+    depends_on:
+      - eureka
+      - api-gateway
+      - storage-service-database
+      - minio
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://storage-service-database:5432/storage_service_database
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    networks:
+      - voyagrr-net
+
 volumes:
   keycloak-database-data:
   user-database-data:
   storage-database-data:
+  minio-data:
 
 networks:
   voyagrr-net:
