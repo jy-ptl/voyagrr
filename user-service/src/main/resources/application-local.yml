@@ -24,4 +24,4 @@ keycloak:
   keycloak-url: http://localhost:8070
   realm: voyagrr
   client-id: voyagrr-client
-  client-secret: R5zFKk4zmeBZAsJIrpZ94EsBeDftbDHi
+  client-secret: NlimILlMn12VE1HL2aUG4o1CAfWFfF7A
