@@ -1,0 +1,66 @@
+name: workflow.yml
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAMESPACE: ${{ github.repository_owner }}/voyagrr
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+
+      - name: Build Maven project (skip tests)
+        run: mvn clean package -DskipTests
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Build & Push user-service image
+      - name: Build & Push user-service Docker image
+        run: |
+          docker build -t $REGISTRY/$IMAGE_NAMESPACE/user-service:latest -f user-service/Dockerfile .
+          docker push $REGISTRY/$IMAGE_NAMESPACE/user-service:latest
+
+      # Build & Push storage-service image
+      - name: Build & Push storage-service Docker image
+        run: |
+          docker build -t $REGISTRY/$IMAGE_NAMESPACE/storage-service:latest -f storage-service/Dockerfile .
+          docker push $REGISTRY/$IMAGE_NAMESPACE/storage-service:latest
+
+      # Build & Push sharing-service image
+      - name: Build & Push sharing-service Docker image
+        run: |
+          docker build -t $REGISTRY/$IMAGE_NAMESPACE/sharing-service:latest -f sharing-service/Dockerfile .
+          docker push $REGISTRY/$IMAGE_NAMESPACE/sharing-service:latest
+
+      # Build & Push api-gateway image
+      - name: Build & Push api-gateway Docker image
+        run: |
+          docker build -t $REGISTRY/$IMAGE_NAMESPACE/api-gateway:latest -f api-gateway/Dockerfile .
+          docker push $REGISTRY/$IMAGE_NAMESPACE/api-gateway:latest
+
+      # Build & Push discovery-service (eureka) image
+      - name: Build & Push discovery-service Docker image
+        run: |
+          docker build -t $REGISTRY/$IMAGE_NAMESPACE/discovery-service:latest -f discovery-service/Dockerfile .
+          docker push $REGISTRY/$IMAGE_NAMESPACE/discovery-service:latest
