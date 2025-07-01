@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.voyagrr.common.proto";
+option java_outer_classname = "PermissionProto";
+option java_generate_equals_and_hash = true;
+option java_string_check_utf8 = true;
+
+
+service SharingPermissionService {
+  rpc HasPermission(HasPermissionRequest) returns (HasPermissionResponse);
+  rpc CreateDefaultPermission(CreateDefaultPermissionRequest) returns (CreateDefaultPermissionResponse);
+}
+
+message CreateDefaultPermissionRequest {
+  string user_id = 1;
+  int64 directory_id = 2;
+}
+
+message CreateDefaultPermissionResponse {
+  bool success = 1;
+}
+
+message HasPermissionRequest {
+  string user_id = 1;
+  int64 directory_id = 2;
+  string permission = 3;
+}
+
+message HasPermissionResponse {
+  bool allowed = 1;
+}

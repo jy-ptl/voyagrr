@@ -1,20 +1,100 @@
 package com.voyagrr.storageservice.service.impl;
 
 import com.voyagrr.storageservice.dto.FileUploadRequest;
+import com.voyagrr.storageservice.model.Directory;
+import com.voyagrr.storageservice.model.File;
+import com.voyagrr.storageservice.repository.FileRepository;
+import com.voyagrr.storageservice.service.DirectoryService;
 import com.voyagrr.storageservice.service.StorageService;
+import com.voyagrr.storageservice.service.grpc.SharingPermissionGrpcClient;
+import com.voyagrr.storageservice.utility.FileUtility;
+import io.minio.BucketExistsArgs;
+import io.minio.MakeBucketArgs;
+import io.minio.MinioClient;
+import io.minio.PutObjectArgs;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.InputStream;
+import java.util.UUID;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class MinioStorageService implements StorageService {
 
+    private final FileUtility fileUtility;
+    private final MinioClient minioClient;
+
+    private final SharingPermissionGrpcClient sharingPermissionGrpcClient;
+
+    private final FileRepository fileRepository;
+    private final DirectoryService directoryService;
+
+    @Value("${minio.bucket}")
+    private String bucket;
+
+    @PostConstruct
+    public void init() {
+        try {
+            if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build())) {
+                minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
+            }
+        } catch (Exception e) {
+            log.error("Error while initializing MinioStorageService", e.getMessage());
+        }
+    }
 
     @Override
-    public String upload(FileUploadRequest request, String keycloakUserId) {
+    public String upload(FileUploadRequest request, MultipartFile file, String keycloakUserId) {
 
+        String mimeType = fileUtility.getMimeType(file);
+
+        Directory directory = directoryService.findDirectoryById(request.directoryId());
+
+        String minioObjectKey = directoryService.buildMinioObjectPathFromDirectoryId(request.directoryId());
+
+        String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+        String uuidFilename = UUID.randomUUID() + (StringUtils.hasText(extension) ? "." + extension : "");
+
+        try (InputStream input = file.getInputStream()) {
+
+            boolean allowed = sharingPermissionGrpcClient.hasUploadPermission(
+                    keycloakUserId, request.directoryId());
+            if (!allowed)
+                throw new AccessDeniedException("User does not have upload permission to this directory");
+
+            minioClient.putObject(
+                    PutObjectArgs
+                            .builder()
+                            .bucket(bucket)
+                            .object(minioObjectKey + "/" + uuidFilename)
+                            .stream(input, file.getSize(), -1)
+                            .contentType(mimeType)
+                            .build()
+            );
+
+            fileRepository
+                    .save(File
+                            .builder()
+                            .name(file.getOriginalFilename())
+                            .directory(directory)
+                            .minioObjectKey(minioObjectKey + "/" + uuidFilename)
+                            .mimeType(mimeType)
+                            .ownerId(keycloakUserId)
+                            .build());
+
+            return "Success";
+        } catch (Exception e) {
+            log.error("Upload failed", e);
+        }
         return "";
     }
 }

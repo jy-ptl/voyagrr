@@ -3,13 +3,11 @@ package com.voyagrr.storageservice.model;
 import com.voyagrr.storageservice.config.Auditable;
 import com.voyagrr.storageservice.enumeration.EncodingStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
+@Builder
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,6 +20,9 @@ public class File extends Auditable {
 
     @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false)
+    private String ownerId;
 
     @ManyToOne
     @JoinColumn(name = "directory_id", nullable = false)

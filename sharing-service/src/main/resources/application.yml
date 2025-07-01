@@ -1,0 +1,13 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: sharing-service
+
+  profiles:
+    active: local
+
+grpc:
+  server:
+    port: 9090

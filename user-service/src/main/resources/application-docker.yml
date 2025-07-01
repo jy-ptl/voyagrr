@@ -3,7 +3,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://keycloak:8070/realms/voyagrr/protocol/openid-connect/certs
+          issuer-uri: http://keycloak:8070/realms/voyagrr
 
   datasource:
     url: jdbc:postgresql://user-service-database:5432/user_service_database
@@ -24,4 +24,4 @@ keycloak:
   keycloak-url: http://keycloak:8070
   realm: voyagrr
   client-id: voyagrr-client
-  client-secret: R5zFKk4zmeBZAsJIrpZ94EsBeDftbDHi
+  client-secret: NlimILlMn12VE1HL2aUG4o1CAfWFfF7A

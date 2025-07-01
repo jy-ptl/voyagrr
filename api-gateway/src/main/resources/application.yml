@@ -24,7 +24,11 @@ spring:
             - id: storage-service
               uri: lb://storage-service
               predicates:
-                - Path=/api/storage/**
+                - Path=/api/storage/**, /api/directory/**
+            - id: sharing-service
+              uri: lb://sharing-service
+              predicates:
+                - Path=/api/share/**, /api/group/**
             - id: encoding-service
               uri: lb://encoding-service
               predicates:
