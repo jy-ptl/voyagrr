@@ -7,9 +7,3 @@ spring:
 
   profiles:
     active: local
-
-grpc:
-  client:
-    sharing-permission-service:
-      address: "static://localhost:9090"
-      negotiationType: plaintext

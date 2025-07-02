@@ -30,3 +30,9 @@ minio:
   access-key: minioadmin
   secret-key: minioadmin123
   bucket: voyagrr-media
+
+grpc:
+  client:
+    sharing-permission-service:
+      address: "static://localhost:9090"
+      negotiationType: plaintext

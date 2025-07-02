@@ -133,6 +133,7 @@ services:
       dockerfile: storage-service/Dockerfile
     ports:
       - '8082:8082'
+      - '9090:9090'
     depends_on:
       - eureka
       - api-gateway
