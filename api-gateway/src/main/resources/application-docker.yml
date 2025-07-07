@@ -4,6 +4,25 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://keycloak:8070/realms/voyagrr
+  cloud:
+    gateway:
+      server:
+        webflux:
+          globalcors:
+            add-to-simple-url-handler-mapping: true
+            cors-configurations:
+              '[/**]':
+                allowed-origins:
+                  - https://voyagrr.com
+                  - https://www.voyagrr.com
+                allowed-methods:
+                  - GET
+                  - POST
+                  - PUT
+                  - DELETE
+                  - OPTIONS
+                allowed-headers: *
+                allow-credentials: true
 
 eureka:
   client:
