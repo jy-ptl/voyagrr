@@ -33,3 +33,31 @@ spring:
               uri: lb://encoding-service
               predicates:
                 - Path=/api/encode/**
+
+            - id: user-service-prometheus
+              uri: http://user-service:8081
+              predicates:
+                - Path=/user-service/actuator/prometheus
+              filters:
+                - StripPrefix=1
+
+            - id: storage-service-prometheus
+              uri: http://storage-service:8082
+              predicates:
+                - Path=/storage-service/actuator/prometheus
+              filters:
+                - StripPrefix=1
+
+            - id: sharing-service-prometheus
+              uri: http://sharing-service:8083
+              predicates:
+                - Path=/sharing-service/actuator/prometheus
+              filters:
+                - StripPrefix=1
+
+            - id: encoding-service-prometheus
+              uri: http://encoding-service:8084
+              predicates:
+                - Path=/encoding-service/actuator/prometheus
+              filters:
+                - StripPrefix=1

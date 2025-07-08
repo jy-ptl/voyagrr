@@ -17,6 +17,12 @@ public class SecurityConfig {
         http
                 .authorizeExchange(exchange -> exchange
                         .pathMatchers(HttpMethod.OPTIONS).permitAll()
+
+                        .pathMatchers("/user-service/actuator/**").permitAll()
+                        .pathMatchers("/storage-service/actuator/**").permitAll()
+                        .pathMatchers("/sharing-service/actuator/**").permitAll()
+                        .pathMatchers("/encoding-service/actuator/**").permitAll()
+
                         .pathMatchers(HttpMethod.POST,"/api/auth/register").permitAll()
                         .pathMatchers(HttpMethod.POST,"/api/auth/login").permitAll()
                         .anyExchange().authenticated()

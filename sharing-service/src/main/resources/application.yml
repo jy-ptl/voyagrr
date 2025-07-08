@@ -12,3 +12,18 @@ spring:
 grpc:
   server:
     port: 9090
+
+management:
+  endpoint:
+    health:
+      show-details: always
+
+  metrics:
+    tags:
+      application: sharing-service
+
+
+  prometheus:
+    metrics:
+      export:
+        enabled: true

@@ -1,0 +1,20 @@
+scrape_configs:
+  - job_name: 'user-service'
+    metrics_path: '/user-service/actuator/prometheus'
+    static_configs:
+      - targets: ['api-gateway:8080']
+
+  - job_name: 'storage-service'
+    metrics_path: '/storage-service/actuator/prometheus'
+    static_configs:
+      - targets: ['api-gateway:8080']
+
+  - job_name: 'sharing-service'
+    metrics_path: '/sharing-service/actuator/prometheus'
+    static_configs:
+      - targets: ['api-gateway:8080']
+
+  - job_name: 'encoding-service'
+    metrics_path: '/encoding-service/actuator/prometheus'
+    static_configs:
+      - targets: ['api-gateway:8080']

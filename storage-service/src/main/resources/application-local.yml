@@ -36,3 +36,9 @@ grpc:
     sharing-permission-service:
       address: "static://localhost:9090"
       negotiationType: plaintext
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

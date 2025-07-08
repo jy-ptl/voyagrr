@@ -31,3 +31,9 @@ grpc:
     sharing-permission-service:
       address: "static://sharing-service:9090"
       negotiationType: plaintext
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus

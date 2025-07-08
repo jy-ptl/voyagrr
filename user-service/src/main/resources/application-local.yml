@@ -25,3 +25,9 @@ keycloak:
   realm: voyagrr
   client-id: voyagrr-client
   client-secret: ulB2DYKDZTAsy5eSKX1KCoPnrDVOw9BD
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

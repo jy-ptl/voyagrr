@@ -25,3 +25,9 @@ minio:
   access-key: minioadmin
   secret-key: minioadmin123
   bucket: voyagrr-media
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus

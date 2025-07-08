@@ -8,3 +8,17 @@ spring:
 
   profiles:
     active: local
+
+management:
+  endpoint:
+    health:
+      show-details: always
+
+  metrics:
+    tags:
+      application: storage-service
+
+  prometheus:
+    metrics:
+      export:
+        enabled: true
