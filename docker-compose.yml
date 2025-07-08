@@ -51,6 +51,19 @@ services:
     networks:
       - voyagrr-net
 
+  encoding-service-database:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: encoding_service_database
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5437:5432'
+    volumes:
+      - encoding-database-data:/var/lib/postgresql/data
+    networks:
+      - voyagrr-net
+
   eureka:
     build:
       context: .
@@ -151,8 +164,11 @@ services:
     build:
       context: .
       dockerfile: sharing-service/Dockerfile
-    ports:
-      - '8083:8083'
+    deploy:
+      mode: replicated
+      replicas: 2
+    expose:
+      - '8083'
     depends_on:
       - eureka
       - api-gateway
@@ -165,12 +181,32 @@ services:
     networks:
       - voyagrr-net
 
+  encoding-service:
+    build:
+      context: .
+      dockerfile: encoding-service/Dockerfile
+    ports:
+      - '8084:8084'
+    depends_on:
+      - eureka
+      - api-gateway
+      - encoding-service-database
+      - minio
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://encoding-service-database:5432/encoding_service_database
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    networks:
+      - voyagrr-net
+
 
 volumes:
   keycloak-database-data:
   user-database-data:
   storage-database-data:
   sharing-database-data:
+  encoding-database-data:
   minio-data:
 
 networks:
