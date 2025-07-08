@@ -21,7 +21,8 @@ spring:
                   - PUT
                   - DELETE
                   - OPTIONS
-                allowed-headers: *
+                allowed-headers:
+                  - "*"
                 allow-credentials: true
 
 eureka:
