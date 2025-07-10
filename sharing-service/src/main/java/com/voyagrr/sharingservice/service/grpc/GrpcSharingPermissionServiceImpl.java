@@ -40,4 +40,28 @@ public class GrpcSharingPermissionServiceImpl extends SharingPermissionServiceGr
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
+
+    @Override
+    public void deletePermission(DeletePermissionRequest request, StreamObserver<DeletePermissionResponse> responseObserver) {
+
+        boolean success;
+        switch (request.getType()) {
+            case USER ->
+                    success = mediaShareService.deleteAllPermissionByUserIds(request.getDeletePermissionList().stream().map(DeletePermissionDto::getUserId).toList());
+            case FILE ->
+                    success = mediaShareService.deleteAllPermissionByFileIds(request.getDeletePermissionList().stream().mapToLong(DeletePermissionDto::getFileId).boxed().toList());
+            case GROUP ->
+                    success = mediaShareService.deleteAllPermissionByGroupIds(request.getDeletePermissionList().stream().mapToLong(DeletePermissionDto::getGroupId).boxed().toList());
+            case DIRECTORY ->
+                    success = mediaShareService.deleteAllPermissionByDirectoryIds(request.getDeletePermissionList().stream().mapToLong(DeletePermissionDto::getDirectoryId).boxed().toList());
+            default -> throw new IllegalStateException("Unexpected value: " + request.getType());
+        }
+
+        DeletePermissionResponse response = DeletePermissionResponse.newBuilder()
+                .setSuccess(success)
+                .build();
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+
+    }
 }

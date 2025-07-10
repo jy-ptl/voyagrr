@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -79,8 +80,44 @@ public class MediaShareServiceImpl implements MediaShareService {
                 .build());
     }
 
+    @Override
+    @Transactional
+    public boolean deleteAllPermissionByDirectoryIds(List<Long> directoryIds) {
+        deleteMediaShares(mediaShareRepository.findAllMediaSharesByDirectoryIds(directoryIds));
+        return true;
+    }
+
+    @Override
+    @Transactional
+    public boolean deleteAllPermissionByUserIds(List<String> userIds) {
+        deleteMediaShares(mediaShareRepository.findAllMediaSharesByUserIds(userIds));
+        return true;
+    }
+
+    @Override
+    @Transactional
+    public boolean deleteAllPermissionByFileIds(List<Long> fileIds) {
+        deleteMediaShares(mediaShareRepository.findAllMediaSharesByFileIds(fileIds));
+        return true;
+    }
+
+    @Override
+    @Transactional
+    public boolean deleteAllPermissionByGroupIds(List<Long> groupIds) {
+        deleteMediaShares(mediaShareRepository.findAllMediaSharesByGroupIds(groupIds));
+        return true;
+    }
+
     public boolean hasPermissionForDirectory(Long directoryId, String keycloakUserId, String permission) {
         return mediaShareRepository.hasPermission(directoryId, keycloakUserId, permission);
+    }
+
+    private void deleteMediaShares(List<MediaShare> mediaShares) {
+        for (MediaShare mediaShare : mediaShares) {
+            mediaShare.getPermissions().clear();
+            mediaShareRepository.save(mediaShare);
+            mediaShareRepository.delete(mediaShare);
+        }
     }
 
 }

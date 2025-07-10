@@ -1,17 +1,18 @@
 package com.voyagrr.storageservice.service.impl;
 
+import com.voyagrr.common.enumeration.Permission;
+import com.voyagrr.common.exception.EntityNotFoundException;
 import com.voyagrr.storageservice.dto.FileUploadRequest;
 import com.voyagrr.storageservice.model.Directory;
 import com.voyagrr.storageservice.model.File;
+import com.voyagrr.storageservice.repository.DirectoryRepository;
 import com.voyagrr.storageservice.repository.FileRepository;
-import com.voyagrr.storageservice.service.DirectoryService;
 import com.voyagrr.storageservice.service.StorageService;
 import com.voyagrr.storageservice.service.grpc.SharingPermissionGrpcClient;
 import com.voyagrr.storageservice.utility.FileUtility;
-import io.minio.BucketExistsArgs;
-import io.minio.MakeBucketArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
+import io.minio.*;
+import io.minio.messages.DeleteError;
+import io.minio.messages.DeleteObject;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -36,7 +38,7 @@ public class MinioStorageService implements StorageService {
     private final SharingPermissionGrpcClient sharingPermissionGrpcClient;
 
     private final FileRepository fileRepository;
-    private final DirectoryService directoryService;
+    private final DirectoryRepository directoryRepository;
 
     @Value("${minio.bucket}")
     private String bucket;
@@ -57,9 +59,10 @@ public class MinioStorageService implements StorageService {
 
         String mimeType = fileUtility.getMimeType(file);
 
-        Directory directory = directoryService.findDirectoryById(request.directoryId());
+        Directory directory = directoryRepository.findById(request.directoryId())
+                .orElseThrow(() -> new EntityNotFoundException("Directory with id : " + request.directoryId() + " does not exists."));
 
-        String minioObjectKey = directoryService.buildMinioObjectPathFromDirectoryId(request.directoryId());
+        String minioObjectKey = directoryRepository.buildMinioObjectPathFromDirectoryId(request.directoryId());
 
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
         String uuidFilename = UUID.randomUUID() + (StringUtils.hasText(extension) ? "." + extension : "");
@@ -97,5 +100,37 @@ public class MinioStorageService implements StorageService {
             log.error("Upload failed", e);
         }
         return "";
+    }
+
+    @Override
+    public void deleteFiles(List<File> files) {
+
+        List<DeleteObject> minioObjects = files
+                .stream()
+                .filter(file -> file.getMinioObjectKey() != null)
+                .map(file -> new DeleteObject(file.getMinioObjectKey()))
+                .toList();
+
+        if (!minioObjects.isEmpty()) {
+            try {
+                minioClient.removeObjects(RemoveObjectsArgs.builder()
+                        .bucket(bucket)
+                        .objects(minioObjects)
+                        .build()).forEach(deleteErrorResult -> {
+                    try {
+                        deleteErrorResult.get();
+                    } catch (Exception exception) {
+                        try {
+                            DeleteError error = deleteErrorResult.get();
+                            log.error(error.bucketName());
+                        } catch (Exception nested) {
+                            log.error(nested.getMessage());
+                        }
+                    }
+                });
+            } catch (Exception exception) {
+                log.error(exception.getMessage());
+            }
+        }
     }
 }

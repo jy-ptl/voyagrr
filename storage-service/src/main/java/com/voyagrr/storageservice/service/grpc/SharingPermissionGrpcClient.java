@@ -35,4 +35,9 @@ public class SharingPermissionGrpcClient {
 
     }
 
+    public boolean deletePermission(DeletePermissionRequest deletePermissionRequest) {
+        DeletePermissionResponse response = stub.deletePermission(deletePermissionRequest);
+        return response.getSuccess();
+    }
+
 }

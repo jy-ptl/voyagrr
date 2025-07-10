@@ -10,6 +10,7 @@ option java_string_check_utf8 = true;
 service SharingPermissionService {
   rpc HasPermission(HasPermissionRequest) returns (HasPermissionResponse);
   rpc CreateDefaultPermission(CreateDefaultPermissionRequest) returns (CreateDefaultPermissionResponse);
+  rpc DeletePermission(DeletePermissionRequest) returns (DeletePermissionResponse);
 }
 
 message CreateDefaultPermissionRequest {
@@ -29,4 +30,29 @@ message HasPermissionRequest {
 
 message HasPermissionResponse {
   bool allowed = 1;
+}
+
+enum PermissionDeletionType {
+  USER = 0;
+  FILE = 1;
+  GROUP = 2;
+  DIRECTORY = 3;
+
+}
+
+message DeletePermissionDto {
+  string user_id = 1;
+  int64 file_id = 2;
+  int64 directory_id = 3;
+  int64 group_id = 4;
+  repeated string permission = 5;
+}
+
+message DeletePermissionRequest {
+  repeated DeletePermissionDto deletePermission = 1;
+  PermissionDeletionType type = 3;
+}
+
+message DeletePermissionResponse {
+  bool success = 1;
 }
