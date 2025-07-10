@@ -66,8 +66,9 @@ public class MinioStorageService implements StorageService {
 
         try (InputStream input = file.getInputStream()) {
 
-            boolean allowed = sharingPermissionGrpcClient.hasUploadPermission(
-                    keycloakUserId, request.directoryId());
+            boolean allowed = sharingPermissionGrpcClient.hasPermission(
+                    keycloakUserId, request.directoryId(), Permission.UPLOAD.name());
+
             if (!allowed)
                 throw new AccessDeniedException("User does not have upload permission to this directory");
 

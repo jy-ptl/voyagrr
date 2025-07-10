@@ -12,10 +12,10 @@ public class SharingPermissionGrpcClient {
     @GrpcClient("sharing-permission-service")
     private SharingPermissionServiceGrpc.SharingPermissionServiceBlockingStub stub;
 
-    public boolean hasUploadPermission(String userId, Long directoryId) {
+    public boolean hasPermission(String userId, Long directoryId, String permission) {
         HasPermissionRequest request = HasPermissionRequest.newBuilder()
                 .setUserId(userId)
-                .setPermission("UPLOAD")
+                .setPermission(permission)
                 .setDirectoryId(directoryId)
                 .build();
 
