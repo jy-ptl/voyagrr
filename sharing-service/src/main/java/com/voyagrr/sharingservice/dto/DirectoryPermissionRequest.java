@@ -1,6 +1,6 @@
 package com.voyagrr.sharingservice.dto;
 
-import com.voyagrr.sharingservice.enumeration.Permission;
+import com.voyagrr.common.enumeration.Permission;
 
 public record DirectoryPermissionRequest(
         Long directoryId,
