@@ -20,7 +20,7 @@ public class DirectoryController {
 
     private final DirectoryService directoryService;
 
-    @PostMapping("/create")
+    @PostMapping("")
     public ResponseEntity<Long> create(@RequestBody DirectoryCreateRequest request,
                                        @AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.ok().body(directoryService.create(request, jwt.getSubject()));
