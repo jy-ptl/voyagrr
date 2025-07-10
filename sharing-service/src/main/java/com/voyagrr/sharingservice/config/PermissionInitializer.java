@@ -16,7 +16,7 @@ public class PermissionInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        Arrays.stream(com.voyagrr.sharingservice.enumeration.Permission.values()).forEach(permissionName -> {
+        Arrays.stream(com.voyagrr.common.enumeration.Permission.values()).forEach(permissionName -> {
             boolean exists = permissionRepository.existsByName(permissionName);
             if (!exists) {
                 permissionRepository.save(Permission.builder()

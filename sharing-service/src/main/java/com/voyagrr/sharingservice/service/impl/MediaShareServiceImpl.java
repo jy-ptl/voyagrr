@@ -31,7 +31,7 @@ public class MediaShareServiceImpl implements MediaShareService {
         Permission permission = permissionRepository
                 .findByName(request.permission()).orElseThrow(() -> new IllegalArgumentException("Invalid permission"));
 
-        boolean allowed = hasPermissionForDirectory(request.directoryId(), keycloakUserId, com.voyagrr.sharingservice.enumeration.Permission.SHARE.name());
+        boolean allowed = hasPermissionForDirectory(request.directoryId(), keycloakUserId, com.voyagrr.common.enumeration.Permission.SHARE.name());
 
         if (!allowed) {
             throw new AccessDeniedException("You don't have permission to share this directory");

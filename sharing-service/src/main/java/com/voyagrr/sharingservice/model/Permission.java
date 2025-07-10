@@ -18,6 +18,6 @@ public class Permission {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private com.voyagrr.sharingservice.enumeration.Permission name;
+    private com.voyagrr.common.enumeration.Permission name;
 
 }

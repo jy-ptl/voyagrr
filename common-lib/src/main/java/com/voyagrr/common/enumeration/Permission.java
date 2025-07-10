@@ -1,4 +1,4 @@
-package com.voyagrr.sharingservice.enumeration;
+package com.voyagrr.common.enumeration;
 
 public enum Permission {
     UPLOAD,
