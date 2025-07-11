@@ -1,5 +1,8 @@
 package com.voyagrr.sharingservice.service.impl;
 
+import com.voyagrr.common.proto.ContentAccessResponse;
+import com.voyagrr.common.proto.DirectoryAccessResponse;
+import com.voyagrr.common.proto.FileAccessResponse;
 import com.voyagrr.sharingservice.dto.DirectoryPermissionRequest;
 import com.voyagrr.sharingservice.model.Group;
 import com.voyagrr.sharingservice.model.Permission;
@@ -15,7 +18,10 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -108,6 +114,46 @@ public class MediaShareServiceImpl implements MediaShareService {
         return true;
     }
 
+    @Override
+    public ContentAccessResponse contentAccessOfDirectoryByDirectoryIdAndUserId(Long directoryId, List<Long> directoryIds, List<Long> fileIds, String keycloakUserId) {
+
+        List<Object[]> rootDirRows = mediaShareRepository.findDirectoryPermissions(List.of(directoryId), keycloakUserId);
+        Map<Long, List<String>> rootDirPermissions = groupPermissions(rootDirRows);
+
+        List<Object[]> dirRows = mediaShareRepository.findDirectoryPermissions(directoryIds, keycloakUserId);
+        Map<Long, List<String>> dirPermissions = groupPermissions(dirRows);
+
+        List<Object[]> fileRows = mediaShareRepository.findFilePermissions(fileIds, keycloakUserId);
+        Map<Long, List<String>> filePermissions = groupPermissions(fileRows);
+
+        List<DirectoryAccessResponse> dirResponses = dirPermissions.entrySet().stream()
+                .map(entry -> DirectoryAccessResponse.newBuilder()
+                        .setDirectoryId(entry.getKey())
+                        .addAllPermission(entry.getValue())
+                        .build())
+                .toList();
+
+        List<FileAccessResponse> fileResponses = filePermissions.entrySet().stream()
+                .map(entry -> FileAccessResponse.newBuilder()
+                        .setFileId(entry.getKey())
+                        .addAllPermission(entry.getValue())
+                        .build())
+                .toList();
+
+        ContentAccessResponse.Builder builder = ContentAccessResponse.newBuilder()
+                .addAllDirectories(dirResponses)
+                .addAllFiles(fileResponses);
+
+        if (rootDirPermissions.containsKey(directoryId)) {
+            builder.setRootDirectory(DirectoryAccessResponse.newBuilder()
+                    .setDirectoryId(directoryId)
+                    .addAllPermission(rootDirPermissions.get(directoryId))
+                    .build());
+        }
+
+        return builder.build();
+    }
+
     public boolean hasPermissionForDirectory(Long directoryId, String keycloakUserId, String permission) {
         return mediaShareRepository.hasPermission(directoryId, keycloakUserId, permission);
     }
@@ -119,5 +165,16 @@ public class MediaShareServiceImpl implements MediaShareService {
             mediaShareRepository.delete(mediaShare);
         }
     }
+
+    private Map<Long, List<String>> groupPermissions(List<Object[]> rows) {
+        Map<Long, List<String>> permissionMap = new HashMap<>();
+        for (Object[] row : rows) {
+            Long id = ((Number) row[0]).longValue();
+            String permission = (String) row[1];
+            permissionMap.computeIfAbsent(id, k -> new ArrayList<>()).add(permission);
+        }
+        return permissionMap;
+    }
+
 
 }

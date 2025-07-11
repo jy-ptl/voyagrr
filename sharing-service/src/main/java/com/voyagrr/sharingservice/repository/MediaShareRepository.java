@@ -50,4 +50,34 @@ public interface MediaShareRepository extends JpaRepository<MediaShare, Long> {
             """, nativeQuery = true)
     List<MediaShare> findAllMediaSharesByGroupIds(@Param("groupIds") List<Long> groupIds);
 
+    @Query(value = """
+    SELECT ms.directory_id, p.name
+    FROM media_shares ms
+             INNER JOIN media_share_permissions msp ON ms.id = msp.media_share_id
+             INNER JOIN permissions p ON msp.permission_id = p.id
+             LEFT JOIN group_members gm ON gm.group_id = ms.group_id AND gm.user_id = :userId
+    WHERE ms.directory_id IN :directoryIds
+      AND (
+        ms.user_id = :userId
+        OR gm.user_id IS NOT NULL
+      )
+    """, nativeQuery = true)
+    List<Object[]> findDirectoryPermissions(@Param("directoryIds") List<Long> directoryIds,
+                                            @Param("userId") String userId);
+
+    @Query(value = """
+    SELECT ms.file_id, p.name
+    FROM media_shares ms
+             INNER JOIN media_share_permissions msp ON ms.id = msp.media_share_id
+             INNER JOIN permissions p ON msp.permission_id = p.id
+             LEFT JOIN group_members gm ON gm.group_id = ms.group_id AND gm.user_id = :userId
+    WHERE ms.file_id IN :fileIds
+      AND (
+        ms.user_id = :userId
+        OR gm.user_id IS NOT NULL
+      )
+    """, nativeQuery = true)
+    List<Object[]> findFilePermissions(@Param("fileIds") List<Long> fileIds,
+                                       @Param("userId") String userId);
+
 }

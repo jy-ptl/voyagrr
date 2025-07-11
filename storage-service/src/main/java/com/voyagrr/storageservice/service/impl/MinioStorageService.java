@@ -69,7 +69,7 @@ public class MinioStorageService implements StorageService {
 
         try (InputStream input = file.getInputStream()) {
 
-            boolean allowed = sharingPermissionGrpcClient.hasPermission(
+            boolean allowed = sharingPermissionGrpcClient.hasPermissionForDirectory(
                     keycloakUserId, request.directoryId(), Permission.UPLOAD.name());
 
             if (!allowed)

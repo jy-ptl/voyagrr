@@ -1,6 +1,7 @@
 package com.voyagrr.storageservice.controller;
 
 import com.voyagrr.storageservice.dto.DirectoryCreateRequest;
+import com.voyagrr.storageservice.dto.DirectoryContentResponse;
 import com.voyagrr.storageservice.dto.DirectoryTreeResponse;
 import com.voyagrr.storageservice.service.DirectoryService;
 import lombok.RequiredArgsConstructor;
@@ -20,20 +21,25 @@ public class DirectoryController {
 
     private final DirectoryService directoryService;
 
-    @PostMapping("")
+    @RequestMapping(value = "", method = RequestMethod.POST)
     public ResponseEntity<Long> create(@RequestBody DirectoryCreateRequest request,
                                        @AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.ok().body(directoryService.create(request, jwt.getSubject()));
     }
 
-    @GetMapping("")
+    @RequestMapping(value = "", method = RequestMethod.GET)
     public ResponseEntity<List<DirectoryTreeResponse>> getAllDirectoriesOfUser(@AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.ok().body(directoryService.getAllDirectoriesOfUser(jwt.getSubject()));
     }
 
-    @DeleteMapping("/{directoryId}")
+    @RequestMapping(value = "{directoryId}", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteDirectoryById(@PathVariable(name = "directoryId") Long directoryId, @AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.ok(directoryService.deleteDirectoryById(directoryId, jwt.getSubject()));
+    }
+
+    @RequestMapping(value = "{directoryId}", method = RequestMethod.GET)
+    public ResponseEntity<DirectoryContentResponse> getDirectoryContents(@PathVariable(name = "directoryId") Long directoryId, @AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok().body(directoryService.getDirectoryContents(directoryId, jwt.getSubject()));
     }
 
 }

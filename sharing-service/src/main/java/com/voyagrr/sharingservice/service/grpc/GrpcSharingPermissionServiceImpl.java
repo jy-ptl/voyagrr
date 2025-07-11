@@ -6,6 +6,8 @@ import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.server.service.GrpcService;
 
+import java.util.List;
+
 @GrpcService
 @RequiredArgsConstructor
 public class GrpcSharingPermissionServiceImpl extends SharingPermissionServiceGrpc.SharingPermissionServiceImplBase {
@@ -13,13 +15,13 @@ public class GrpcSharingPermissionServiceImpl extends SharingPermissionServiceGr
     private final MediaShareService mediaShareService;
 
     @Override
-    public void hasPermission(HasPermissionRequest request, StreamObserver<HasPermissionResponse> responseObserver) {
+    public void hasPermissionForDirectory(HasPermissionDirectoryRequest request, StreamObserver<HasPermissionDirectoryResponse> responseObserver) {
 
         Long directoryId = request.getDirectoryId();
         String keycloakUserId = request.getUserId();
         String permission = request.getPermission();
 
-        HasPermissionResponse response = HasPermissionResponse.newBuilder()
+        HasPermissionDirectoryResponse response = HasPermissionDirectoryResponse.newBuilder()
                 .setAllowed(mediaShareService.hasPermissionForDirectory(directoryId, keycloakUserId, permission))
                 .build();
         responseObserver.onNext(response);
@@ -64,4 +66,19 @@ public class GrpcSharingPermissionServiceImpl extends SharingPermissionServiceGr
         responseObserver.onCompleted();
 
     }
+
+    @Override
+    public void contentAccessOfDirectory(ContentAccessRequest request, StreamObserver<ContentAccessResponse> responseObserver) {
+
+        Long directoryId = request.getDirectoryId();
+        List<Long> directoryIds = request.getChildDirectoryIdList();
+        List<Long> fileIds = request.getFileIdList();
+        String keycloakUserId = request.getUserId();
+
+        ContentAccessResponse response = mediaShareService.contentAccessOfDirectoryByDirectoryIdAndUserId(directoryId, directoryIds, fileIds, keycloakUserId);
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
 }

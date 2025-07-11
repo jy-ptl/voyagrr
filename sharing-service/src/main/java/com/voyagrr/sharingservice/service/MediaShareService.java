@@ -1,5 +1,6 @@
 package com.voyagrr.sharingservice.service;
 
+import com.voyagrr.common.proto.ContentAccessResponse;
 import com.voyagrr.sharingservice.dto.DirectoryPermissionRequest;
 
 import java.util.List;
@@ -19,4 +20,6 @@ public interface MediaShareService {
     boolean deleteAllPermissionByFileIds(List<Long> fileIds);
 
     boolean deleteAllPermissionByGroupIds(List<Long> groupIds);
+
+    ContentAccessResponse contentAccessOfDirectoryByDirectoryIdAndUserId(Long directoryId, List<Long> directoryIds, List<Long> fileIds, String keycloakUserId);
 }

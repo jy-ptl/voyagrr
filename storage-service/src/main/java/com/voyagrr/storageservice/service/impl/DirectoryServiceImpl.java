@@ -2,12 +2,8 @@ package com.voyagrr.storageservice.service.impl;
 
 import com.voyagrr.common.enumeration.Permission;
 import com.voyagrr.common.exception.EntityNotFoundException;
-import com.voyagrr.common.proto.DeletePermissionDto;
-import com.voyagrr.common.proto.DeletePermissionRequest;
-import com.voyagrr.common.proto.PermissionDeletionType;
-import com.voyagrr.storageservice.dto.DirectoryCreateRequest;
-import com.voyagrr.storageservice.dto.DirectoryFlatResponse;
-import com.voyagrr.storageservice.dto.DirectoryTreeResponse;
+import com.voyagrr.common.proto.*;
+import com.voyagrr.storageservice.dto.*;
 import com.voyagrr.storageservice.model.Directory;
 import com.voyagrr.storageservice.model.File;
 import com.voyagrr.storageservice.repository.DirectoryRepository;
@@ -22,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.voyagrr.common.proto.PermissionDeletionType.DIRECTORY;
 import static com.voyagrr.common.proto.PermissionDeletionType.FILE;
@@ -72,7 +70,7 @@ public class DirectoryServiceImpl implements DirectoryService {
     public String deleteDirectoryById(Long directoryId, String keycloakUserId) {
         Directory directory = findDirectoryById(directoryId);
 
-        boolean allowed = sharingPermissionGrpcClient.hasPermission(
+        boolean allowed = sharingPermissionGrpcClient.hasPermissionForDirectory(
                 keycloakUserId, directoryId, Permission.DELETE.name());
 
         if (!allowed)
@@ -81,6 +79,71 @@ public class DirectoryServiceImpl implements DirectoryService {
         deleteRecursively(directory);
 
         return "Success";
+    }
+
+    @Override
+    public DirectoryContentResponse getDirectoryContents(Long directoryId, String keycloakUserId) {
+
+        Directory directory = findDirectoryById(directoryId);
+
+        List<File> files = fileService.findByDirectory(directory);
+        List<Directory> directories = directoryRepository.findByParentDirectory(directory);
+
+        ContentAccessResponse accessResponse = sharingPermissionGrpcClient.contentAccessOfDirectory(ContentAccessRequest.newBuilder()
+                .setUserId(keycloakUserId)
+                .setDirectoryId(directoryId)
+                .addAllChildDirectoryId(directories.stream().mapToLong(Directory::getId).boxed().toList())
+                .addAllFileId(files.stream().mapToLong(File::getId).boxed().toList())
+                .build());
+
+        Map<Long, List<String>> filePermissionsMap = accessResponse.getFilesList().stream()
+                .collect(Collectors.toMap(
+                        FileAccessResponse::getFileId,
+                        FileAccessResponse::getPermissionList
+                ));
+
+        List<String> rootDirPermissions = accessResponse.getRootDirectory().getPermissionList();
+
+        Map<Long, List<String>> dirPermissionsMap = accessResponse.getDirectoriesList().stream()
+                .collect(Collectors.toMap(
+                        DirectoryAccessResponse::getDirectoryId,
+                        DirectoryAccessResponse::getPermissionList
+                ));
+
+        List<FileResponse> fileResponses = files.stream()
+                .map(f -> {
+                    List<String> filePermissions = filePermissionsMap.getOrDefault(f.getId(), new ArrayList<>());
+
+                    List<String> combinedPermissions = Stream.concat(
+                                    filePermissions.stream(),
+                                    rootDirPermissions.stream()
+                            )
+                            .distinct()
+                            .toList();
+
+                    return new AbstractMap.SimpleEntry<>(f, combinedPermissions);
+                })
+                .filter(entry -> !entry.getValue().isEmpty())
+                .map(entry -> new FileResponse(
+                        entry.getKey().getId(),
+                        entry.getKey().getName(),
+                        entry.getKey().getMimeType(),
+                        entry.getValue()
+                ))
+                .toList();
+
+
+        return DirectoryContentResponse.builder()
+                .files(fileResponses)
+                .children(directories.stream()
+                        .filter(f -> dirPermissionsMap.containsKey(f.getId()))
+                        .map(f -> new DirectoryResponse(
+                                f.getId(),
+                                f.getName(),
+                                dirPermissionsMap.get(f.getId())
+                        ))
+                        .toList())
+                .build();
     }
 
     private List<DirectoryTreeResponse> buildDirectoryTree(List<DirectoryFlatResponse> flatList) {
