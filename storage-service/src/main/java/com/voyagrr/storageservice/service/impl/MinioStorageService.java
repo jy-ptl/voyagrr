@@ -1,6 +1,7 @@
 package com.voyagrr.storageservice.service.impl;
 
 import com.voyagrr.common.enumeration.Permission;
+import com.voyagrr.common.exception.AccessDeniedException;
 import com.voyagrr.common.exception.EntityNotFoundException;
 import com.voyagrr.storageservice.dto.FileUploadRequest;
 import com.voyagrr.storageservice.model.Directory;
@@ -18,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,6 +26,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
+
+import static com.voyagrr.common.constant.ExceptionConstant.*;
 
 @Slf4j
 @Service
@@ -73,7 +75,7 @@ public class MinioStorageService implements StorageService {
                     keycloakUserId, request.directoryId(), Permission.UPLOAD.name());
 
             if (!allowed)
-                throw new AccessDeniedException("User does not have upload permission to this directory");
+                throw new AccessDeniedException(ACCESS_DENIED_FOR_RESOURCE.formatted(Permission.UPLOAD.name(), RESOURCES.DIRECTORY));
 
             minioClient.putObject(
                     PutObjectArgs

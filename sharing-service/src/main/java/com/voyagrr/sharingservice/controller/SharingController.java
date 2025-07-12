@@ -17,7 +17,7 @@ public class SharingController {
 
     private final MediaShareService mediaShareService;
 
-    @PostMapping("directory")
+    @RequestMapping(value = "directory", method = RequestMethod.POST)
     public ResponseEntity<String> shareDirectory(@RequestBody DirectoryPermissionRequest request,
                                                  @AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.ok().body(mediaShareService.updateDirectoryPermission(request, jwt.getSubject()));

@@ -7,10 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -20,7 +17,7 @@ public class GroupController {
 
     private final GroupService groupService;
 
-    @PostMapping("/create")
+    @RequestMapping(value = "create", method = RequestMethod.POST)
     public ResponseEntity<Long> create(@RequestBody GroupCreateRequest request,
                                        @AuthenticationPrincipal Jwt jwt) {
         String keycloakUserId = jwt.getSubject();

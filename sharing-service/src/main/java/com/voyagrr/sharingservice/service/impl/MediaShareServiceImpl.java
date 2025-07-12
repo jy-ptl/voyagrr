@@ -1,5 +1,7 @@
 package com.voyagrr.sharingservice.service.impl;
 
+import com.voyagrr.common.exception.AccessDeniedException;
+import com.voyagrr.common.exception.EntityNotFoundException;
 import com.voyagrr.common.proto.ContentAccessResponse;
 import com.voyagrr.common.proto.DirectoryAccessResponse;
 import com.voyagrr.common.proto.FileAccessResponse;
@@ -11,10 +13,8 @@ import com.voyagrr.sharingservice.repository.GroupRepository;
 import com.voyagrr.sharingservice.repository.MediaShareRepository;
 import com.voyagrr.sharingservice.repository.PermissionRepository;
 import com.voyagrr.sharingservice.service.MediaShareService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.voyagrr.common.constant.ExceptionConstant.*;
 
 @Slf4j
 @Service
@@ -36,12 +38,12 @@ public class MediaShareServiceImpl implements MediaShareService {
     public String updateDirectoryPermission(DirectoryPermissionRequest request, String keycloakUserId) {
 
         Permission permission = permissionRepository
-                .findByName(request.permission()).orElseThrow(() -> new IllegalArgumentException("Invalid permission"));
+                .findByName(request.permission()).orElseThrow(() -> new IllegalArgumentException(ENTITY_DOES_NOT_EXISTS.formatted(request.permission())));
 
         boolean allowed = hasPermissionForDirectory(request.directoryId(), keycloakUserId, com.voyagrr.common.enumeration.Permission.SHARE.name());
 
         if (!allowed) {
-            throw new AccessDeniedException("You don't have permission to share this directory");
+            throw new AccessDeniedException(ACCESS_DENIED_FOR_RESOURCE.formatted(com.voyagrr.common.enumeration.Permission.SHARE.name(), RESOURCES.DIRECTORY));
         }
 
         if (request.toGroupId() == null && request.toUserId() == null) {
@@ -64,7 +66,7 @@ public class MediaShareServiceImpl implements MediaShareService {
         } else {
 
             Group group = groupRepository.findById(request.toGroupId())
-                    .orElseThrow(() -> new EntityNotFoundException("Group not found"));
+                    .orElseThrow(() -> new EntityNotFoundException(ENTITY_DOES_NOT_EXISTS.formatted(RESOURCES.GROUP)));
 
             mediaShareRepository.save(MediaShare.builder()
                     .directoryId(request.directoryId())

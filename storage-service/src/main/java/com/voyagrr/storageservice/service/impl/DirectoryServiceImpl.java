@@ -21,6 +21,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.voyagrr.common.constant.ExceptionConstant.*;
 import static com.voyagrr.common.proto.PermissionDeletionType.DIRECTORY;
 import static com.voyagrr.common.proto.PermissionDeletionType.FILE;
 
@@ -36,7 +37,7 @@ public class DirectoryServiceImpl implements DirectoryService {
 
     @Override
     public Directory findDirectoryById(Long directoryId) {
-        return directoryRepository.findById(directoryId).orElseThrow(() -> new EntityNotFoundException("Directory with id : " + directoryId + " does not exists."));
+        return directoryRepository.findById(directoryId).orElseThrow(() -> new EntityNotFoundException(ENTITY_DOES_NOT_EXISTS.formatted(RESOURCES.DIRECTORY)));
     }
 
     @Override
@@ -74,7 +75,7 @@ public class DirectoryServiceImpl implements DirectoryService {
                 keycloakUserId, directoryId, Permission.DELETE.name());
 
         if (!allowed)
-            throw new AccessDeniedException("User does not have upload permission to this directory");
+            throw new AccessDeniedException(ACCESS_DENIED_FOR_RESOURCE.formatted(Permission.DELETE.name(), RESOURCES.DIRECTORY));
 
         deleteRecursively(directory);
 

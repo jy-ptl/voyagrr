@@ -14,12 +14,12 @@ public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
 
-    @PostMapping("/register")
+    @RequestMapping(value = "register", method = RequestMethod.POST)
     public ResponseEntity<String> register(@RequestBody UserCreateRequest request) {
         return ResponseEntity.ok().body(authenticationService.register(request));
     }
 
-    @PostMapping("/login")
+    @RequestMapping(value = "login", method = RequestMethod.POST)
     public ResponseEntity<String> login(@RequestBody UserLoginRequest request) {
         return ResponseEntity.ok().body(authenticationService.login(request));
     }
