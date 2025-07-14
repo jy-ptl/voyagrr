@@ -25,3 +25,9 @@ management:
     web:
       exposure:
         include: health,info,metrics,prometheus
+
+grpc:
+  client:
+    storage-service:
+      address: "static://storage-service:9091"
+      negotiationType: plaintext

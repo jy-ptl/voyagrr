@@ -33,7 +33,7 @@ minio:
 
 grpc:
   client:
-    sharing-permission-service:
+    sharing-service:
       address: "static://localhost:9090"
       negotiationType: plaintext
 

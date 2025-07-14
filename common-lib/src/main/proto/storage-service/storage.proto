@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.voyagrr.common.proto";
+option java_outer_classname = "StorageProto";
+option java_generate_equals_and_hash = true;
+option java_string_check_utf8 = true;
+
+service StorageService {
+  rpc GetAllAncestorsIncludingSelf(AncestorsIncludingSelfRequest) returns (AncestorsIncludingSelfResponse);
+  rpc GetAllAncestorsIncludingSelfFromFileId(AncestorsIncludingSelfRequestForFile) returns (AncestorsIncludingSelfResponse);
+}
+
+message AncestorsIncludingSelfRequestForFile {
+  int64 file_id = 1;
+}
+
+message AncestorsIncludingSelfRequest {
+  int64 directory_id = 1;
+}
+
+message AncestorsIncludingSelfResponse {
+  repeated int64 directory_id = 1;
+}
+

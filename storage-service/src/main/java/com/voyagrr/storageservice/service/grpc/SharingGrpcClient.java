@@ -5,12 +5,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
-public class SharingPermissionGrpcClient {
+public class SharingGrpcClient {
 
-    @GrpcClient("sharing-permission-service")
-    private SharingPermissionServiceGrpc.SharingPermissionServiceBlockingStub stub;
+    @GrpcClient("sharing-service")
+    private SharingServiceGrpc.SharingServiceBlockingStub stub;
 
     public boolean hasPermissionForDirectory(String userId, Long directoryId, String permission) {
         HasPermissionDirectoryRequest request = HasPermissionDirectoryRequest.newBuilder()
@@ -42,6 +44,26 @@ public class SharingPermissionGrpcClient {
 
     public ContentAccessResponse contentAccessOfDirectory(ContentAccessRequest request) {
         return stub.contentAccessOfDirectory(request);
+    }
+
+    public boolean hasPermissionForDirectories(String keycloakUserId, List<Long> directoryIds, String permission) {
+        return stub.hasPermissionForDirectories(
+                HasPermissionForDirectoriesRequest.newBuilder()
+                        .setUserId(keycloakUserId)
+                        .setPermission(permission)
+                        .addAllDirectoryId(directoryIds)
+                        .build()
+        ).getAllowed();
+    }
+
+    public boolean hasPermissionForFile(String keycloakUserId, long fileId, String permission) {
+        return stub.hasPermissionForFile(
+                HasPermissionForFileRequest.newBuilder()
+                        .setUserId(keycloakUserId)
+                        .setFileId(fileId)
+                        .setPermission(permission)
+                        .build()
+        ).getAllowed();
     }
 
 }

@@ -10,7 +10,7 @@ import java.util.List;
 
 @GrpcService
 @RequiredArgsConstructor
-public class GrpcSharingPermissionServiceImpl extends SharingPermissionServiceGrpc.SharingPermissionServiceImplBase {
+public class GrpcSharingServiceImpl extends SharingServiceGrpc.SharingServiceImplBase {
 
     private final MediaShareService mediaShareService;
 
@@ -25,6 +25,29 @@ public class GrpcSharingPermissionServiceImpl extends SharingPermissionServiceGr
                 .setAllowed(mediaShareService.hasPermissionForDirectory(directoryId, keycloakUserId, permission))
                 .build();
         responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void hasPermissionForDirectories(HasPermissionForDirectoriesRequest request, StreamObserver<HasPermissionForDirectoriesResponse> responseObserver) {
+        String keycloakUserId = request.getUserId();
+        String permission = request.getPermission();
+
+        HasPermissionForDirectoriesResponse response = HasPermissionForDirectoriesResponse.newBuilder()
+                .setAllowed(mediaShareService.hasPermissionForDirectories(keycloakUserId, request.getDirectoryIdList(), permission))
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void hasPermissionForFile(HasPermissionForFileRequest request, StreamObserver<HasPermissionForFileResponse> responseObserver) {
+        responseObserver.onNext(
+                HasPermissionForFileResponse.newBuilder()
+                        .setAllowed(mediaShareService.hasPermissionForFile(request.getUserId(), request.getFileId(), request.getPermission()))
+                        .build()
+        );
         responseObserver.onCompleted();
     }
 
@@ -70,12 +93,12 @@ public class GrpcSharingPermissionServiceImpl extends SharingPermissionServiceGr
     @Override
     public void contentAccessOfDirectory(ContentAccessRequest request, StreamObserver<ContentAccessResponse> responseObserver) {
 
-        Long directoryId = request.getDirectoryId();
+        List<Long> ancestorsIncludingSelf = request.getDirectoryIdList();
         List<Long> directoryIds = request.getChildDirectoryIdList();
         List<Long> fileIds = request.getFileIdList();
         String keycloakUserId = request.getUserId();
 
-        ContentAccessResponse response = mediaShareService.contentAccessOfDirectoryByDirectoryIdAndUserId(directoryId, directoryIds, fileIds, keycloakUserId);
+        ContentAccessResponse response = mediaShareService.contentAccessOfDirectoryByDirectoryIdAndUserId(ancestorsIncludingSelf, directoryIds, fileIds, keycloakUserId);
 
         responseObserver.onNext(response);
         responseObserver.onCompleted();

@@ -1,5 +1,7 @@
 package com.voyagrr.storageservice.service.impl;
 
+import com.voyagrr.common.constant.ExceptionConstant;
+import com.voyagrr.common.exception.EntityNotFoundException;
 import com.voyagrr.storageservice.model.Directory;
 import com.voyagrr.storageservice.model.File;
 import com.voyagrr.storageservice.repository.FileRepository;
@@ -10,12 +12,19 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.voyagrr.common.constant.ExceptionConstant.ENTITY_DOES_NOT_EXISTS;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class FileServiceImpl implements FileService {
 
     private final FileRepository fileRepository;
+
+    @Override
+    public File findById(long fileId) {
+        return fileRepository.findById(fileId).orElseThrow(() -> new EntityNotFoundException(ENTITY_DOES_NOT_EXISTS.formatted(ExceptionConstant.RESOURCES.FILE)));
+    }
 
     @Override
     public List<File> findByDirectory(Directory directory) {

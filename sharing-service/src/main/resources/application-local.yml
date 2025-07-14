@@ -25,3 +25,9 @@ management:
     web:
       exposure:
         include: "*"
+
+grpc:
+  client:
+    storage-service:
+      address: "static://localhost:9091"
+      negotiationType: plaintext

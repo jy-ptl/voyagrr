@@ -28,7 +28,7 @@ minio:
 
 grpc:
   client:
-    sharing-permission-service:
+    sharing-service:
       address: "static://sharing-service:9090"
       negotiationType: plaintext
 

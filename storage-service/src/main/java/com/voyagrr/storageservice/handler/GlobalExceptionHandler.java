@@ -1,6 +1,7 @@
 package com.voyagrr.storageservice.handler;
 
 import com.voyagrr.common.dto.ErrorResponse;
+import com.voyagrr.common.exception.AccessDeniedException;
 import com.voyagrr.common.exception.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,6 +18,15 @@ public class GlobalExceptionHandler {
         return ErrorResponse
                 .builder()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
+                .message(exception.getMessage())
+                .build();
+    }
+
+    @ExceptionHandler(value = AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public @ResponseBody ErrorResponse handleAccessDeniedException(AccessDeniedException exception) {
+        return ErrorResponse.builder()
+                .statusCode(HttpStatus.FORBIDDEN.value())
                 .message(exception.getMessage())
                 .build();
     }

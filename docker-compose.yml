@@ -192,6 +192,8 @@ services:
       replicas: 2
     expose:
       - '8083'
+      - '9091'
+
     depends_on:
       - eureka
       - api-gateway

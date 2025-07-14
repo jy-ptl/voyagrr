@@ -58,5 +58,22 @@ public interface DirectoryRepository extends JpaRepository<Directory, Long> {
             """, nativeQuery = true)
     List<DirectoryFlatResponse> getAllDirectoriesRecursivelyForUserId(@Param("keycloakUserId") String keycloakUserId);
 
+    @Query(value = """
+            WITH RECURSIVE ancestors AS (
+                SELECT id, name, parent_directory_id
+                FROM directories
+                WHERE id = :directoryId
+            
+                UNION ALL
+            
+                SELECT d.id, d.name, d.parent_directory_id
+                FROM directories d
+                INNER JOIN ancestors a ON d.id = a.parent_directory_id
+            )
+            SELECT id, name, parent_directory_id
+            FROM ancestors
+            """, nativeQuery = true)
+    List<DirectoryFlatResponse> getAllAncestorsIncludingSelf(@Param("directoryId") long directoryId);
+
 
 }

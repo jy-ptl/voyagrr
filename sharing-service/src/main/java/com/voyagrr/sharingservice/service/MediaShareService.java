@@ -2,9 +2,9 @@ package com.voyagrr.sharingservice.service;
 
 import com.voyagrr.common.proto.ContentAccessResponse;
 import com.voyagrr.sharingservice.dto.DirectoryPermissionRequest;
+import com.voyagrr.sharingservice.dto.FilePermissionRequest;
 
 import java.util.List;
-import java.util.stream.LongStream;
 
 public interface MediaShareService {
     boolean hasPermissionForDirectory(Long directoryId, String keycloakUserId, String permission);
@@ -21,5 +21,11 @@ public interface MediaShareService {
 
     boolean deleteAllPermissionByGroupIds(List<Long> groupIds);
 
-    ContentAccessResponse contentAccessOfDirectoryByDirectoryIdAndUserId(Long directoryId, List<Long> directoryIds, List<Long> fileIds, String keycloakUserId);
+    ContentAccessResponse contentAccessOfDirectoryByDirectoryIdAndUserId(List<Long> ancestorsIncludingSelf, List<Long> directoryIds, List<Long> fileIds, String keycloakUserId);
+
+    boolean hasPermissionForDirectories(String keycloakUserId, List<Long> directoryIds, String permission);
+
+    boolean hasPermissionForFile(String userId, long fileId, String permission);
+
+    String updateFilePermission(FilePermissionRequest request, String keycloakUserId);
 }

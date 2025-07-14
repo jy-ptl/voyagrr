@@ -20,4 +20,6 @@ public interface DirectoryService {
     String deleteDirectoryById(Long directoryId, String keycloakUserId);
 
     DirectoryContentResponse getDirectoryContents(Long directoryId, String keycloakUserId);
+
+    List<Long> getAllAncestorsIncludingSelfFromFileId(long fileId);
 }
