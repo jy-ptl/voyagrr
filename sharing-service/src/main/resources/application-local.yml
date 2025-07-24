@@ -29,5 +29,8 @@ management:
 grpc:
   client:
     storage-service:
-      address: "static://localhost:9091"
+      address: static://localhost:9091
       negotiationType: plaintext
+
+  server:
+    port: 9090

@@ -1,66 +1,162 @@
-name: workflow.yml
+name: Deployment Pipeline
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
+    branches: [ main, staging ]
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAMESPACE: ${{ github.repository_owner }}/voyagrr
+  SERVICES: |
+    user-service
+    storage-service
+    sharing-service
+    encoding-service
+    api-gateway
+    discovery-service
 
 jobs:
-  build-and-push:
+  build-images:
     runs-on: self-hosted
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Set up JDK 21
-        uses: actions/setup-java@v3
+      - uses: actions/setup-java@v3
         with:
           distribution: temurin
           java-version: 21
           cache: maven
 
-      - name: Build Maven project (skip tests)
-        run: mvn clean package -DskipTests
+      - run: mvn clean package -DskipTests
 
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v2
+      - uses: docker/login-action@v2
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_PAT }}
 
-      # Build & Push user-service image
-      - name: Build & Push user-service Docker image
+      - name: Build images
         run: |
-          docker build -t $REGISTRY/$IMAGE_NAMESPACE/user-service:latest -f user-service/Dockerfile .
-          docker push $REGISTRY/$IMAGE_NAMESPACE/user-service:latest
+          for service in $SERVICES; do
+            docker build -t $service:${{ github.ref_name }} -f $service/Dockerfile .
+          done
 
-      # Build & Push storage-service image
-      - name: Build & Push storage-service Docker image
-        run: |
-          docker build -t $REGISTRY/$IMAGE_NAMESPACE/storage-service:latest -f storage-service/Dockerfile .
-          docker push $REGISTRY/$IMAGE_NAMESPACE/storage-service:latest
+  push-images:
+    runs-on: self-hosted
+    needs: build-images
 
-      # Build & Push sharing-service image
-      - name: Build & Push sharing-service Docker image
-        run: |
-          docker build -t $REGISTRY/$IMAGE_NAMESPACE/sharing-service:latest -f sharing-service/Dockerfile .
-          docker push $REGISTRY/$IMAGE_NAMESPACE/sharing-service:latest
+    steps:
+      - uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PAT }}
 
-      # Build & Push api-gateway image
-      - name: Build & Push api-gateway Docker image
+      - name: Tag and push images
         run: |
-          docker build -t $REGISTRY/$IMAGE_NAMESPACE/api-gateway:latest -f api-gateway/Dockerfile .
-          docker push $REGISTRY/$IMAGE_NAMESPACE/api-gateway:latest
+          for service in $SERVICES; do
+            docker tag $service:${{ github.ref_name }} $REGISTRY/$IMAGE_NAMESPACE/$service:${{ github.ref_name }}
+            docker push $REGISTRY/$IMAGE_NAMESPACE/$service:${{ github.ref_name }}
+          done
 
-      # Build & Push discovery-service (eureka) image
-      - name: Build & Push discovery-service Docker image
+  deploy:
+    runs-on: self-hosted
+    needs: push-images
+    if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main'
+    environment: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
+
+    steps:
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add server to known_hosts
         run: |
-          docker build -t $REGISTRY/$IMAGE_NAMESPACE/discovery-service:latest -f discovery-service/Dockerfile .
-          docker push $REGISTRY/$IMAGE_NAMESPACE/discovery-service:latest
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+
+      - name: Rsync Grafana & Prometheus (if changed)
+        if: |
+          contains(join(github.event.commits.*.modified), 'grafana/') ||
+          contains(join(github.event.commits.*.added), 'grafana/') ||
+          contains(join(github.event.commits.*.modified), 'prometheus/') ||
+          contains(join(github.event.commits.*.added), 'prometheus/')
+        run: |
+          rsync -avz -e "ssh" ./grafana ./prometheus \
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:~/deployment/voyagrr
+
+      - name: Deploy to remote server
+        run: |
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+            set -e
+            docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GHCR_PAT }}
+
+            for service in $SERVICES; do
+              docker pull ghcr.io/${{ github.repository_owner }}/voyagrr/$service:${{ github.ref_name }}
+            done
+
+            cd ~/deployment/voyagrr
+
+            if [ "${{ github.ref_name }}" = "main" ]; then
+              export SPRING_PROFILES_ACTIVE=production
+            else
+              export SPRING_PROFILES_ACTIVE=staging
+            fi
+
+            export IMAGE_NAMESPACE=${{ github.repository_owner }}/voyagrr
+            export TAG=${{ github.ref_name }}
+
+            # Export secrets
+
+            export KEYCLOAK_ADMIN=${{ secrets.KEYCLOAK_ADMIN }}
+            export KEYCLOAK_ADMIN_PASSWORD=${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}
+
+            export KEYCLOAK_DB_HOST=${{ secrets.KEYCLOAK_DB_HOST }}
+            export KEYCLOAK_DB_PORT=${{ secrets.KEYCLOAK_DB_PORT }}
+            export KEYCLOAK_DB_NAME=${{ secrets.KEYCLOAK_DB_NAME }}
+            export KEYCLOAK_DB_USER=${{ secrets.KEYCLOAK_DB_USER }}
+            export KEYCLOAK_DB_PASSWORD=${{ secrets.KEYCLOAK_DB_PASSWORD }}
+
+            export MINIO_ENDPOINT=${{ secrets.MINIO_ENDPOINT }}
+            export MINIO_ACCESS_KEY=${{ secrets.MINIO_ACCESS_KEY }}
+            export MINIO_SECRET_KEY=${{ secrets.MINIO_SECRET_KEY }}
+
+            export KEYCLOAK_URL=${{ secrets.KEYCLOAK_URL }}
+            export KEYCLOAK_REALM=${{ secrets.KEYCLOAK_REALM }}
+            export KEYCLOAK_AUTH_CLIENT_ID=${{ secrets.KEYCLOAK_CLIENT_ID }}
+            export KEYCLOAK_AUTH_CLIENT_SECRET=${{ secrets.KEYCLOAK_CLIENT_SECRET }}
+
+            export STORAGE_GRPC_SERVICE_PORT=${{ secrets.STORAGE_GRPC_SERVICE_PORT }}
+            export SHARING_GRPC_SERVICE_PORT=${{ secrets.SHARING_GRPC_SERVICE_PORT }}
+
+            export USER_DB_HOST=${{ secrets.USER_DB_HOST }}
+            export USER_DB_PORT=${{ secrets.USER_DB_PORT }}
+            export USER_DB_NAME=${{ secrets.USER_DB_NAME }}
+            export USER_DB_USER=${{ secrets.USER_DB_USER }}
+            export USER_DB_PASSWORD=${{ secrets.USER_DB_PASSWORD }}
+
+            export STORAGE_DB_HOST=${{ secrets.STORAGE_DB_HOST }}
+            export STORAGE_DB_PORT=${{ secrets.STORAGE_DB_PORT }}
+            export STORAGE_DB_NAME=${{ secrets.STORAGE_DB_NAME }}
+            export STORAGE_DB_USER=${{ secrets.STORAGE_DB_USER }}
+            export STORAGE_DB_PASSWORD=${{ secrets.STORAGE_DB_PASSWORD }}
+
+            export SHARING_DB_HOST=${{ secrets.SHARING_DB_HOST }}
+            export SHARING_DB_PORT=${{ secrets.SHARING_DB_PORT }}
+            export SHARING_DB_NAME=${{ secrets.SHARING_DB_NAME }}
+            export SHARING_DB_USER=${{ secrets.SHARING_DB_USER }}
+            export SHARING_DB_PASSWORD=${{ secrets.SHARING_DB_PASSWORD }}
+
+            export ENCODING_DB_HOST=${{ secrets.ENCODING_DB_HOST }}
+            export ENCODING_DB_PORT=${{ secrets.ENCODING_DB_PORT }}
+            export ENCODING_DB_NAME=${{ secrets.ENCODING_DB_NAME }}
+            export ENCODING_DB_USER=${{ secrets.ENCODING_DB_USER }}
+            export ENCODING_DB_PASSWORD=${{ secrets.ENCODING_DB_PASSWORD }}
+
+            export EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=${{ secrets.EUREKA_CLIENT_SERIVCEURL_DEFAULTZONE }}
+
+            docker-compose down
+            docker-compose up -d
+          EOF

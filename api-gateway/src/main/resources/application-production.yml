@@ -3,7 +3,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://keycloak:8070/realms/voyagrr
+          issuer-uri: ${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}
   cloud:
     gateway:
       server:
@@ -15,7 +15,6 @@ spring:
                 allowed-origins:
                   - https://voyagrr.com
                   - https://www.voyagrr.com
-                  - http://localhost:5173
                 allowed-methods:
                   - GET
                   - POST
@@ -36,4 +35,4 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://eureka:8761/eureka
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}

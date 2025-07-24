@@ -6,9 +6,6 @@ spring:
   application:
     name: user-service
 
-  profiles:
-    active: local
-
 management:
   endpoint:
     health:

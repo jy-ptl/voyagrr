@@ -1,0 +1,7 @@
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
+
+  server:
+    enable-self-preservation: true

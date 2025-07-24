@@ -3,12 +3,12 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://keycloak:8070/realms/voyagrr
+          issuer-uri: ${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}
 
   datasource:
-    url: jdbc:postgresql://storage-service-database:5432/storage_service_database
-    username: postgres
-    password: postgres
+    url: jdbc:postgresql://${STORAGE_DB_HOST}:${STORAGE_DB_PORT}/${STORAGE_DB_NAME}
+    username: ${STORAGE_DB_USER}
+    password: ${STORAGE_DB_PASSWORD}
 
   jpa:
     hibernate:
@@ -23,22 +23,22 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://eureka:8761/eureka
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
 
 minio:
-  url: http://minio:9000
-  access-key: minioadmin
-  secret-key: minioadmin123
-  bucket: voyagrr-media
+  url: ${MINIO_URL}
+  access-key: ${MINIO_ACCESS_KEY}
+  secret-key: ${MINIO_SECRET_KEY}
+  bucket: ${MINIO_BUCKET}
 
 grpc:
   client:
     sharing-service:
-      address: static://localhost:9090
+      address: static://sharing-service:${SHARING_GRPC_SERVICE_PORT}
       negotiationType: plaintext
 
   server:
-    port: 9091
+    port: ${STORAGE_GRPC_SERVICE_PORT}
 
 management:
   endpoints:

@@ -127,6 +127,7 @@ services:
     ports:
       - "9080:9090"
     volumes:
+      - prometheus-data:/prometheus
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     networks:
       - voyagrr-net
@@ -233,6 +234,7 @@ volumes:
   sharing-database-data:
   encoding-database-data:
   minio-data:
+  prometheus-data:
   grafana-storage:
 
 networks:

@@ -3,12 +3,12 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://keycloak:8070/realms/voyagrr
+          issuer-uri: ${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}
 
   datasource:
-    url: jdbc:postgresql://sharing-service-database:5432/storage_service_database
-    username: postgres
-    password: postgres
+    url: jdbc:postgresql://${SHARING_DB_HOST}:${SHARING_DB_PORT}/${SHARING_DB_NAME}
+    username: ${SHARING_DB_USER}
+    password: ${SHARING_DB_PASSWORD}
 
   jpa:
     hibernate:
@@ -18,7 +18,7 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://eureka:8761/eureka
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
 
 management:
   endpoints:
@@ -29,8 +29,8 @@ management:
 grpc:
   client:
     storage-service:
-      address: static://localhost:9091
+      address: static://storage-service:${STORAGE_GRPC_SERVICE_PORT}
       negotiationType: plaintext
 
   server:
-    port: 9090
+    port: ${SHARING_GRPC_SERVICE_PORT}

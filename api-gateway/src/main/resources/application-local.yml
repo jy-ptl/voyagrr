@@ -23,6 +23,12 @@ spring:
                   - "*"
                 allow-credentials: true
 
+          httpclient:
+            max-initial-line-length: 65536
+            max-header-size: 65536
+  http:
+    codecs:
+      max-in-memory-size: 200MB
 
 eureka:
   client:

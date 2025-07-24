@@ -5,8 +5,6 @@ server:
 spring:
   application:
     name: encoding-service
-  profiles:
-    active: local
 
 management:
   endpoint:

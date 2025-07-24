@@ -6,13 +6,6 @@ spring:
   application:
     name: sharing-service
 
-  profiles:
-    active: local
-
-grpc:
-  server:
-    port: 9090
-
 management:
   endpoint:
     health:
