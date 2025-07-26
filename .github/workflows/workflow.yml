@@ -122,8 +122,8 @@ jobs:
 
             export KEYCLOAK_URL="${{ secrets.KEYCLOAK_URL }}"
             export KEYCLOAK_REALM="${{ secrets.KEYCLOAK_REALM }}"
-            export KEYCLOAK_AUTH_CLIENT_ID="${{ secrets.KEYCLOAK_CLIENT_ID }}"
-            export KEYCLOAK_AUTH_CLIENT_SECRET="${{ secrets.KEYCLOAK_CLIENT_SECRET }}"
+            export KEYCLOAK_CLIENT_ID="${{ secrets.KEYCLOAK_CLIENT_ID }}"
+            export KEYCLOAK_CLIENT_SECRET="${{ secrets.KEYCLOAK_CLIENT_SECRET }}"
 
             export STORAGE_GRPC_SERVICE_PORT="${{ secrets.STORAGE_GRPC_SERVICE_PORT }}"
             export SHARING_GRPC_SERVICE_PORT="${{ secrets.SHARING_GRPC_SERVICE_PORT }}"
