@@ -23,8 +23,8 @@ eureka:
 keycloak:
   keycloak-url: ${KEYCLOAK_URL}
   realm: ${KEYCLOAK_REALM}
-  client-id: ${KEYCLOAK_AUTH_CLIENT_ID}
-  client-secret: ${KEYCLOAK_AUTH_CLIENT_SECRET}
+  client-id: ${KEYCLOAK_CLIENT_ID}
+  client-secret: ${KEYCLOAK_CLIENT_SECRET}
 
 management:
   endpoints:
