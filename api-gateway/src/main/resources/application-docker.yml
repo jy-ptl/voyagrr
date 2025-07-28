@@ -13,8 +13,6 @@ spring:
             cors-configurations:
               '[/**]':
                 allowed-origins:
-                  - https://voyagrr.com
-                  - https://www.voyagrr.com
                   - http://localhost:5173
                 allowed-methods:
                   - GET

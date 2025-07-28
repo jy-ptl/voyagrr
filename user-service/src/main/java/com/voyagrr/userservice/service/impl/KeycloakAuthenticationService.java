@@ -8,6 +8,7 @@ import com.voyagrr.userservice.service.AuthenticationService;
 import com.voyagrr.userservice.service.UserService;
 import com.voyagrr.userservice.utility.UserMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatusCode;
@@ -20,6 +21,7 @@ import reactor.core.publisher.Mono;
 
 import java.net.URI;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class KeycloakAuthenticationService implements AuthenticationService {
