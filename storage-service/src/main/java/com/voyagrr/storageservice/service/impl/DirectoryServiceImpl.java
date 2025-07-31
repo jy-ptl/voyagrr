@@ -37,7 +37,8 @@ public class DirectoryServiceImpl implements DirectoryService {
 
     @Override
     public Directory findDirectoryById(Long directoryId) {
-        return directoryRepository.findById(directoryId).orElseThrow(() -> new EntityNotFoundException(ENTITY_DOES_NOT_EXISTS.formatted(RESOURCES.DIRECTORY)));
+        return directoryRepository.findById(directoryId)
+                .orElseThrow(() -> new EntityNotFoundException(ENTITY_DOES_NOT_EXISTS.formatted(RESOURCES.DIRECTORY)));
     }
 
     @Override
@@ -72,10 +73,13 @@ public class DirectoryServiceImpl implements DirectoryService {
         Directory directory = findDirectoryById(directoryId);
 
         boolean allowed = sharingGrpcClient.hasPermissionForDirectories(
-                keycloakUserId, directoryRepository.getAllAncestorsIncludingSelf(directoryId).stream().mapToLong(DirectoryFlatResponse::id).boxed().toList(), Permission.DELETE.name());
+                keycloakUserId, directoryRepository.getAllAncestorsIncludingSelf(directoryId).stream()
+                        .mapToLong(DirectoryFlatResponse::id).boxed().toList(),
+                Permission.DELETE.name());
 
         if (!allowed)
-            throw new AccessDeniedException(ACCESS_DENIED_FOR_RESOURCE.formatted(Permission.DELETE.name(), RESOURCES.DIRECTORY));
+            throw new AccessDeniedException(
+                    ACCESS_DENIED_FOR_RESOURCE.formatted(Permission.DELETE.name(), RESOURCES.DIRECTORY));
 
         deleteRecursively(directory);
 
@@ -90,35 +94,34 @@ public class DirectoryServiceImpl implements DirectoryService {
         List<File> files = fileService.findByDirectory(directory);
         List<Directory> directories = directoryRepository.findByParentDirectory(directory);
 
-        ContentAccessResponse accessResponse = sharingGrpcClient.contentAccessOfDirectory(ContentAccessRequest.newBuilder()
-                .setUserId(keycloakUserId)
-                .addAllDirectoryId(directoryRepository.getAllAncestorsIncludingSelf(directoryId).stream().mapToLong(DirectoryFlatResponse::id).boxed().toList())
-                .addAllChildDirectoryId(directories.stream().mapToLong(Directory::getId).boxed().toList())
-                .addAllFileId(files.stream().mapToLong(File::getId).boxed().toList())
-                .build());
+        ContentAccessResponse accessResponse = sharingGrpcClient
+                .contentAccessOfDirectory(ContentAccessRequest.newBuilder()
+                        .setUserId(keycloakUserId)
+                        .addAllDirectoryId(directoryRepository.getAllAncestorsIncludingSelf(directoryId).stream()
+                                .mapToLong(DirectoryFlatResponse::id).boxed().toList())
+                        .addAllChildDirectoryId(directories.stream().mapToLong(Directory::getId).boxed().toList())
+                        .addAllFileId(files.stream().mapToLong(File::getId).boxed().toList())
+                        .build());
 
         Map<Long, List<String>> filePermissionsMap = accessResponse.getFilesList().stream()
                 .collect(Collectors.toMap(
                         FileAccessResponse::getFileId,
-                        FileAccessResponse::getPermissionList
-                ));
+                        FileAccessResponse::getPermissionList));
 
         List<String> rootDirPermissions = accessResponse.getRootDirectoryPermissionsList();
 
         Map<Long, List<String>> dirPermissionsMap = accessResponse.getDirectoriesList().stream()
                 .collect(Collectors.toMap(
                         DirectoryAccessResponse::getDirectoryId,
-                        DirectoryAccessResponse::getPermissionList
-                ));
+                        DirectoryAccessResponse::getPermissionList));
 
         List<FileResponse> fileResponses = files.stream()
                 .map(f -> {
                     List<String> filePermissions = filePermissionsMap.getOrDefault(f.getId(), new ArrayList<>());
 
                     List<String> combinedPermissions = Stream.concat(
-                                    filePermissions.stream(),
-                                    rootDirPermissions.stream()
-                            )
+                            filePermissions.stream(),
+                            rootDirPermissions.stream())
                             .distinct()
                             .toList();
 
@@ -129,10 +132,8 @@ public class DirectoryServiceImpl implements DirectoryService {
                         entry.getKey().getId(),
                         entry.getKey().getName(),
                         entry.getKey().getMimeType(),
-                        entry.getValue()
-                ))
+                        entry.getValue()))
                 .toList();
-
 
         return DirectoryContentResponse.builder()
                 .permission(rootDirPermissions)
@@ -142,8 +143,7 @@ public class DirectoryServiceImpl implements DirectoryService {
                         .map(f -> new DirectoryResponse(
                                 f.getId(),
                                 f.getName(),
-                                dirPermissionsMap.get(f.getId())
-                        ))
+                                dirPermissionsMap.get(f.getId())))
                         .toList())
                 .build();
     }
@@ -151,7 +151,8 @@ public class DirectoryServiceImpl implements DirectoryService {
     @Override
     public List<Long> getAllAncestorsIncludingSelfFromFileId(long fileId) {
         File file = fileService.findById(fileId);
-        return directoryRepository.getAllAncestorsIncludingSelf(file.getDirectory().getId()).stream().mapToLong(DirectoryFlatResponse::id).boxed().toList();
+        return directoryRepository.getAllAncestorsIncludingSelf(file.getDirectory().getId()).stream()
+                .mapToLong(DirectoryFlatResponse::id).boxed().toList();
     }
 
     private List<DirectoryTreeResponse> buildDirectoryTree(List<DirectoryFlatResponse> flatList) {
@@ -208,7 +209,6 @@ public class DirectoryServiceImpl implements DirectoryService {
                 .addAllDeletePermission(permissionsForFiles)
                 .setType(FILE).build();
 
-
         boolean successForDirectories = sharingGrpcClient.deletePermission(directoriesPermissionsDeletionRequest);
         boolean successForFiles = sharingGrpcClient.deletePermission(filesPermissionsDeletionRequest);
 
@@ -216,7 +216,8 @@ public class DirectoryServiceImpl implements DirectoryService {
             log.info("Failed to delete permissions for directories %s".formatted(allDirectoryIds.toString()));
 
         if (!successForFiles)
-            log.info("Failed to delete permissions for files %s".formatted(Arrays.toString(allFiles.stream().mapToLong(File::getId).toArray())));
+            log.info("Failed to delete permissions for files %s"
+                    .formatted(Arrays.toString(allFiles.stream().mapToLong(File::getId).toArray())));
 
     }
 

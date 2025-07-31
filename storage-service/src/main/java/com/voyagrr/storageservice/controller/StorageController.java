@@ -31,9 +31,9 @@ public class StorageController {
 
     @RequestMapping(value = "upload", method = RequestMethod.POST)
     public ResponseEntity<String> upload(@RequestParam("file") MultipartFile file,
-                                         @RequestParam("name") String name,
-                                         @RequestParam("directoryId") long directoryId,
-                                         @AuthenticationPrincipal Jwt jwt) {
+            @RequestParam("name") String name,
+            @RequestParam("directoryId") long directoryId,
+            @AuthenticationPrincipal Jwt jwt) {
         String keycloakUserId = jwt.getSubject();
         FileUploadRequest request = new FileUploadRequest(name, directoryId);
         return ResponseEntity.ok().body(storageService.upload(request, file, keycloakUserId));
@@ -41,7 +41,7 @@ public class StorageController {
 
     @RequestMapping(value = "{fileId}", method = RequestMethod.GET, produces = APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> download(@PathVariable(name = "fileId") long fileId,
-                                             @AuthenticationPrincipal Jwt jwt) {
+            @AuthenticationPrincipal Jwt jwt) {
 
         File file = fileService.findById(fileId);
         String encodedFileName = URLEncoder.encode(file.getName(), StandardCharsets.UTF_8);
@@ -54,7 +54,7 @@ public class StorageController {
 
     @RequestMapping(value = "{fileId}", method = RequestMethod.DELETE)
     public ResponseEntity<String> delete(@PathVariable(name = "fileId") long fileId,
-                                         @AuthenticationPrincipal Jwt jwt) {
+            @AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.ok().body(storageService.deleteFile(fileId, jwt.getSubject()));
     }
 

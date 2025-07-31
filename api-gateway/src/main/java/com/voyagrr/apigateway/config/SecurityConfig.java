@@ -23,10 +23,9 @@ public class SecurityConfig {
                         .pathMatchers("/sharing-service/actuator/**").permitAll()
                         .pathMatchers("/encoding-service/actuator/**").permitAll()
 
-                        .pathMatchers(HttpMethod.POST,"/api/auth/register").permitAll()
-                        .pathMatchers(HttpMethod.POST,"/api/auth/login").permitAll()
-                        .anyExchange().authenticated()
-                )
+                        .pathMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                        .anyExchange().authenticated())
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .oauth2ResourceServer(oauth -> oauth.jwt(Customizer.withDefaults()));
 

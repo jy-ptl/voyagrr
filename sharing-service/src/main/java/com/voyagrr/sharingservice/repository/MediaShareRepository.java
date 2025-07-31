@@ -26,8 +26,8 @@ public interface MediaShareRepository extends JpaRepository<MediaShare, Long> {
                  )
             """, nativeQuery = true)
     boolean hasPermission(@Param("directoryId") Long directoryId,
-                          @Param("userId") String userId,
-                          @Param("permission") String permission);
+            @Param("userId") String userId,
+            @Param("permission") String permission);
 
     @Query(value = """
             select * from media_shares where media_shares.directory_id in :directoryIds
@@ -62,7 +62,7 @@ public interface MediaShareRepository extends JpaRepository<MediaShare, Long> {
               )
             """, nativeQuery = true)
     List<Object[]> findDirectoryPermissions(@Param("directoryIds") List<Long> directoryIds,
-                                            @Param("userId") String userId);
+            @Param("userId") String userId);
 
     @Query(value = """
             SELECT ms.file_id, p.name
@@ -77,7 +77,7 @@ public interface MediaShareRepository extends JpaRepository<MediaShare, Long> {
               )
             """, nativeQuery = true)
     List<Object[]> findFilePermissions(@Param("fileIds") List<Long> fileIds,
-                                       @Param("userId") String userId);
+            @Param("userId") String userId);
 
     @Query(value = """
             SELECT EXISTS (
@@ -95,8 +95,8 @@ public interface MediaShareRepository extends JpaRepository<MediaShare, Long> {
             )
             """, nativeQuery = true)
     boolean existsByUserIdAndDirectoryIdInAndPermission(@Param("userId") String keycloakUserId,
-                                                        @Param("directoryIds") List<Long> directoryIds,
-                                                        @Param("permission") String permission);
+            @Param("directoryIds") List<Long> directoryIds,
+            @Param("permission") String permission);
 
     @Query(value = """
             SELECT EXISTS (
@@ -114,7 +114,7 @@ public interface MediaShareRepository extends JpaRepository<MediaShare, Long> {
             )
             """, nativeQuery = true)
     boolean existsByUserIdAndFileIdAndPermission(@Param("userId") String keycloakUserId,
-                                                 @Param("fileId") long fileId,
-                                                 @Param("permission") String permission);
+            @Param("fileId") long fileId,
+            @Param("permission") String permission);
 
 }

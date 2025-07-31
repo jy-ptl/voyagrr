@@ -92,9 +92,9 @@ public class KeycloakAuthenticationService implements AuthenticationService {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .bodyValue(formData)
                 .retrieve()
-                .onStatus(HttpStatusCode::isError, response ->
-                        response.bodyToMono(String.class).flatMap(error -> Mono.error(new RuntimeException("Login failed: " + error)))
-                )
+                .onStatus(HttpStatusCode::isError,
+                        response -> response.bodyToMono(String.class)
+                                .flatMap(error -> Mono.error(new RuntimeException("Login failed: " + error))))
                 .bodyToMono(String.class)
                 .block();
     }

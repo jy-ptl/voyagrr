@@ -24,8 +24,8 @@ public class StorageGrpcClient {
         return stub.getAllAncestorsIncludingSelfFromFileId(
                 AncestorsIncludingSelfRequestForFile.newBuilder()
                         .setFileId(fileId)
-                        .build()).getDirectoryIdList();
+                        .build())
+                .getDirectoryIdList();
     }
-
 
 }
