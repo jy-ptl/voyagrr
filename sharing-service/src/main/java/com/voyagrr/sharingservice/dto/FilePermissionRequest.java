@@ -6,6 +6,5 @@ public record FilePermissionRequest(
         Long fileId,
         String toUserId,
         Long toGroupId,
-        Permission permission
-) {
+        Permission permission) {
 }

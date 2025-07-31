@@ -6,6 +6,5 @@ public record FileResponse(
         Long id,
         String name,
         String mineType,
-        List<String> permissions
-) {
+        List<String> permissions) {
 }

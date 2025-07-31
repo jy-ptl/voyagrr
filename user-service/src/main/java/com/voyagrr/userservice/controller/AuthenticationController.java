@@ -24,5 +24,4 @@ public class AuthenticationController {
         return ResponseEntity.ok().body(authenticationService.login(request));
     }
 
-
 }

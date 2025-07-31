@@ -23,7 +23,7 @@ public class DirectoryController {
 
     @RequestMapping(value = "", method = RequestMethod.POST)
     public ResponseEntity<Long> create(@RequestBody DirectoryCreateRequest request,
-                                       @AuthenticationPrincipal Jwt jwt) {
+            @AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.ok().body(directoryService.create(request, jwt.getSubject()));
     }
 
@@ -33,12 +33,14 @@ public class DirectoryController {
     }
 
     @RequestMapping(value = "{directoryId}", method = RequestMethod.DELETE)
-    public ResponseEntity<String> deleteDirectoryById(@PathVariable(name = "directoryId") Long directoryId, @AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<String> deleteDirectoryById(@PathVariable(name = "directoryId") Long directoryId,
+            @AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.ok(directoryService.deleteDirectoryById(directoryId, jwt.getSubject()));
     }
 
     @RequestMapping(value = "{directoryId}", method = RequestMethod.GET)
-    public ResponseEntity<DirectoryContentResponse> getDirectoryContents(@PathVariable(name = "directoryId") Long directoryId, @AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<DirectoryContentResponse> getDirectoryContents(
+            @PathVariable(name = "directoryId") Long directoryId, @AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.ok().body(directoryService.getDirectoryContents(directoryId, jwt.getSubject()));
     }
 

@@ -19,9 +19,9 @@ public interface DirectoryRepository extends JpaRepository<Directory, Long> {
                     SELECT id, parent_directory_id, 1 AS level
                     FROM directories
                     WHERE id = :directoryId
-            
+
                     UNION ALL
-            
+
                     SELECT d.id, d.parent_directory_id, dp.level + 1
                     FROM directories d
                     JOIN dir_path dp ON dp.parent_directory_id = d.id
@@ -40,9 +40,9 @@ public interface DirectoryRepository extends JpaRepository<Directory, Long> {
                 FROM directories d
                 WHERE d.parent_directory_id IS NULL
                   AND d.owner_id = :keycloakUserId
-            
+
                 UNION ALL
-            
+
                 SELECT
                     child.id,
                     child.name,
@@ -63,9 +63,9 @@ public interface DirectoryRepository extends JpaRepository<Directory, Long> {
                 SELECT id, name, parent_directory_id
                 FROM directories
                 WHERE id = :directoryId
-            
+
                 UNION ALL
-            
+
                 SELECT d.id, d.name, d.parent_directory_id
                 FROM directories d
                 INNER JOIN ancestors a ON d.id = a.parent_directory_id
@@ -74,6 +74,5 @@ public interface DirectoryRepository extends JpaRepository<Directory, Long> {
             FROM ancestors
             """, nativeQuery = true)
     List<DirectoryFlatResponse> getAllAncestorsIncludingSelf(@Param("directoryId") long directoryId);
-
 
 }

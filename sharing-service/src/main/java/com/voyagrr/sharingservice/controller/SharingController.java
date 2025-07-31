@@ -20,13 +20,13 @@ public class SharingController {
 
     @RequestMapping(value = "directory", method = RequestMethod.POST)
     public ResponseEntity<String> updateDirectoryPermission(@RequestBody DirectoryPermissionRequest request,
-                                                 @AuthenticationPrincipal Jwt jwt) {
+            @AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.ok().body(mediaShareService.updateDirectoryPermission(request, jwt.getSubject()));
     }
 
     @RequestMapping(value = "file", method = RequestMethod.POST)
     public ResponseEntity<String> updateFilePermission(@RequestBody FilePermissionRequest request,
-                                                       @AuthenticationPrincipal Jwt jwt) {
+            @AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.ok().body(mediaShareService.updateFilePermission(request, jwt.getSubject()));
     }
 

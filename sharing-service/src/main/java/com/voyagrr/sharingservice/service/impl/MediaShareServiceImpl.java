@@ -42,14 +42,17 @@ public class MediaShareServiceImpl implements MediaShareService {
     public String updateDirectoryPermission(DirectoryPermissionRequest request, String keycloakUserId) {
 
         Permission permission = permissionRepository
-                .findByName(request.permission()).orElseThrow(() -> new IllegalArgumentException(ENTITY_DOES_NOT_EXISTS.formatted(request.permission())));
+                .findByName(request.permission()).orElseThrow(
+                        () -> new IllegalArgumentException(ENTITY_DOES_NOT_EXISTS.formatted(request.permission())));
 
         List<Long> ancestorsIncludingSelf = storageGrpcClient.getAllAncestorsIncludingSelf(request.directoryId());
 
-        boolean allowed = hasPermissionForDirectories(keycloakUserId, ancestorsIncludingSelf, com.voyagrr.common.enumeration.Permission.SHARE.name());
+        boolean allowed = hasPermissionForDirectories(keycloakUserId, ancestorsIncludingSelf,
+                com.voyagrr.common.enumeration.Permission.SHARE.name());
 
         if (!allowed) {
-            throw new AccessDeniedException(ACCESS_DENIED_FOR_RESOURCE.formatted(com.voyagrr.common.enumeration.Permission.SHARE.name(), RESOURCES.DIRECTORY));
+            throw new AccessDeniedException(ACCESS_DENIED_FOR_RESOURCE
+                    .formatted(com.voyagrr.common.enumeration.Permission.SHARE.name(), RESOURCES.DIRECTORY));
         }
 
         if (request.toGroupId() == null && request.toUserId() == null) {
@@ -123,9 +126,11 @@ public class MediaShareServiceImpl implements MediaShareService {
     }
 
     @Override
-    public ContentAccessResponse contentAccessOfDirectoryByDirectoryIdAndUserId(List<Long> ancestorsIncludingSelf, List<Long> directoryIds, List<Long> fileIds, String keycloakUserId) {
+    public ContentAccessResponse contentAccessOfDirectoryByDirectoryIdAndUserId(List<Long> ancestorsIncludingSelf,
+            List<Long> directoryIds, List<Long> fileIds, String keycloakUserId) {
 
-        List<Object[]> rootDirRows = mediaShareRepository.findDirectoryPermissions(ancestorsIncludingSelf, keycloakUserId);
+        List<Object[]> rootDirRows = mediaShareRepository.findDirectoryPermissions(ancestorsIncludingSelf,
+                keycloakUserId);
 
         List<Object[]> dirRows = mediaShareRepository.findDirectoryPermissions(directoryIds, keycloakUserId);
         Map<Long, List<String>> dirPermissions = groupPermissions(dirRows);
@@ -156,7 +161,8 @@ public class MediaShareServiceImpl implements MediaShareService {
                     rootDirRows.stream()
                             .map(row -> (String) row[1])
                             .distinct()
-                            .toList()).build();
+                            .toList())
+                    .build();
         }
 
         return builder.build();
@@ -164,7 +170,8 @@ public class MediaShareServiceImpl implements MediaShareService {
 
     @Override
     public boolean hasPermissionForDirectories(String keycloakUserId, List<Long> directoryIds, String permission) {
-        return mediaShareRepository.existsByUserIdAndDirectoryIdInAndPermission(keycloakUserId, directoryIds, permission);
+        return mediaShareRepository.existsByUserIdAndDirectoryIdInAndPermission(keycloakUserId, directoryIds,
+                permission);
     }
 
     @Override
@@ -175,11 +182,14 @@ public class MediaShareServiceImpl implements MediaShareService {
     @Override
     public String updateFilePermission(FilePermissionRequest request, String keycloakUserId) {
         Permission permission = permissionRepository
-                .findByName(request.permission()).orElseThrow(() -> new IllegalArgumentException(ENTITY_DOES_NOT_EXISTS.formatted(request.permission())));
+                .findByName(request.permission()).orElseThrow(
+                        () -> new IllegalArgumentException(ENTITY_DOES_NOT_EXISTS.formatted(request.permission())));
 
-        boolean hasFilePermission = hasPermissionForFile(keycloakUserId, request.fileId(), com.voyagrr.common.enumeration.Permission.SHARE.name());
+        boolean hasFilePermission = hasPermissionForFile(keycloakUserId, request.fileId(),
+                com.voyagrr.common.enumeration.Permission.SHARE.name());
         List<Long> ancestorsIncludingSelf = storageGrpcClient.getAllAncestorsIncludingSelfForFileId(request.fileId());
-        boolean permissionForDirectories = hasPermissionForDirectories(keycloakUserId, ancestorsIncludingSelf, com.voyagrr.common.enumeration.Permission.SHARE.name());
+        boolean permissionForDirectories = hasPermissionForDirectories(keycloakUserId, ancestorsIncludingSelf,
+                com.voyagrr.common.enumeration.Permission.SHARE.name());
 
         if (hasFilePermission || permissionForDirectories) {
             if (request.toGroupId() == null && request.toUserId() == null) {
@@ -198,7 +208,8 @@ public class MediaShareServiceImpl implements MediaShareService {
 
             } else {
                 Group group = groupRepository.findById(request.toGroupId())
-                        .orElseThrow(() -> new EntityNotFoundException(ENTITY_DOES_NOT_EXISTS.formatted(RESOURCES.GROUP)));
+                        .orElseThrow(
+                                () -> new EntityNotFoundException(ENTITY_DOES_NOT_EXISTS.formatted(RESOURCES.GROUP)));
 
                 mediaShareRepository.save(MediaShare.builder()
                         .fileId(request.fileId())
@@ -209,7 +220,8 @@ public class MediaShareServiceImpl implements MediaShareService {
             return "Success";
 
         } else {
-            throw new AccessDeniedException(ACCESS_DENIED_FOR_RESOURCE.formatted(com.voyagrr.common.enumeration.Permission.SHARE.name(), RESOURCES.FILE));
+            throw new AccessDeniedException(ACCESS_DENIED_FOR_RESOURCE
+                    .formatted(com.voyagrr.common.enumeration.Permission.SHARE.name(), RESOURCES.FILE));
         }
     }
 
@@ -234,6 +246,5 @@ public class MediaShareServiceImpl implements MediaShareService {
         }
         return permissionMap;
     }
-
 
 }

@@ -19,10 +19,9 @@ public class GroupController {
 
     @RequestMapping(value = "create", method = RequestMethod.POST)
     public ResponseEntity<Long> create(@RequestBody GroupCreateRequest request,
-                                       @AuthenticationPrincipal Jwt jwt) {
+            @AuthenticationPrincipal Jwt jwt) {
         String keycloakUserId = jwt.getSubject();
         return ResponseEntity.ok().body(groupService.create(request, keycloakUserId));
     }
-
 
 }

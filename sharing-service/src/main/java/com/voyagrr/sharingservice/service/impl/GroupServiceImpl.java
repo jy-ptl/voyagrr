@@ -15,7 +15,6 @@ public class GroupServiceImpl implements GroupService {
 
     private final GroupRepository groupRepository;
 
-
     @Override
     public Long create(GroupCreateRequest request, String keycloakUserId) {
         return groupRepository
@@ -23,6 +22,7 @@ public class GroupServiceImpl implements GroupService {
                         .builder()
                         .name(request.name())
                         .ownerId(keycloakUserId)
-                        .build()).getId();
+                        .build())
+                .getId();
     }
 }

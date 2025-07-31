@@ -15,7 +15,8 @@ public class GrpcSharingServiceImpl extends SharingServiceGrpc.SharingServiceImp
     private final MediaShareService mediaShareService;
 
     @Override
-    public void hasPermissionForDirectory(HasPermissionDirectoryRequest request, StreamObserver<HasPermissionDirectoryResponse> responseObserver) {
+    public void hasPermissionForDirectory(HasPermissionDirectoryRequest request,
+            StreamObserver<HasPermissionDirectoryResponse> responseObserver) {
 
         Long directoryId = request.getDirectoryId();
         String keycloakUserId = request.getUserId();
@@ -29,12 +30,14 @@ public class GrpcSharingServiceImpl extends SharingServiceGrpc.SharingServiceImp
     }
 
     @Override
-    public void hasPermissionForDirectories(HasPermissionForDirectoriesRequest request, StreamObserver<HasPermissionForDirectoriesResponse> responseObserver) {
+    public void hasPermissionForDirectories(HasPermissionForDirectoriesRequest request,
+            StreamObserver<HasPermissionForDirectoriesResponse> responseObserver) {
         String keycloakUserId = request.getUserId();
         String permission = request.getPermission();
 
         HasPermissionForDirectoriesResponse response = HasPermissionForDirectoriesResponse.newBuilder()
-                .setAllowed(mediaShareService.hasPermissionForDirectories(keycloakUserId, request.getDirectoryIdList(), permission))
+                .setAllowed(mediaShareService.hasPermissionForDirectories(keycloakUserId, request.getDirectoryIdList(),
+                        permission))
                 .build();
 
         responseObserver.onNext(response);
@@ -42,17 +45,19 @@ public class GrpcSharingServiceImpl extends SharingServiceGrpc.SharingServiceImp
     }
 
     @Override
-    public void hasPermissionForFile(HasPermissionForFileRequest request, StreamObserver<HasPermissionForFileResponse> responseObserver) {
+    public void hasPermissionForFile(HasPermissionForFileRequest request,
+            StreamObserver<HasPermissionForFileResponse> responseObserver) {
         responseObserver.onNext(
                 HasPermissionForFileResponse.newBuilder()
-                        .setAllowed(mediaShareService.hasPermissionForFile(request.getUserId(), request.getFileId(), request.getPermission()))
-                        .build()
-        );
+                        .setAllowed(mediaShareService.hasPermissionForFile(request.getUserId(), request.getFileId(),
+                                request.getPermission()))
+                        .build());
         responseObserver.onCompleted();
     }
 
     @Override
-    public void createDefaultPermission(CreateDefaultPermissionRequest request, StreamObserver<CreateDefaultPermissionResponse> responseObserver) {
+    public void createDefaultPermission(CreateDefaultPermissionRequest request,
+            StreamObserver<CreateDefaultPermissionResponse> responseObserver) {
 
         Long directoryId = request.getDirectoryId();
         String keycloakUserId = request.getUserId();
@@ -67,18 +72,23 @@ public class GrpcSharingServiceImpl extends SharingServiceGrpc.SharingServiceImp
     }
 
     @Override
-    public void deletePermission(DeletePermissionRequest request, StreamObserver<DeletePermissionResponse> responseObserver) {
+    public void deletePermission(DeletePermissionRequest request,
+            StreamObserver<DeletePermissionResponse> responseObserver) {
 
         boolean success;
         switch (request.getType()) {
             case USER ->
-                    success = mediaShareService.deleteAllPermissionByUserIds(request.getDeletePermissionList().stream().map(DeletePermissionDto::getUserId).toList());
+                success = mediaShareService.deleteAllPermissionByUserIds(
+                        request.getDeletePermissionList().stream().map(DeletePermissionDto::getUserId).toList());
             case FILE ->
-                    success = mediaShareService.deleteAllPermissionByFileIds(request.getDeletePermissionList().stream().mapToLong(DeletePermissionDto::getFileId).boxed().toList());
+                success = mediaShareService.deleteAllPermissionByFileIds(request.getDeletePermissionList().stream()
+                        .mapToLong(DeletePermissionDto::getFileId).boxed().toList());
             case GROUP ->
-                    success = mediaShareService.deleteAllPermissionByGroupIds(request.getDeletePermissionList().stream().mapToLong(DeletePermissionDto::getGroupId).boxed().toList());
+                success = mediaShareService.deleteAllPermissionByGroupIds(request.getDeletePermissionList().stream()
+                        .mapToLong(DeletePermissionDto::getGroupId).boxed().toList());
             case DIRECTORY ->
-                    success = mediaShareService.deleteAllPermissionByDirectoryIds(request.getDeletePermissionList().stream().mapToLong(DeletePermissionDto::getDirectoryId).boxed().toList());
+                success = mediaShareService.deleteAllPermissionByDirectoryIds(request.getDeletePermissionList().stream()
+                        .mapToLong(DeletePermissionDto::getDirectoryId).boxed().toList());
             default -> throw new IllegalStateException("Unexpected value: " + request.getType());
         }
 
@@ -91,14 +101,16 @@ public class GrpcSharingServiceImpl extends SharingServiceGrpc.SharingServiceImp
     }
 
     @Override
-    public void contentAccessOfDirectory(ContentAccessRequest request, StreamObserver<ContentAccessResponse> responseObserver) {
+    public void contentAccessOfDirectory(ContentAccessRequest request,
+            StreamObserver<ContentAccessResponse> responseObserver) {
 
         List<Long> ancestorsIncludingSelf = request.getDirectoryIdList();
         List<Long> directoryIds = request.getChildDirectoryIdList();
         List<Long> fileIds = request.getFileIdList();
         String keycloakUserId = request.getUserId();
 
-        ContentAccessResponse response = mediaShareService.contentAccessOfDirectoryByDirectoryIdAndUserId(ancestorsIncludingSelf, directoryIds, fileIds, keycloakUserId);
+        ContentAccessResponse response = mediaShareService.contentAccessOfDirectoryByDirectoryIdAndUserId(
+                ancestorsIncludingSelf, directoryIds, fileIds, keycloakUserId);
 
         responseObserver.onNext(response);
         responseObserver.onCompleted();

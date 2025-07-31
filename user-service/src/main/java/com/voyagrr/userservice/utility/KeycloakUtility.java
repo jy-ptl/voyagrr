@@ -44,5 +44,4 @@ public class KeycloakUtility {
         return cachedToken;
     }
 
-
 }

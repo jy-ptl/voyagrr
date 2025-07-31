@@ -6,6 +6,5 @@ public record DirectoryPermissionRequest(
         Long directoryId,
         String toUserId,
         Long toGroupId,
-        Permission permission
-) {
+        Permission permission) {
 }
