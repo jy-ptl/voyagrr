@@ -34,7 +34,7 @@ minio:
 grpc:
   client:
     sharing-service:
-      address: static://localhost:9090
+      address: static://sharing-service:9090
       negotiationType: plaintext
 
   server:
