@@ -29,7 +29,7 @@ management:
 grpc:
   client:
     storage-service:
-      address: static://localhost:9091
+      address: static://storage-service:9091
       negotiationType: plaintext
 
   server:
