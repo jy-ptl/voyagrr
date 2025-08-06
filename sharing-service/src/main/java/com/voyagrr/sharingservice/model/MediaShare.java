@@ -30,12 +30,7 @@ public class MediaShare extends Auditable {
     private Group group;
 
     @ManyToMany
-    @JoinTable(
-            name = "media_share_permissions",
-            joinColumns = @JoinColumn(name = "media_share_id"),
-            inverseJoinColumns = @JoinColumn(name = "permission_id")
-    )
+    @JoinTable(name = "media_share_permissions", joinColumns = @JoinColumn(name = "media_share_id"), inverseJoinColumns = @JoinColumn(name = "permission_id"))
     private List<Permission> permissions;
-
 
 }

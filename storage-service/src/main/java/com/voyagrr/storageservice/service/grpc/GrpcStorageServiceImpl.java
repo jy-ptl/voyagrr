@@ -16,20 +16,22 @@ public class GrpcStorageServiceImpl extends StorageServiceGrpc.StorageServiceImp
     private final DirectoryRepository directoryRepository;
 
     @Override
-    public void getAllAncestorsIncludingSelf(AncestorsIncludingSelfRequest request, StreamObserver<AncestorsIncludingSelfResponse> responseObserver) {
+    public void getAllAncestorsIncludingSelf(AncestorsIncludingSelfRequest request,
+            StreamObserver<AncestorsIncludingSelfResponse> responseObserver) {
         responseObserver.onNext(AncestorsIncludingSelfResponse.newBuilder()
-                .addAllDirectoryId(directoryRepository.getAllAncestorsIncludingSelf(request.getDirectoryId()).stream().mapToLong(DirectoryFlatResponse::id).boxed().toList())
+                .addAllDirectoryId(directoryRepository.getAllAncestorsIncludingSelf(request.getDirectoryId()).stream()
+                        .mapToLong(DirectoryFlatResponse::id).boxed().toList())
                 .build());
         responseObserver.onCompleted();
     }
 
     @Override
-    public void getAllAncestorsIncludingSelfFromFileId(AncestorsIncludingSelfRequestForFile request, StreamObserver<AncestorsIncludingSelfResponse> responseObserver) {
+    public void getAllAncestorsIncludingSelfFromFileId(AncestorsIncludingSelfRequestForFile request,
+            StreamObserver<AncestorsIncludingSelfResponse> responseObserver) {
         responseObserver.onNext(
                 AncestorsIncludingSelfResponse.newBuilder()
                         .addAllDirectoryId(directoryService.getAllAncestorsIncludingSelfFromFileId(request.getFileId()))
-                        .build()
-        );
+                        .build());
         responseObserver.onCompleted();
     }
 }

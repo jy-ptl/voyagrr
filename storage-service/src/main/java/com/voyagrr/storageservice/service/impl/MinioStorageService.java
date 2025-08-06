@@ -75,10 +75,13 @@ public class MinioStorageService implements StorageService {
         try (InputStream input = file.getInputStream()) {
 
             boolean allowed = sharingGrpcClient.hasPermissionForDirectories(
-                    keycloakUserId, directoryRepository.getAllAncestorsIncludingSelf(request.directoryId()).stream().mapToLong(DirectoryFlatResponse::id).boxed().toList(), Permission.UPLOAD.name());
+                    keycloakUserId, directoryRepository.getAllAncestorsIncludingSelf(request.directoryId()).stream()
+                            .mapToLong(DirectoryFlatResponse::id).boxed().toList(),
+                    Permission.UPLOAD.name());
 
             if (!allowed)
-                throw new AccessDeniedException(ACCESS_DENIED_FOR_RESOURCE.formatted(Permission.UPLOAD.name(), RESOURCES.DIRECTORY));
+                throw new AccessDeniedException(
+                        ACCESS_DENIED_FOR_RESOURCE.formatted(Permission.UPLOAD.name(), RESOURCES.DIRECTORY));
 
             minioClient.putObject(
                     PutObjectArgs
@@ -87,8 +90,7 @@ public class MinioStorageService implements StorageService {
                             .object(minioObjectKey + "/" + uuidFilename)
                             .stream(input, file.getSize(), -1)
                             .contentType(mimeType)
-                            .build()
-            );
+                            .build());
 
             fileRepository
                     .save(File
@@ -122,17 +124,17 @@ public class MinioStorageService implements StorageService {
                         .bucket(bucket)
                         .objects(minioObjects)
                         .build()).forEach(deleteErrorResult -> {
-                    try {
-                        deleteErrorResult.get();
-                    } catch (Exception exception) {
-                        try {
-                            DeleteError error = deleteErrorResult.get();
-                            log.error(error.bucketName());
-                        } catch (Exception nested) {
-                            log.error(nested.getMessage());
-                        }
-                    }
-                });
+                            try {
+                                deleteErrorResult.get();
+                            } catch (Exception exception) {
+                                try {
+                                    DeleteError error = deleteErrorResult.get();
+                                    log.error(error.bucketName());
+                                } catch (Exception nested) {
+                                    log.error(nested.getMessage());
+                                }
+                            }
+                        });
             } catch (Exception exception) {
                 log.error(exception.getMessage());
             }
@@ -141,7 +143,8 @@ public class MinioStorageService implements StorageService {
 
     @Override
     public Resource download(long fileId, String keycloakUserId) {
-        File file = fileRepository.findById(fileId).orElseThrow(() -> new EntityNotFoundException(ENTITY_DOES_NOT_EXISTS.formatted(RESOURCES.FILE)));
+        File file = fileRepository.findById(fileId)
+                .orElseThrow(() -> new EntityNotFoundException(ENTITY_DOES_NOT_EXISTS.formatted(RESOURCES.FILE)));
         if (hasPermissionForFile(file, keycloakUserId, Permission.DOWNLOAD.name())) {
             try {
                 InputStream inputStream = minioClient.getObject(GetObjectArgs.builder()
@@ -153,41 +156,51 @@ public class MinioStorageService implements StorageService {
                 log.error(exception.getMessage());
             }
         } else {
-            throw new AccessDeniedException(ACCESS_DENIED_FOR_RESOURCE.formatted(Permission.DOWNLOAD.name(), RESOURCES.FILE));
+            throw new AccessDeniedException(
+                    ACCESS_DENIED_FOR_RESOURCE.formatted(Permission.DOWNLOAD.name(), RESOURCES.FILE));
         }
         return null;
     }
 
     @Override
     public String deleteFile(long fileId, String keycloakUserId) {
-        File file = fileRepository.findById(fileId).orElseThrow(() -> new EntityNotFoundException(ENTITY_DOES_NOT_EXISTS.formatted(RESOURCES.FILE)));
+        File file = fileRepository.findById(fileId)
+                .orElseThrow(() -> new EntityNotFoundException(ENTITY_DOES_NOT_EXISTS.formatted(RESOURCES.FILE)));
         if (hasPermissionForFile(file, keycloakUserId, Permission.DELETE.name())) {
             deleteFiles(List.of(file));
             fileRepository.delete(file);
             return "Success";
         } else {
-            throw new AccessDeniedException(ACCESS_DENIED_FOR_RESOURCE.formatted(Permission.DELETE.name(), RESOURCES.FILE));
+            throw new AccessDeniedException(
+                    ACCESS_DENIED_FOR_RESOURCE.formatted(Permission.DELETE.name(), RESOURCES.FILE));
         }
     }
 
     /**
-     * Checks if a user has the specified permission on a given file, either via any ancestor directory (including its own directory)
+     * Checks if a user has the specified permission on a given file, either via any
+     * ancestor directory (including its own directory)
      * or directly on the file itself.
      * <p>
-     * This method first checks if the user has the given permission on any ancestor directory of the file
-     * (including the directory the file resides in). If such permission exists, it returns {@code true} immediately.
+     * This method first checks if the user has the given permission on any ancestor
+     * directory of the file
+     * (including the directory the file resides in). If such permission exists, it
+     * returns {@code true} immediately.
      * Otherwise, it checks if the user has the permission directly on the file.
      * </p>
      *
      * @param file           The {@link File} entity to check.
-     * @param keycloakUserId The Keycloak user ID for whom the permission is being checked.
-     * @param permission     The permission to verify (e.g., "UPLOAD", "DOWNLOAD", "DELETE").
-     * @return {@code true} if the user has the specified permission on any ancestor directory or directly on the file;
-     * {@code false} otherwise.
+     * @param keycloakUserId The Keycloak user ID for whom the permission is being
+     *                       checked.
+     * @param permission     The permission to verify (e.g., "UPLOAD", "DOWNLOAD",
+     *                       "DELETE").
+     * @return {@code true} if the user has the specified permission on any ancestor
+     *         directory or directly on the file;
+     *         {@code false} otherwise.
      */
     private boolean hasPermissionForFile(File file, String keycloakUserId, String permission) {
         boolean hasPermissionForAnyDir = sharingGrpcClient.hasPermissionForDirectories(keycloakUserId,
-                directoryRepository.getAllAncestorsIncludingSelf(file.getDirectory().getId()).stream().mapToLong(DirectoryFlatResponse::id).boxed().toList(),
+                directoryRepository.getAllAncestorsIncludingSelf(file.getDirectory().getId()).stream()
+                        .mapToLong(DirectoryFlatResponse::id).boxed().toList(),
                 permission);
 
         if (hasPermissionForAnyDir)

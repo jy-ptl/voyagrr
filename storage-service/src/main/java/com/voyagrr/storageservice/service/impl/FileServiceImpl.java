@@ -23,7 +23,8 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public File findById(long fileId) {
-        return fileRepository.findById(fileId).orElseThrow(() -> new EntityNotFoundException(ENTITY_DOES_NOT_EXISTS.formatted(ExceptionConstant.RESOURCES.FILE)));
+        return fileRepository.findById(fileId).orElseThrow(
+                () -> new EntityNotFoundException(ENTITY_DOES_NOT_EXISTS.formatted(ExceptionConstant.RESOURCES.FILE)));
     }
 
     @Override

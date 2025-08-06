@@ -21,7 +21,8 @@ public interface MediaShareService {
 
     boolean deleteAllPermissionByGroupIds(List<Long> groupIds);
 
-    ContentAccessResponse contentAccessOfDirectoryByDirectoryIdAndUserId(List<Long> ancestorsIncludingSelf, List<Long> directoryIds, List<Long> fileIds, String keycloakUserId);
+    ContentAccessResponse contentAccessOfDirectoryByDirectoryIdAndUserId(List<Long> ancestorsIncludingSelf,
+            List<Long> directoryIds, List<Long> fileIds, String keycloakUserId);
 
     boolean hasPermissionForDirectories(String keycloakUserId, List<Long> directoryIds, String permission);
 

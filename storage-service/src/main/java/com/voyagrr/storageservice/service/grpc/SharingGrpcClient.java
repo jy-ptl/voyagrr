@@ -52,8 +52,8 @@ public class SharingGrpcClient {
                         .setUserId(keycloakUserId)
                         .setPermission(permission)
                         .addAllDirectoryId(directoryIds)
-                        .build()
-        ).getAllowed();
+                        .build())
+                .getAllowed();
     }
 
     public boolean hasPermissionForFile(String keycloakUserId, long fileId, String permission) {
@@ -62,8 +62,8 @@ public class SharingGrpcClient {
                         .setUserId(keycloakUserId)
                         .setFileId(fileId)
                         .setPermission(permission)
-                        .build()
-        ).getAllowed();
+                        .build())
+                .getAllowed();
     }
 
 }
