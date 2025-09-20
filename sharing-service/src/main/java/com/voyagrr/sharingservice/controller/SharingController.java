@@ -10,20 +10,29 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/share")
 @RequiredArgsConstructor
+@Tag(name = "Share", description = "APIs related to sharing a resource")
 public class SharingController {
 
     private final MediaShareService mediaShareService;
 
+    @Operation(summary = "Share a directory", description = "Share a directory with specified permission to a user or a group", security = {
+            @SecurityRequirement(name = "bearerAuth") })
     @RequestMapping(value = "directory", method = RequestMethod.POST)
     public ResponseEntity<String> updateDirectoryPermission(@RequestBody DirectoryPermissionRequest request,
             @AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.ok().body(mediaShareService.updateDirectoryPermission(request, jwt.getSubject()));
     }
 
+    @Operation(summary = "Share a file", description = "Share a file with specified permission to a user or a group", security = {
+            @SecurityRequirement(name = "bearerAuth") })
     @RequestMapping(value = "file", method = RequestMethod.POST)
     public ResponseEntity<String> updateFilePermission(@RequestBody FilePermissionRequest request,
             @AuthenticationPrincipal Jwt jwt) {
