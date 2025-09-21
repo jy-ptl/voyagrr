@@ -18,12 +18,12 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 @RequestMapping("/api/group")
 @RequiredArgsConstructor
 @Tag(name = "Group", description = "APIs for managing groups")
+@SecurityRequirement(name = "bearerAuth")
 public class GroupController {
 
     private final GroupService groupService;
 
-    @Operation(summary = "Create a group", description = "Create a new group", security = {
-            @SecurityRequirement(name = "bearerAuth") })
+    @Operation(summary = "Create a group", description = "Create a new group")
     @RequestMapping(value = "create", method = RequestMethod.POST)
     public ResponseEntity<Long> create(@RequestBody GroupCreateRequest request,
             @AuthenticationPrincipal Jwt jwt) {

@@ -19,20 +19,19 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 @RequestMapping("/api/share")
 @RequiredArgsConstructor
 @Tag(name = "Share", description = "APIs related to sharing a resource")
+@SecurityRequirement(name = "bearerAuth")
 public class SharingController {
 
     private final MediaShareService mediaShareService;
 
-    @Operation(summary = "Share a directory", description = "Share a directory with specified permission to a user or a group", security = {
-            @SecurityRequirement(name = "bearerAuth") })
+    @Operation(summary = "Share a directory", description = "Share a directory with specified permission to a user or a group")
     @RequestMapping(value = "directory", method = RequestMethod.POST)
     public ResponseEntity<String> updateDirectoryPermission(@RequestBody DirectoryPermissionRequest request,
             @AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.ok().body(mediaShareService.updateDirectoryPermission(request, jwt.getSubject()));
     }
 
-    @Operation(summary = "Share a file", description = "Share a file with specified permission to a user or a group", security = {
-            @SecurityRequirement(name = "bearerAuth") })
+    @Operation(summary = "Share a file", description = "Share a file with specified permission to a user or a group")
     @RequestMapping(value = "file", method = RequestMethod.POST)
     public ResponseEntity<String> updateFilePermission(@RequestBody FilePermissionRequest request,
             @AuthenticationPrincipal Jwt jwt) {

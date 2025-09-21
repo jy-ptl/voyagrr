@@ -9,7 +9,8 @@ public final class ExceptionConstant {
     public enum RESOURCES {
         FILE,
         DIRECTORY,
-        GROUP
+        GROUP,
+        USER
     }
 
     public static final String ENTITY_DOES_NOT_EXISTS = "%s does not exist";
