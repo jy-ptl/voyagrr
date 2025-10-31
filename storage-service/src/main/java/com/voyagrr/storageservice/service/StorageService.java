@@ -16,4 +16,6 @@ public interface StorageService {
     Resource download(long fileId, String keycloakUserId);
 
     String deleteFile(long fileId, String keycloakUserId);
+
+    String getMinioObjectKey(Long fileId, String keycloakUserId);
 }

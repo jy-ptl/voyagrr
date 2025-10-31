@@ -1,0 +1,21 @@
+server:
+  port: 8085
+  forward-headers-strategy: framework
+
+spring:
+  application:
+    name: metadata-service
+
+management:
+  endpoint:
+    health:
+      show-details: always
+
+  metrics:
+    tags:
+      application: metadata-service
+
+  prometheus:
+    metrics:
+      export:
+        enabled: true

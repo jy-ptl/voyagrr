@@ -176,6 +176,16 @@ public class MinioStorageService implements StorageService {
         }
     }
 
+    @Override
+    public String getMinioObjectKey(Long fileId, String keycloakUserId) {
+        File file = fileRepository.findById(fileId)
+                .orElseThrow(() -> new EntityNotFoundException(ENTITY_DOES_NOT_EXISTS.formatted(RESOURCES.FILE)));
+        if (hasPermissionForFile(file, keycloakUserId, Permission.VIEW.name())) {
+            return file.getMinioObjectKey();
+        }
+        return "";
+    }
+
     /**
      * Checks if a user has the specified permission on a given file, either via any
      * ancestor directory (including its own directory)

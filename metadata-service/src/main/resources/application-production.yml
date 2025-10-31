@@ -1,0 +1,42 @@
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}
+
+  datasource:
+    url: jdbc:postgresql://${ENCODING_DB_HOST}:${ENCODING_DB_PORT}/${ENCODING_DB_NAME}
+    username: ${ENCODING_DB_USER}
+    password: ${ENCODING_DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
+
+minio:
+  url: ${MINIO_ENDPOINT}
+  access-key: ${MINIO_ACCESS_KEY}
+  secret-key: ${MINIO_SECRET_KEY}
+  bucket: ${MINIO_BUCKET}
+
+grpc:
+  client:
+    storage-service:
+      address: static://storage-service:${STORAGE_GRPC_SERVICE_PORT}
+      negotiationType: plaintext
+
+  server:
+    port: ${METADATA_GRPC_SERVICE_PORT}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus

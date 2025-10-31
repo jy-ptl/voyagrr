@@ -63,6 +63,19 @@ services:
       - encoding-database-data:/var/lib/postgresql/data
     networks:
       - voyagrr-net
+    
+  metadata-service-database:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: metadata_service_database
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5438:5432'
+    volumes:
+      - metadata-database-data:/var/lib/postgresql/data
+    networks:
+      - voyagrr-net
 
   eureka:
     build:
@@ -228,12 +241,34 @@ services:
     networks:
       - voyagrr-net
 
+  metadata-service:
+    build:
+      context: .
+      dockerfile: metadata-service/Dockerfile
+    ports:
+      - '8085:8085'
+      - '9092:9092'
+    depends_on:
+      - eureka
+      - api-gateway
+      - metadata-service-database
+      - minio
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://metadata-service-database:5432/metadata_service_database
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    networks:
+      - voyagrr-net
+
+
 volumes:
   keycloak-database-data:
   user-database-data:
   storage-database-data:
   sharing-database-data:
   encoding-database-data:
+  metadata-database-data:
   minio-data:
   prometheus-data:
   grafana-storage:

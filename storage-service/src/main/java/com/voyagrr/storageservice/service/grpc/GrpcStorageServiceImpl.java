@@ -4,6 +4,8 @@ import com.voyagrr.common.proto.*;
 import com.voyagrr.storageservice.dto.DirectoryFlatResponse;
 import com.voyagrr.storageservice.repository.DirectoryRepository;
 import com.voyagrr.storageservice.service.DirectoryService;
+import com.voyagrr.storageservice.service.StorageService;
+
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.server.service.GrpcService;
@@ -14,6 +16,7 @@ public class GrpcStorageServiceImpl extends StorageServiceGrpc.StorageServiceImp
 
     private final DirectoryService directoryService;
     private final DirectoryRepository directoryRepository;
+    private final StorageService storageService;
 
     @Override
     public void getAllAncestorsIncludingSelf(AncestorsIncludingSelfRequest request,
@@ -33,5 +36,17 @@ public class GrpcStorageServiceImpl extends StorageServiceGrpc.StorageServiceImp
                         .addAllDirectoryId(directoryService.getAllAncestorsIncludingSelfFromFileId(request.getFileId()))
                         .build());
         responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getMinioObjectKeyFromFileId(MinioObjectKeyRequest request,
+            StreamObserver<MinioObjectKeyResponse> responseObserver) {
+        responseObserver.onNext(
+                MinioObjectKeyResponse.newBuilder()
+                        .setMinioObjectKey(
+                                storageService.getMinioObjectKey(request.getFileId(), request.getKeycloakUserId()))
+                        .build());
+        responseObserver.onCompleted();
+
     }
 }

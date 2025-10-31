@@ -1,0 +1,42 @@
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://keycloak:8070/realms/voyagrr
+
+  datasource:
+    url: jdbc:postgresql://metadata-service-database:5432/metadata_service_database
+    username: postgres
+    password: postgres
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka:8761/eureka
+
+minio:
+  url: http://minio:9000
+  access-key: minioadmin
+  secret-key: minioadmin123
+  bucket: voyagrr-media
+
+grpc:
+  client:
+    storage-service:
+      address: static://storage-service:9091
+      negotiationType: plaintext
+
+  server:
+    port: 9092
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
