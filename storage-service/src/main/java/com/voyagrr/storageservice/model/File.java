@@ -28,14 +28,15 @@ public class File extends Auditable {
     @JoinColumn(name = "directory_id", nullable = false)
     private Directory directory;
 
-    @Column(name = "mini_object_key")
+    @Column(name = "minio_object_key")
     private String minioObjectKey;
 
     @Column(name = "mime_type")
     private String mimeType;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
-    @Column(name = "encoding_status")
+    @Column(name = "encoding_status", nullable = false)
     private EncodingStatus encodingStatus = EncodingStatus.PENDING;
 
 }

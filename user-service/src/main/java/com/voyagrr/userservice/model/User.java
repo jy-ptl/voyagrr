@@ -30,7 +30,8 @@ public class User extends Auditable {
 
     private String lastName;
 
-    @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
-    private boolean isDeleted;
+    @Builder.Default
+    @Column(name = "is_deleted", nullable = false)
+    private boolean deleted = false;
 
 }

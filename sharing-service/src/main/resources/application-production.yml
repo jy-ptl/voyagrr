@@ -5,6 +5,11 @@ spring:
         jwt:
           issuer-uri: ${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}
 
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog.master.yaml
+
+
   datasource:
     url: jdbc:postgresql://${SHARING_DB_HOST}:${SHARING_DB_PORT}/${SHARING_DB_NAME}
     username: ${SHARING_DB_USER}
@@ -12,7 +17,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
 eureka:
