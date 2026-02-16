@@ -21,10 +21,10 @@ public class FileMetadata extends Auditable {
     @Column(name = "file_id", nullable = false, updatable = false)
     private Long fileId;
 
-    @Column(name = "mini_object_key", nullable = false, updatable = false)
+    @Column(name = "minio_object_key", nullable = false, updatable = false)
     private String minioObjectKey;
 
-    @Column(name = "mime_type")
+    @Column(name = "mime_type", nullable = false)
     private String mimeType;
 
 }
