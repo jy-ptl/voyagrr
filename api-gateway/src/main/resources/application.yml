@@ -30,10 +30,10 @@ spring:
               uri: lb://encoding-service
               predicates:
                 - Path=/api/encode/**
-            - id: metadata-service
-              uri: lb://metadata-service
+            - id: processing-service
+              uri: lb://processing-service
               predicates:
-                - Path=/api/metadata/**
+                - Path=/api/process/**
 
             - id: user-service-prometheus
               uri: http://user-service:8081
@@ -63,9 +63,9 @@ spring:
               filters:
                 - StripPrefix=1
 
-            - id: metadata-service-prometheus
-              uri: http://metadata-service:8085
+            - id: processing-service-prometheus
+              uri: http://processing-service:8085
               predicates:
-                - Path=/metadata-service/actuator/prometheus
+                - Path=/processing-service/actuator/prometheus
               filters:
                 - StripPrefix=1

@@ -86,7 +86,7 @@ elif [ "$MODE" = "infra" ]; then
   mvn clean install -pl common-lib -am
   echo "Starting infrastructure services only..."
 
-  SERVICES="keycloak-database user-service-database storage-service-database encoding-service-database sharing-service-database metadata-service-database keycloak minio prometheus grafana"
+  SERVICES="keycloak-database user-service-database storage-service-database encoding-service-database sharing-service-database processing-service-database keycloak minio prometheus grafana"
 
   docker compose down
   docker system prune -f

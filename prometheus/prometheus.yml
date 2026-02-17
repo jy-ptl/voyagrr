@@ -19,7 +19,7 @@ scrape_configs:
     static_configs:
       - targets: ['api-gateway:8080']
 
-  - job_name: 'metadata-service'
-    metrics_path: '/metadata-service/actuator/prometheus'
+  - job_name: 'processing-service'
+    metrics_path: '/processing-service/actuator/prometheus'
     static_configs:
       - targets: ['api-gateway:8080']
