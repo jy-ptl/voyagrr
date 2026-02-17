@@ -29,42 +29,42 @@ spring:
             - id: encoding-service
               uri: lb://encoding-service
               predicates:
-                - Path=/api/encode/**
+                - Path=/api/process/**
             - id: processing-service
               uri: lb://processing-service
               predicates:
                 - Path=/api/process/**
 
             - id: user-service-prometheus
-              uri: http://user-service:8081
+              uri: lb://user-service
               predicates:
                 - Path=/user-service/actuator/prometheus
               filters:
                 - StripPrefix=1
 
             - id: storage-service-prometheus
-              uri: http://storage-service:8082
+              uri: lb://storage-service
               predicates:
                 - Path=/storage-service/actuator/prometheus
               filters:
                 - StripPrefix=1
 
             - id: sharing-service-prometheus
-              uri: http://sharing-service:8083
+              uri: lb://sharing-service
               predicates:
                 - Path=/sharing-service/actuator/prometheus
               filters:
                 - StripPrefix=1
 
             - id: encoding-service-prometheus
-              uri: http://encoding-service:8084
+              uri: lb://encoding-service
               predicates:
                 - Path=/encoding-service/actuator/prometheus
               filters:
                 - StripPrefix=1
 
             - id: processing-service-prometheus
-              uri: http://processing-service:8085
+              uri: lb://processing-service
               predicates:
                 - Path=/processing-service/actuator/prometheus
               filters:
