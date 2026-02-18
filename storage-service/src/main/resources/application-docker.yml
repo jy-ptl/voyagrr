@@ -5,6 +5,18 @@ spring:
         jwt:
           issuer-uri: http://keycloak:8070/realms/voyagrr
 
+  kafka:
+    bootstrap-servers: kafka:9092
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+    properties:
+      acks: all
+      retries: 5
+      enable.idempotence: true
+
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog.master.yaml

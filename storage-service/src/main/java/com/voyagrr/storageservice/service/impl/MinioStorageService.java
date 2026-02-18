@@ -5,12 +5,14 @@ import com.voyagrr.common.exception.AccessDeniedException;
 import com.voyagrr.common.exception.EntityNotFoundException;
 import com.voyagrr.storageservice.dto.DirectoryFlatResponse;
 import com.voyagrr.storageservice.dto.FileUploadRequest;
+import com.voyagrr.storageservice.dto.FileUploadedEvent;
 import com.voyagrr.storageservice.model.Directory;
 import com.voyagrr.storageservice.model.File;
 import com.voyagrr.storageservice.repository.DirectoryRepository;
 import com.voyagrr.storageservice.repository.FileRepository;
 import com.voyagrr.storageservice.service.StorageService;
 import com.voyagrr.storageservice.service.grpc.SharingGrpcClient;
+import com.voyagrr.storageservice.service.kafka.FileEventProducer;
 import com.voyagrr.storageservice.utility.FileUtility;
 import io.minio.*;
 import io.minio.messages.DeleteError;
@@ -27,6 +29,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,6 +47,8 @@ public class MinioStorageService implements StorageService {
 
     private final FileRepository fileRepository;
     private final DirectoryRepository directoryRepository;
+
+    private final FileEventProducer fileEventProducer;
 
     @Value("${minio.bucket}")
     private String bucket;
@@ -92,7 +97,7 @@ public class MinioStorageService implements StorageService {
                             .contentType(mimeType)
                             .build());
 
-            fileRepository
+            File savedFile = fileRepository
                     .save(File
                             .builder()
                             .name(file.getOriginalFilename())
@@ -100,6 +105,20 @@ public class MinioStorageService implements StorageService {
                             .minioObjectKey(minioObjectKey + "/" + uuidFilename)
                             .mimeType(mimeType)
                             .ownerId(keycloakUserId)
+                            .build());
+
+            fileEventProducer.sendUploadedEvent(
+                    FileUploadedEvent.builder()
+                            .eventId(UUID.randomUUID().toString())
+                            .eventType("FILE_UPLOADED")
+                            .bucket(bucket)
+                            .timestamp(Instant.now())
+                            .fileId(String.valueOf(savedFile.getId()))
+                            .ownerId(savedFile.getOwnerId())
+                            .objectKey(savedFile.getMinioObjectKey())
+                            .mimeType(savedFile.getMimeType())
+                            .size(file.getSize())
+                            .status("UPLOADED")
                             .build());
 
             return "Success";

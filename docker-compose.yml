@@ -77,6 +77,19 @@ services:
     networks:
       - voyagrr-net
 
+  metadata-service-database:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: metadata_service_database
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5439:5432'
+    volumes:
+      - metadata-database-data:/var/lib/postgresql/data
+    networks:
+      - voyagrr-net
+
   eureka:
     build:
       context: .
@@ -165,6 +178,23 @@ services:
       - grafana-storage:/var/lib/grafana
     networks:
       - voyagrr-net
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
   user-service:
     build:
@@ -267,6 +297,15 @@ services:
     networks:
       - voyagrr-net
 
+  metadata-service:
+    build: ./metadata-service
+    environment:
+      ENV: docker
+
+    depends_on:
+      - kafka
+      - metadata-service-database
+      - minio
 
 volumes:
   keycloak-database-data:
@@ -275,6 +314,7 @@ volumes:
   sharing-database-data:
   encoding-database-data:
   processing-database-data:
+  metadata-database-data:
   minio-data:
   prometheus-data:
   grafana-storage:

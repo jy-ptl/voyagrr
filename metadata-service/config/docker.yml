@@ -1,0 +1,11 @@
+kafka:
+  bootstrap_servers: kafka:9092 
+  topic_uploaded: file.uploaded.v1
+
+postgres:
+  url: postgresql://metadata-service-database:5432/metadata_service_database
+
+minio:
+  url: minio:9000
+  access-key: minioadmin
+  secret-key: minioadmin123

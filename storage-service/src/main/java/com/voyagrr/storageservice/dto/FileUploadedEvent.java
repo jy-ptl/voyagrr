@@ -1,0 +1,29 @@
+package com.voyagrr.storageservice.dto;
+
+import java.time.Instant;
+
+import lombok.*;
+
+@Getter
+@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class FileUploadedEvent {
+
+    private String eventId;
+    private String eventType;
+    private Instant timestamp;
+
+    private String fileId;
+    private String ownerId;
+
+    private String bucket;
+    private String objectKey;
+
+    private String mimeType;
+    private long size;
+
+    private String status;
+
+}
