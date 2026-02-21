@@ -9,6 +9,13 @@ spring:
     enabled: true
     change-log: classpath:db/changelog/db.changelog.master.yaml
 
+  kafka:
+    bootstrap-servers: kafka:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+
   datasource:
     url: jdbc:postgresql://processing-service-database:5432/processing_service_database
     username: postgres

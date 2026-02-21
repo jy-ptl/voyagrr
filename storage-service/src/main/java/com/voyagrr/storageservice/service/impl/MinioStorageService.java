@@ -116,8 +116,6 @@ public class MinioStorageService implements StorageService {
                             .fileId(String.valueOf(savedFile.getId()))
                             .ownerId(savedFile.getOwnerId())
                             .objectKey(savedFile.getMinioObjectKey())
-                            .mimeType(savedFile.getMimeType())
-                            .size(file.getSize())
                             .status("UPLOADED")
                             .build());
 

@@ -2,4 +2,6 @@ databaseChangeLog:
   - include:
       file: db/changelog/migrations/12-add-liquibase-for-relevent-services.sql
       relativeToChangelogFile: false
-
+  - include:
+      file: db/changelog/migrations/14-rewrite-metadata-service-in-python.sql
+      relativeToChangelogFile: false

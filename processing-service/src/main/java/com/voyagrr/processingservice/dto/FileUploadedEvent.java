@@ -1,4 +1,4 @@
-package com.voyagrr.storageservice.dto;
+package com.voyagrr.processingservice.dto;
 
 import java.time.Instant;
 

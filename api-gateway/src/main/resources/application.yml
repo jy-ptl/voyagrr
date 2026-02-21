@@ -29,7 +29,7 @@ spring:
             - id: encoding-service
               uri: lb://encoding-service
               predicates:
-                - Path=/api/process/**
+                - Path=/api/encode/**
             - id: processing-service
               uri: lb://processing-service
               predicates:

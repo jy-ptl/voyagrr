@@ -1,22 +1,18 @@
 package com.voyagrr.processingservice.service.impl;
 
-import java.io.InputStream;
+import java.time.Instant;
+import java.util.UUID;
 
-import com.drew.imaging.ImageMetadataReader;
-import com.drew.metadata.Directory;
-import com.drew.metadata.Metadata;
-import com.drew.metadata.Tag;
+import com.voyagrr.processingservice.dto.FileUploadedEvent;
 import com.voyagrr.processingservice.dto.ProcessRequest;
-import com.voyagrr.processingservice.repository.FileMetadataRepository;
 import com.voyagrr.processingservice.service.ProcessingService;
 import com.voyagrr.processingservice.service.grpc.StorageGrpcClient;
+import com.voyagrr.processingservice.service.kafka.FileEventProducer;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import io.minio.GetObjectArgs;
-import io.minio.MinioClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,10 +24,9 @@ public class ProcessingServiceImpl implements ProcessingService {
     @Value("${minio.bucket}")
     private String bucket;
 
-    private final MinioClient minioClient;
-    private final FileMetadataRepository fileMetadataRepository;
-
     private final StorageGrpcClient storageGrpcClient;
+
+    private final FileEventProducer fileEventProducer;
 
     @Async
     @Override
@@ -43,22 +38,17 @@ public class ProcessingServiceImpl implements ProcessingService {
         if (minioObjectKey.equals(""))
             return;
 
-        try {
-            InputStream inputStream = minioClient.getObject(GetObjectArgs.builder()
-                    .bucket(bucket)
-                    .object(processRequest.minioObjectKey())
-                    .build());
-            Metadata metadata = ImageMetadataReader.readMetadata(inputStream);
-
-            for (Directory directory : metadata.getDirectories()) {
-                for (Tag tag : directory.getTags()) {
-                    System.out.println(tag);
-                }
-            }
-
-        } catch (Exception exception) {
-            log.error(exception.getMessage());
-        }
+        fileEventProducer.sendUploadedEvent(
+                FileUploadedEvent.builder()
+                        .eventId(UUID.randomUUID().toString())
+                        .eventType("FILE_UPLOADED")
+                        .bucket(bucket)
+                        .timestamp(Instant.now())
+                        .fileId(String.valueOf(processRequest.fileId()))
+                        .ownerId(keycloakUserId)
+                        .objectKey(minioObjectKey)
+                        .status("UPLOADED")
+                        .build());
 
     }
 

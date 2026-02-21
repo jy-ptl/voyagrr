@@ -1,6 +1,11 @@
 package com.voyagrr.processingservice.model;
 
+import java.util.Map;
+
 import com.voyagrr.processingservice.config.Auditable;
+
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -26,5 +31,9 @@ public class FileMetadata extends Auditable {
 
     @Column(name = "mime_type", nullable = false)
     private String mimeType;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "metadata", columnDefinition = "jsonb")
+    private Map<String, Object> metadata;
 
 }
