@@ -127,6 +127,8 @@ services:
         condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
       interval: 15s
@@ -222,6 +224,14 @@ services:
       timeout: 10s
       retries: 10
       start_period: 30s
+    networks:
+      - voyagrr-net
+
+  redis:
+    image: redis:7
+    restart: always
+    ports:
+      - "6379:6379"
     networks:
       - voyagrr-net
 

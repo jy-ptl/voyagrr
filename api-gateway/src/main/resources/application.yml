@@ -4,7 +4,10 @@ server:
 spring:
   application:
     name: api-gateway
-
+  data:
+    redis:
+      host: redis
+      port: 6379
   cloud:
     gateway:
       server:
@@ -18,10 +21,22 @@ spring:
               uri: lb://user-service
               predicates:
                 - Path=/api/auth/**, /api/user/**
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 1
+                    redis-rate-limiter.burstCapacity: 2
+                    key-resolver: "#{@ipKeyResolver}"
             - id: storage-service
               uri: lb://storage-service
               predicates:
                 - Path=/api/storage/**, /api/directory/**
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 2
+                    redis-rate-limiter.burstCapacity: 5
+                    key-resolver: "#{@userKeyResolver}"
             - id: sharing-service
               uri: lb://sharing-service
               predicates:
@@ -30,6 +45,12 @@ spring:
               uri: lb://encoding-service
               predicates:
                 - Path=/api/encode/**
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 1
+                    redis-rate-limiter.burstCapacity: 2
+                    key-resolver: "#{@userKeyResolver}"
             - id: processing-service
               uri: lb://processing-service
               predicates:
@@ -69,3 +90,9 @@ spring:
                 - Path=/processing-service/actuator/prometheus
               filters:
                 - StripPrefix=1
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: gateway,health
