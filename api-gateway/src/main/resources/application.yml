@@ -62,28 +62,24 @@ spring:
                 - Path=/user-service/actuator/prometheus
               filters:
                 - StripPrefix=1
-
             - id: storage-service-prometheus
               uri: lb://storage-service
               predicates:
                 - Path=/storage-service/actuator/prometheus
               filters:
                 - StripPrefix=1
-
             - id: sharing-service-prometheus
               uri: lb://sharing-service
               predicates:
                 - Path=/sharing-service/actuator/prometheus
               filters:
                 - StripPrefix=1
-
             - id: encoding-service-prometheus
               uri: lb://encoding-service
               predicates:
                 - Path=/encoding-service/actuator/prometheus
               filters:
                 - StripPrefix=1
-
             - id: processing-service-prometheus
               uri: lb://processing-service
               predicates:
@@ -95,4 +91,4 @@ management:
   endpoints:
     web:
       exposure:
-        include: gateway,health
+        include: health

@@ -2,7 +2,7 @@ package com.voyagrr.processingservice.model;
 
 import java.util.Map;
 
-import com.voyagrr.processingservice.config.Auditable;
+import com.voyagrr.processingservice.config.entity.Auditable;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;

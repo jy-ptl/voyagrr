@@ -6,8 +6,8 @@ import java.util.UUID;
 import com.voyagrr.processingservice.dto.FileUploadedEvent;
 import com.voyagrr.processingservice.dto.ProcessRequest;
 import com.voyagrr.processingservice.service.ProcessingService;
-import com.voyagrr.processingservice.service.grpc.StorageGrpcClient;
-import com.voyagrr.processingservice.service.kafka.FileEventProducer;
+import com.voyagrr.processingservice.service.grpc.client.StorageGrpcClient;
+import com.voyagrr.processingservice.service.kafka.producer.FileEventProducer;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;

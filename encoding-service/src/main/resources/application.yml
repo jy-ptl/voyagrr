@@ -10,11 +10,9 @@ management:
   endpoint:
     health:
       show-details: always
-
   metrics:
     tags:
       application: encoding-service
-
   prometheus:
     metrics:
       export:

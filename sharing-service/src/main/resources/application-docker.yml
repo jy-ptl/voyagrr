@@ -4,16 +4,13 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://keycloak:8070/realms/voyagrr
-
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog.master.yaml
-
   datasource:
     url: jdbc:postgresql://sharing-service-database:5432/storage_service_database
     username: postgres
     password: postgres
-
   jpa:
     hibernate:
       ddl-auto: none
@@ -35,6 +32,5 @@ grpc:
     storage-service:
       address: static://storage-service:9091
       negotiationType: plaintext
-
   server:
     port: 9090

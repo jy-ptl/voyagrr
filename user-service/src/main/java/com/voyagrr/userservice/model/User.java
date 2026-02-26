@@ -1,6 +1,6 @@
 package com.voyagrr.userservice.model;
 
-import com.voyagrr.userservice.config.Auditable;
+import com.voyagrr.userservice.config.entity.Auditable;
 import jakarta.persistence.*;
 import lombok.*;
 

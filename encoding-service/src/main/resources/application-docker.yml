@@ -4,12 +4,10 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://keycloak:8070/realms/voyagrr
-
   datasource:
     url: jdbc:postgresql://encoding-service-database:5432/encoding_service_database
     username: postgres
     password: postgres
-
   jpa:
     hibernate:
       ddl-auto: update

@@ -4,12 +4,10 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: ${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}
-
   datasource:
     url: jdbc:postgresql://${ENCODING_DB_HOST}:${ENCODING_DB_PORT}/${ENCODING_DB_NAME}
     username: ${ENCODING_DB_USER}
     password: ${ENCODING_DB_PASSWORD}
-
   jpa:
     hibernate:
       ddl-auto: update

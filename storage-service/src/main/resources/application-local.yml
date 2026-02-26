@@ -4,21 +4,17 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8070/realms/voyagrr
-
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog.master.yaml
-
   datasource:
     url: jdbc:postgresql://localhost:5435/storage_service_database
     username: postgres
     password: postgres
-
   jpa:
     hibernate:
       ddl-auto: none
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-
   servlet:
     multipart:
       max-file-size: 200MB
@@ -40,7 +36,6 @@ grpc:
     sharing-service:
       address: static://localhost:9090
       negotiationType: plaintext
-
   server:
     port: 9091
 

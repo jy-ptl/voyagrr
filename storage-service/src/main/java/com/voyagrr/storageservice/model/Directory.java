@@ -1,6 +1,6 @@
 package com.voyagrr.storageservice.model;
 
-import com.voyagrr.storageservice.config.Auditable;
+import com.voyagrr.storageservice.config.entity.Auditable;
 import jakarta.persistence.*;
 import lombok.*;
 

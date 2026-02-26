@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.voyagrr.common.exception.KeycloakAuthException;
 import com.voyagrr.common.exception.InvalidCredentialsException;
 import com.voyagrr.common.exception.EntityAlreadyExistsException;
-import com.voyagrr.userservice.config.KeycloakProperties;
+import com.voyagrr.userservice.config.keycloak.KeycloakProperties;
 import com.voyagrr.userservice.dto.UserCreateRequest;
 import com.voyagrr.userservice.dto.UserLoginRequest;
 import com.voyagrr.userservice.model.User;

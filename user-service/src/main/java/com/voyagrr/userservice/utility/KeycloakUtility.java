@@ -1,6 +1,6 @@
 package com.voyagrr.userservice.utility;
 
-import com.voyagrr.userservice.config.KeycloakProperties;
+import com.voyagrr.userservice.config.keycloak.KeycloakProperties;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
 import org.springframework.http.MediaType;
