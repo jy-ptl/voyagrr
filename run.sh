@@ -68,9 +68,9 @@ if [[ "$LOG_OPTION" != "logs" && "$LOG_OPTION" != "nologs" ]]; then
 fi
 
 if [ "$MODE" = "full" ]; then
-  mvn clean install -pl common-lib -am
   echo "Running full mode..."
 
+  mvn clean install -pl common-lib -am
   docker compose down
   docker system prune -f
 
@@ -83,10 +83,9 @@ if [ "$MODE" = "full" ]; then
   fi
 
 elif [ "$MODE" = "infra" ]; then
-  mvn clean install -pl common-lib -am
   echo "Starting infrastructure services only..."
 
-  SERVICES="keycloak-database user-service-database storage-service-database encoding-service-database sharing-service-database processing-service-database keycloak minio prometheus grafana"
+  SERVICES="keycloak-database user-service-database storage-service-database encoding-service-database sharing-service-database keycloak minio prometheus grafana"
 
   docker compose down
   docker system prune -f

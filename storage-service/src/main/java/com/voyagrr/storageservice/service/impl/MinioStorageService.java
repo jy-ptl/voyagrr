@@ -53,11 +53,17 @@ public class MinioStorageService implements StorageService {
     @Value("${minio.bucket}")
     private String bucket;
 
+    @Value("${minio.processed-video-bucket}")
+    private String processedVideobucket;
+
     @PostConstruct
     public void init() {
         try {
             if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build())) {
                 minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
+            }
+            if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(processedVideobucket).build())) {
+                minioClient.makeBucket(MakeBucketArgs.builder().bucket(processedVideobucket).build());
             }
         } catch (Exception e) {
             log.error(e.getMessage());

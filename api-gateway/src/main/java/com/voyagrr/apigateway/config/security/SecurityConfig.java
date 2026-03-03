@@ -21,7 +21,6 @@ public class SecurityConfig {
                         .pathMatchers("/user-service/actuator/**").permitAll()
                         .pathMatchers("/storage-service/actuator/**").permitAll()
                         .pathMatchers("/sharing-service/actuator/**").permitAll()
-                        .pathMatchers("/encoding-service/actuator/**").permitAll()
                         .pathMatchers("/processing-service/actuator/**").permitAll()
 
                         .pathMatchers(HttpMethod.POST, "/api/auth/register").permitAll()

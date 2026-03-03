@@ -41,10 +41,6 @@ spring:
               uri: lb://sharing-service
               predicates:
                 - Path=/api/share/**, /api/group/**
-            - id: encoding-service
-              uri: lb://encoding-service
-              predicates:
-                - Path=/api/encode/**
               filters:
                 - name: RequestRateLimiter
                   args:
@@ -72,12 +68,6 @@ spring:
               uri: lb://sharing-service
               predicates:
                 - Path=/sharing-service/actuator/prometheus
-              filters:
-                - StripPrefix=1
-            - id: encoding-service-prometheus
-              uri: lb://encoding-service
-              predicates:
-                - Path=/encoding-service/actuator/prometheus
               filters:
                 - StripPrefix=1
             - id: processing-service-prometheus
