@@ -208,3 +208,14 @@ mvn clean test
 - Mobile application
 
 ---
+
+## License
+
+This project is dual-licensed:
+
+- GNU Affero General Public License v3 (AGPLv3) for open-source use
+- Commercial license for proprietary or commercial use
+
+For commercial licensing, contact the project owner.
+
+---
