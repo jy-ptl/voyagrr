@@ -356,6 +356,21 @@ services:
     networks:
       - voyagrr-net
 
+  analysis-service:
+    build:
+      context: ./analysis-service
+    environment:
+      ENV: docker
+    depends_on:
+      kafka:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - voyagrr-net
+    volumes:
+      - analysis-models:/models
+
 volumes:
   keycloak-database-data:
   user-database-data:
@@ -367,6 +382,7 @@ volumes:
   minio-data:
   prometheus-data:
   grafana-storage:
+  analysis-models:
 
 networks:
   voyagrr-net:

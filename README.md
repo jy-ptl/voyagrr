@@ -30,10 +30,10 @@ Core features:
                         API Gateway
                             │
                             ▼
-      ------------------------------------------------
-      │         │        |        |         │        │
-    User     Storage  Sharing  Metadata  Encoding  Future
-    Service  Service  Service  Service   Services  Services
+      ----------------------------------------------------------
+      │         │        |        |         │        │         │
+    User     Storage  Sharing  Metadata  Encoding  Analysis  Future
+    Service  Service  Service  Service   Services  Service   Services
                 │                 |         |
                 ▼                 |         |
               MinIO ◀------------------------
@@ -50,6 +50,13 @@ Core features:
 - JWT validation
 - Centralized routing
 - Rate limiting
+
+### analysis-service
+- Performs AI-based media analysis
+- Detects faces, emotions, and scene information
+- Generates analysis metadata for media files
+- Consumes processing events
+- Produces analysis results for storage or search
 
 ### user-service
 - Keycloak integration
@@ -90,6 +97,7 @@ Backend:
 - Python
 - gRPC
 - Maven
+- TensorFlow / OpenCV
 
 Storage:
 - MinIO (S3-compatible object storage)
@@ -111,6 +119,7 @@ Infrastructure:
 ```
 voyagrr/
 ├── api-gateway/
+├── analysis-service/
 ├── common-lib/
 ├── discovery-service/
 ├── encoding-service/

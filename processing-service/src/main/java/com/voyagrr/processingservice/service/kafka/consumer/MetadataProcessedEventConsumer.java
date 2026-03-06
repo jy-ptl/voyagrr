@@ -50,10 +50,16 @@ public class MetadataProcessedEventConsumer {
                             .status("UPLOADED")
                             .build());
         } else if (event.getMime().contains("image")) {
-            videoEncodingCompletedProducer.sendEncodingCompletedEvent(FileUploadedEvent.builder()
-                    .fileId(event.getFileId())
-                    .objectKey(event.getMinioObjectKey())
-                    .build());
+            videoEncodingCompletedProducer.sendEncodingCompletedEvent(
+                    FileUploadedEvent.builder()
+                            .eventId(UUID.randomUUID().toString())
+                            .eventType("FILE_ENCODE_COMPLETE")
+                            .bucket(bucket)
+                            .timestamp(Instant.now())
+                            .fileId(event.getFileId())
+                            .objectKey(event.getMinioObjectKey())
+                            .status("ENCODED")
+                            .build());
         }
 
         fileMetadataRepository.save(FileMetadata.builder()
