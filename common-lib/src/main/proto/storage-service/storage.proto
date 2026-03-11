@@ -9,6 +9,7 @@ option java_string_check_utf8 = true;
 service StorageService {
   rpc GetAllAncestorsIncludingSelf(AncestorsIncludingSelfRequest) returns (AncestorsIncludingSelfResponse);
   rpc GetAllAncestorsIncludingSelfFromFileId(AncestorsIncludingSelfRequestForFile) returns (AncestorsIncludingSelfResponse);
+  rpc GetMinioObjectKeyFromFileId(MinioObjectKeyRequest) returns (MinioObjectKeyResponse);
 }
 
 message AncestorsIncludingSelfRequestForFile {
@@ -23,3 +24,11 @@ message AncestorsIncludingSelfResponse {
   repeated int64 directory_id = 1;
 }
 
+message MinioObjectKeyRequest {
+  int64 file_id = 1;
+  string keycloak_user_id = 2;
+}
+
+message MinioObjectKeyResponse {
+  string minio_object_key = 1;
+}

@@ -1,0 +1,13 @@
+kafka:
+  bootstrap_servers: localhost:9092
+  topic_analyze: file.analyze.v1
+  topic_ai_result: file.analyzed.v1
+
+minio:
+  endpoint: localhost:9000
+  access-key: minioadmin
+  secret-key: minioadmin123
+  secure: false
+
+app:
+  temp_dir: /tmp/analysis

@@ -1,6 +1,6 @@
 package com.voyagrr.userservice.model;
 
-import com.voyagrr.userservice.config.Auditable;
+import com.voyagrr.userservice.config.entity.Auditable;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,7 +30,8 @@ public class User extends Auditable {
 
     private String lastName;
 
-    @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
-    private boolean isDeleted;
+    @Builder.Default
+    @Column(name = "is_deleted", nullable = false)
+    private boolean deleted = false;
 
 }

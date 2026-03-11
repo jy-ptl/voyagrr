@@ -1,0 +1,17 @@
+app:
+  temp_dir: /tmp/encoding
+  max_workers: 2
+  cleanup_after_encoding: true
+
+kafka:
+  bootstrap_servers: localhost:9092
+  topic_encoding: file.encode.v1
+
+postgres:
+  url: postgresql://postgres:postgres@localhost:5437/encoding_service_database
+
+minio:
+  endpoint: localhost:9000
+  access-key: minio
+  secret-key: minio123
+  secure: False

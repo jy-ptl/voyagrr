@@ -1,10 +1,13 @@
-FROM maven:3.9.6-eclipse-temurin-21 AS builder
-WORKDIR /app
-COPY . .
-RUN mvn clean package -DskipTests
+FROM python:3.11-slim
 
-FROM eclipse-temurin:21-jdk-alpine
+RUN apt-get update && apt-get install -y ffmpeg
+
 WORKDIR /app
-COPY --from=builder /app/encoding-service/target/encoding-service-0.0.1-SNAPSHOT.jar app.jar
-EXPOSE 8084
-ENTRYPOINT ["java", "-jar", "app.jar"]
+
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY app ./app
+COPY config ./config
+
+CMD ["python", "-u", "-m", "app.main"]

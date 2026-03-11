@@ -4,7 +4,10 @@ server:
 spring:
   application:
     name: api-gateway
-
+  data:
+    redis:
+      host: redis
+      port: 6379
   cloud:
     gateway:
       server:
@@ -18,43 +21,64 @@ spring:
               uri: lb://user-service
               predicates:
                 - Path=/api/auth/**, /api/user/**
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 1
+                    redis-rate-limiter.burstCapacity: 2
+                    key-resolver: "#{@ipKeyResolver}"
             - id: storage-service
               uri: lb://storage-service
               predicates:
                 - Path=/api/storage/**, /api/directory/**
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 2
+                    redis-rate-limiter.burstCapacity: 5
+                    key-resolver: "#{@userKeyResolver}"
             - id: sharing-service
               uri: lb://sharing-service
               predicates:
                 - Path=/api/share/**, /api/group/**
-            - id: encoding-service
-              uri: lb://encoding-service
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 1
+                    redis-rate-limiter.burstCapacity: 2
+                    key-resolver: "#{@userKeyResolver}"
+            - id: processing-service
+              uri: lb://processing-service
               predicates:
-                - Path=/api/encode/**
+                - Path=/api/process/**
 
             - id: user-service-prometheus
-              uri: http://user-service:8081
+              uri: lb://user-service
               predicates:
                 - Path=/user-service/actuator/prometheus
               filters:
                 - StripPrefix=1
-
             - id: storage-service-prometheus
-              uri: http://storage-service:8082
+              uri: lb://storage-service
               predicates:
                 - Path=/storage-service/actuator/prometheus
               filters:
                 - StripPrefix=1
-
             - id: sharing-service-prometheus
-              uri: http://sharing-service:8083
+              uri: lb://sharing-service
               predicates:
                 - Path=/sharing-service/actuator/prometheus
               filters:
                 - StripPrefix=1
-
-            - id: encoding-service-prometheus
-              uri: http://encoding-service:8084
+            - id: processing-service-prometheus
+              uri: lb://processing-service
               predicates:
-                - Path=/encoding-service/actuator/prometheus
+                - Path=/processing-service/actuator/prometheus
               filters:
                 - StripPrefix=1
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health

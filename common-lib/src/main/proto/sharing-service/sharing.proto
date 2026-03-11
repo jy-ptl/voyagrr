@@ -6,7 +6,6 @@ option java_outer_classname = "SharingProto";
 option java_generate_equals_and_hash = true;
 option java_string_check_utf8 = true;
 
-
 service SharingService {
   rpc HasPermissionForDirectory(HasPermissionDirectoryRequest) returns (HasPermissionDirectoryResponse);
   rpc HasPermissionForDirectories(HasPermissionForDirectoriesRequest) returns (HasPermissionForDirectoriesResponse);

@@ -1,6 +1,11 @@
 package com.voyagrr.userservice.service.impl;
 
-import com.voyagrr.userservice.config.KeycloakProperties;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.voyagrr.common.exception.KeycloakAuthException;
+import com.voyagrr.common.exception.InvalidCredentialsException;
+import com.voyagrr.common.exception.EntityAlreadyExistsException;
+import com.voyagrr.userservice.config.keycloak.KeycloakProperties;
 import com.voyagrr.userservice.dto.UserCreateRequest;
 import com.voyagrr.userservice.dto.UserLoginRequest;
 import com.voyagrr.userservice.model.User;
@@ -9,8 +14,10 @@ import com.voyagrr.userservice.service.UserService;
 import com.voyagrr.userservice.utility.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -57,6 +64,13 @@ public class KeycloakAuthenticationService implements AuthenticationService {
                 .uri("/admin/realms/{realm}/users", keycloakProperties.getRealm())
                 .bodyValue(payload.toString())
                 .retrieve()
+                .onStatus(HttpStatusCode::isError, response -> response.bodyToMono(String.class).flatMap(errorBody -> {
+                    HttpStatusCode status = response.statusCode();
+                    if (status == HttpStatus.CONFLICT) {
+                        return Mono.error(new EntityAlreadyExistsException("user already exists"));
+                    }
+                    return Mono.error(new KeycloakAuthException());
+                }))
                 .toBodilessEntity()
                 .map(response -> {
                     URI location = response.getHeaders().getLocation();
@@ -70,9 +84,8 @@ public class KeycloakAuthenticationService implements AuthenticationService {
 
                         return keycloakUserId;
                     }
-                    return "Created but no user ID found";
+                    throw new KeycloakAuthException();
                 })
-                .onErrorResume(error -> Mono.just("Error: " + error.getMessage()))
                 .block();
     }
 
@@ -94,7 +107,21 @@ public class KeycloakAuthenticationService implements AuthenticationService {
                 .retrieve()
                 .onStatus(HttpStatusCode::isError,
                         response -> response.bodyToMono(String.class)
-                                .flatMap(error -> Mono.error(new RuntimeException("Login failed: " + error))))
+                                .flatMap(errorBody -> {
+                                    try {
+                                        ObjectMapper mapper = new ObjectMapper();
+                                        JsonNode errorJson = mapper.readTree(errorBody);
+                                        String error = errorJson.path("error").asText();
+                                        String description = errorJson.path("error_description").asText();
+                                        if ("invalid_grant".equals(error)) {
+                                            return Mono.error(
+                                                    new InvalidCredentialsException("Invalid username or password"));
+                                        }
+                                        return Mono.error(new KeycloakAuthException("login failed: " + description));
+                                    } catch (Exception exception) {
+                                        return Mono.error(new KeycloakAuthException("login failed: " + errorBody));
+                                    }
+                                }))
                 .bodyToMono(String.class)
                 .block();
     }

@@ -1,0 +1,36 @@
+server:
+  port: 8085
+  forward-headers-strategy: framework
+
+spring:
+  application:
+    name: processing-service
+  kafka:
+    bootstrap-servers: kafka:9092
+    producer:
+      properties:
+        spring.json.add.type.headers: false
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      properties:
+        spring.json.use.type.headers: false
+  liquibase:
+  enabled: true
+  change-log: classpath:db/changelog/db.changelog.master.yaml
+
+logging:
+  level:
+    liquibase: INFO
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: processing-service
+  prometheus:
+    metrics:
+      export:
+        enabled: true

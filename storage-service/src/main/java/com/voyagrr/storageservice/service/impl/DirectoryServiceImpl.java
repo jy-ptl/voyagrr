@@ -11,7 +11,7 @@ import com.voyagrr.storageservice.repository.DirectoryRepository;
 import com.voyagrr.storageservice.service.DirectoryService;
 import com.voyagrr.storageservice.service.FileService;
 import com.voyagrr.storageservice.service.StorageService;
-import com.voyagrr.storageservice.service.grpc.SharingGrpcClient;
+import com.voyagrr.storageservice.service.grpc.client.SharingGrpcClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

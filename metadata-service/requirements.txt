@@ -1,0 +1,8 @@
+kafka-python
+minio
+sqlalchemy
+psycopg2-binary
+python-magic
+pillow
+ffmpeg-python
+pyyaml

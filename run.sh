@@ -70,6 +70,7 @@ fi
 if [ "$MODE" = "full" ]; then
   echo "Running full mode..."
 
+  mvn clean install -pl common-lib -am
   docker compose down
   docker system prune -f
 
