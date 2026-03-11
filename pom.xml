@@ -15,6 +15,6 @@
         <module>user-service</module>
         <module>storage-service</module>
         <module>sharing-service</module>
-        <module>encoding-service</module>
+        <module>processing-service</module>
     </modules>
 </project>

@@ -14,7 +14,7 @@ import com.voyagrr.sharingservice.repository.GroupRepository;
 import com.voyagrr.sharingservice.repository.MediaShareRepository;
 import com.voyagrr.sharingservice.repository.PermissionRepository;
 import com.voyagrr.sharingservice.service.MediaShareService;
-import com.voyagrr.sharingservice.service.grpc.StorageGrpcClient;
+import com.voyagrr.sharingservice.service.grpc.client.StorageGrpcClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

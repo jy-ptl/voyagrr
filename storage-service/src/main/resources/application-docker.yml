@@ -4,17 +4,31 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://keycloak:8070/realms/voyagrr
-
+  kafka:
+    bootstrap-servers: kafka:9092
+    producer:
+      properties:
+        spring.json.add.type.headers: false
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      properties:
+        spring.json.use.type.headers: false
+    properties:
+      acks: all
+      retries: 5
+      enable.idempotence: true
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog.master.yaml
   datasource:
     url: jdbc:postgresql://storage-service-database:5432/storage_service_database
     username: postgres
     password: postgres
-
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none 
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-
   servlet:
     multipart:
       max-file-size: 200MB
@@ -30,13 +44,13 @@ minio:
   access-key: minioadmin
   secret-key: minioadmin123
   bucket: voyagrr-media
+  processed-video-bucket: processed-videos
 
 grpc:
   client:
     sharing-service:
       address: static://sharing-service:9090
       negotiationType: plaintext
-
   server:
     port: 9091
 

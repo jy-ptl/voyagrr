@@ -1,0 +1,6 @@
+kafka-python
+minio
+sqlalchemy
+psycopg2-binary
+pydantic-settings
+pyyaml

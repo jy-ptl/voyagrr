@@ -3,7 +3,7 @@ package com.voyagrr.userservice.service.impl;
 import com.voyagrr.common.constant.ExceptionConstant;
 import com.voyagrr.common.exception.EntityNotFoundException;
 import com.voyagrr.common.exception.KeycloakAuthException;
-import com.voyagrr.userservice.config.KeycloakProperties;
+import com.voyagrr.userservice.config.keycloak.KeycloakProperties;
 import com.voyagrr.userservice.dto.UserResponse;
 import com.voyagrr.userservice.dto.UserUpdateRequest;
 import com.voyagrr.userservice.model.User;

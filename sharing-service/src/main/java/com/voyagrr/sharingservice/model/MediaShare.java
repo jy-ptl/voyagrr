@@ -1,6 +1,6 @@
 package com.voyagrr.sharingservice.model;
 
-import com.voyagrr.sharingservice.config.Auditable;
+import com.voyagrr.sharingservice.config.entity.Auditable;
 import jakarta.persistence.*;
 import lombok.*;
 

@@ -22,7 +22,6 @@ spring:
                 allowed-headers:
                   - "*"
                 allow-credentials: true
-
           httpclient:
             max-initial-line-length: 65536
             max-header-size: 65536
