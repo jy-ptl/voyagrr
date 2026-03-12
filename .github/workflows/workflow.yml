@@ -7,7 +7,8 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAMESPACE: ${{ github.repository_owner }}/voyagrr
-  SERVICES: user-service storage-service sharing-service encoding-service api-gateway discovery-service
+  SERVICES: user-service storage-service sharing-service processing-service api-gateway discovery-service
+  PYTHON_SERVICES: encoding-service analysis-service metadata-service
 
 jobs:
   build-images:
@@ -33,7 +34,10 @@ jobs:
       - name: Build images
         run: |
           for service in $SERVICES; do
-            docker build -t $service:${{ github.ref_name }} -f $service/Dockerfile .
+            docker build -t $service:${{ github.ref_name }} -f $service/Dockerfile . &
+          done
+          for service in $PYTHON_SERVICES; do
+            docker build -t $sevice:${{ github.ref_name }} -f $service/Dockerfile $service &
           done
 
   push-images:
@@ -49,7 +53,7 @@ jobs:
 
       - name: Tag and push images
         run: |
-          for service in $SERVICES; do
+          for service in $SERVICES $PYTHON_SERVICES; do
             docker tag $service:${{ github.ref_name }} $REGISTRY/$IMAGE_NAMESPACE/$service:${{ github.ref_name }}
             docker push $REGISTRY/$IMAGE_NAMESPACE/$service:${{ github.ref_name }}
           done
