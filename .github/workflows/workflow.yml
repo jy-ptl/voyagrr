@@ -37,7 +37,7 @@ jobs:
             docker build -t $service:${{ github.ref_name }} -f $service/Dockerfile . &
           done
           for service in $PYTHON_SERVICES; do
-            docker build -t $sevice:${{ github.ref_name }} -f $service/Dockerfile $service &
+            docker build -t $service:${{ github.ref_name }} -f $service/Dockerfile $service &
           done
 
   push-images:
