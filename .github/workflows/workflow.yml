@@ -36,9 +36,12 @@ jobs:
           for service in $SERVICES; do
             docker build -t $service:${{ github.ref_name }} -f $service/Dockerfile . &
           done
+
           for service in $PYTHON_SERVICES; do
             docker build -t $service:${{ github.ref_name }} -f $service/Dockerfile $service &
           done
+
+          wait
 
   push-images:
     runs-on: self-hosted
