@@ -96,7 +96,7 @@ jobs:
 
             SERVICES=$(echo "$SERVICES" | xargs)
 
-            for service in $SERVICES; do
+            for service in $SERVICES $PYTHON_SERVICES; do
               docker pull ghcr.io/${{ github.repository_owner }}/voyagrr/$service:${{ github.ref_name }}
             done
 
