@@ -126,6 +126,7 @@ jobs:
             export MINIO_ACCESS_KEY="${{ secrets.MINIO_ACCESS_KEY }}"
             export MINIO_SECRET_KEY="${{ secrets.MINIO_SECRET_KEY }}"
             export MINIO_BUCKET="${{ secrets.MINIO_BUCKET }}"
+            export PROCESSED_VIDEO_BUCKET="${{ secrets.PROCESSED_VIDEO_BUCKET }}"
 
             export KEYCLOAK_URL="${{ secrets.KEYCLOAK_URL }}"
             export KEYCLOAK_REALM="${{ secrets.KEYCLOAK_REALM }}"
