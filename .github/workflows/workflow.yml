@@ -163,5 +163,5 @@ jobs:
             export EUREKA_CLIENT_SERVICEURL_DEFAULTZONE="${{ secrets.EUREKA_CLIENT_SERVICEURL_DEFAULTZONE }}"
 
             docker compose down
-            docker compose up -d
+            docker compose up -d --force-recreate
           EOF
