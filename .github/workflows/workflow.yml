@@ -140,6 +140,7 @@ jobs:
 
             export STORAGE_GRPC_SERVICE_PORT="${{ secrets.STORAGE_GRPC_SERVICE_PORT }}"
             export SHARING_GRPC_SERVICE_PORT="${{ secrets.SHARING_GRPC_SERVICE_PORT }}"
+            export PROCESSING_GRPC_SERVICE_PORT="${{ secrets.PROCESSING_GRPC_SERVICE_PORT }}"
 
             export USER_DB_HOST="${{ secrets.USER_DB_HOST }}"
             export USER_DB_PORT="${{ secrets.USER_DB_PORT }}"
@@ -164,6 +165,12 @@ jobs:
             export ENCODING_DB_NAME="${{ secrets.ENCODING_DB_NAME }}"
             export ENCODING_DB_USER="${{ secrets.ENCODING_DB_USER }}"
             export ENCODING_DB_PASSWORD="${{ secrets.ENCODING_DB_PASSWORD }}"
+
+            export PROCESSING_DB_HOST="${{ secrets.PROCESSING_DB_HOST }}"
+            export PROCESSING_DB_PORT="${{ secrets.PROCESSING_DB_PORT }}"
+            export PROCESSING_DB_NAME="${{ secrets.PROCESSING_DB_NAME }}"
+            export PROCESSING_DB_USER="${{ secrets.PROCESSING_DB_USER }}"
+            export PROCESSING_DB_PASSWORD="${{ secrets.PROCESSING_DB_PASSWORD }}"
 
             export EUREKA_CLIENT_SERVICEURL_DEFAULTZONE="${{ secrets.EUREKA_CLIENT_SERVICEURL_DEFAULTZONE }}"
 
