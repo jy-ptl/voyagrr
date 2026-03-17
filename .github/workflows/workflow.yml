@@ -176,6 +176,20 @@ jobs:
             export PROCESSING_DB_USER="${{ secrets.PROCESSING_DB_USER }}"
             export PROCESSING_DB_PASSWORD="${{ secrets.PROCESSING_DB_PASSWORD }}"
 
+            export ANALYSIS_TEMP_DIR="${{ secrets.ANALYSIS_TEMP_DIR }}"
+
+            export ANALYSIS_DB_HOST="${{ secrets.ANALYSIS_DB_HOST }}"
+            export ANALYSIS_DB_PORT="${{ secrets.ANALYSIS_DB_PORT }}"
+            export ANALYSIS_DB_NAME="${{ secrets.ANALYSIS_DB_NAME }}"
+            export ANALYSIS_DB_USER="${{ secrets.ANALYSIS_DB_USER }}"
+            export ANALYSIS_DB_PASSWORD="${{ secrets.ANALYSIS_DB_PASSWORD }}"
+
+            export METADATA_DB_HOST="${{ secrets.METADATA_DB_HOST }}"
+            export METADATA_DB_PORT="${{ secrets.METADATA_DB_PORT }}"
+            export METADATA_DB_NAME="${{ secrets.METADATA_DB_NAME }}"
+            export METADATA_DB_USER="${{ secrets.METADATA_DB_USER }}"
+            export METADATA_DB_PASSWORD="${{ secrets.METADATA_DB_PASSWORD }}"
+
             export EUREKA_CLIENT_SERVICEURL_DEFAULTZONE="${{ secrets.EUREKA_CLIENT_SERVICEURL_DEFAULTZONE }}"
 
             docker compose down
