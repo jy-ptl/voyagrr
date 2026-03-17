@@ -10,7 +10,7 @@ minio:
   secure: False
 
 postgres:
-  url: postgresql://postgres:${ANALYSIS_DB_USER}@${ANALYSIS_DB_HOST}:${ANALYSIS_DB_PORT}/${ANALYSIS_DB_NAME}
+  url: postgresql://${ANALYSIS_DB_USER}:${ANALYSIS_DB_PASSWORD}@${ANALYSIS_DB_HOST}:${ANALYSIS_DB_PORT}/${ANALYSIS_DB_NAME}
 
 app:
   temp_dir: ${ANALYSIS_TEMP_DIR}
