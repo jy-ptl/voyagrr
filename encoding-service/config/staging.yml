@@ -1,0 +1,17 @@
+app:
+  temp_dir: ${ENCODING_TEMP_DIR}
+  max_workers: ${ENCODING_MAX_WORKERS}
+  cleanup_after_encoding: true
+
+kafka:
+  bootstrap_servers: kafka:9092
+  topic_encoding: file.encode.v1
+
+postgres:
+  url: postgresql://postgres:${ENCODING_DB_USER}@${ENCODING_DB_HOST}:${ENCODING_DB_PORT}/${ENCODING_DB_NAME}
+
+minio:
+  endpoint: ${PYTHON_MINIO_ENDPOINT}
+  access-key: ${MINIO_ACCESS_KEY}
+  secret-key: ${MINIO_SECRET_KEY}
+  secure: False

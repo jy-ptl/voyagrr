@@ -128,6 +128,7 @@ jobs:
             export KEYCLOAK_DB_PASSWORD="${{ secrets.KEYCLOAK_DB_PASSWORD }}"
 
             export MINIO_ENDPOINT="${{ secrets.MINIO_ENDPOINT }}"
+            export PYTHON_MINIO_ENDPOINT="${{ secrets.PYTHON_MINIO_ENDPOINT }}"
             export MINIO_ACCESS_KEY="${{ secrets.MINIO_ACCESS_KEY }}"
             export MINIO_SECRET_KEY="${{ secrets.MINIO_SECRET_KEY }}"
             export MINIO_BUCKET="${{ secrets.MINIO_BUCKET }}"
@@ -159,6 +160,9 @@ jobs:
             export SHARING_DB_NAME="${{ secrets.SHARING_DB_NAME }}"
             export SHARING_DB_USER="${{ secrets.SHARING_DB_USER }}"
             export SHARING_DB_PASSWORD="${{ secrets.SHARING_DB_PASSWORD }}"
+
+            export ENCODING_TEMP_DIR="${{ secrets.ENCODING_TEMP_DIR }}"
+            export ENCODING_MAX_WORKERS="${{ secrets.ENCODING_MAX_WORKERS }}"
 
             export ENCODING_DB_HOST="${{ secrets.ENCODING_DB_HOST }}"
             export ENCODING_DB_PORT="${{ secrets.ENCODING_DB_PORT }}"
