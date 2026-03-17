@@ -8,7 +8,7 @@ kafka:
   topic_encoding: file.encode.v1
 
 postgres:
-  url: postgresql://postgres:${ENCODING_DB_USER}@${ENCODING_DB_HOST}:${ENCODING_DB_PORT}/${ENCODING_DB_NAME}
+  url: postgresql://${ENCODING_DB_USER}:${ENCODING_DB_PASSWORD}@${ENCODING_DB_HOST}:${ENCODING_DB_PORT}/${ENCODING_DB_NAME}
 
 minio:
   endpoint: ${PYTHON_MINIO_ENDPOINT}

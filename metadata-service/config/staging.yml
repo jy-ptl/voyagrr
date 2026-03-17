@@ -9,4 +9,4 @@ minio:
   secure: False
 
 postgres:
-  url: postgresql://postgres:${METADATA_DB_USER}@${METADATA_DB_HOST}:${METADATA_DB_PORT}/${METADATA_DB_NAME}
+  url: postgresql://${METADATA_DB_USER}:${METADATA_DB_PASSWORD}@${METADATA_DB_HOST}:${METADATA_DB_PORT}/${METADATA_DB_NAME}
