@@ -4,16 +4,13 @@ from app.core.config import get_config
 from app.core.minio_client import download_file
 from app.core.logging_config import get_logger
 from app.service.analysis_pipeline import analyze_image
-from app.core.kafka_client import create_producer
-
+from app.core.kafka_client import get_producer
 
 logger = get_logger(__name__)
 cfg = get_config()
 
 TEMP_DIR = cfg["app"]["temp_dir"]
 os.makedirs(TEMP_DIR, exist_ok=True)
-
-producer = create_producer()
 
 
 def process_event(event):
@@ -34,6 +31,7 @@ def process_event(event):
             "result": result,
         }
 
+        producer = get_producer()
         producer.send("file.analyzed.v1", result_event)
 
         logger.info("result %s", result_event)
