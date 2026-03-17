@@ -98,8 +98,8 @@ jobs:
           ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << EOF
             set -eu
 
-            SERVICES: user-service storage-service sharing-service processing-service api-gateway discovery-service
-            PYTHON_SERVICES: encoding-service analysis-service metadata-service
+            SERVICES="user-service storage-service sharing-service processing-service api-gateway discovery-service"
+            PYTHON_SERVICES="encoding-service analysis-service metadata-service"
 
             echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
