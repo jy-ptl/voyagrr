@@ -101,89 +101,87 @@ jobs:
             mkdir -p ~/deployment/voyagrr
             cd ~/deployment/voyagrr
 
-            echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
             cat << EOT > .env
-            REGISTRY=${{ env.REGISTRY }}
-            IMAGE_NAMESPACE=${{ github.repository_owner }}/voyagrr
-            TAG=${{ github.ref_name }}
-            SPRING_PROFILES_ACTIVE=${{ github.ref_name == 'main' && 'production' || 'staging' }}
+REGISTRY=${{ env.REGISTRY }}
+IMAGE_NAMESPACE=${{ github.repository_owner }}/voyagrr
+TAG=${{ github.ref_name }}
+SPRING_PROFILES_ACTIVE=${{ github.ref_name == 'main' && 'production' || 'staging' }}
 
-            # Database & Infrastructure Secrets
-            KEYCLOAK_ADMIN=${{ secrets.KEYCLOAK_ADMIN }}
-            KEYCLOAK_ADMIN_PASSWORD=${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}
-            KEYCLOAK_DB_HOST=${{ secrets.KEYCLOAK_DB_HOST }}
-            KEYCLOAK_DB_PORT=${{ secrets.KEYCLOAK_DB_PORT }}
-            KEYCLOAK_DB_NAME=${{ secrets.KEYCLOAK_DB_NAME }}
-            KEYCLOAK_DB_USER=${{ secrets.KEYCLOAK_DB_USER }}
-            KEYCLOAK_DB_PASSWORD=${{ secrets.KEYCLOAK_DB_PASSWORD }}
+KEYCLOAK_ADMIN=${{ secrets.KEYCLOAK_ADMIN }}
+KEYCLOAK_ADMIN_PASSWORD=${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}
+KEYCLOAK_DB_HOST=${{ secrets.KEYCLOAK_DB_HOST }}
+KEYCLOAK_DB_PORT=${{ secrets.KEYCLOAK_DB_PORT }}
+KEYCLOAK_DB_NAME=${{ secrets.KEYCLOAK_DB_NAME }}
+KEYCLOAK_DB_USER=${{ secrets.KEYCLOAK_DB_USER }}
+KEYCLOAK_DB_PASSWORD=${{ secrets.KEYCLOAK_DB_PASSWORD }}
 
-            MINIO_ENDPOINT=${{ secrets.MINIO_ENDPOINT }}
-            PYTHON_MINIO_ENDPOINT=${{ secrets.PYTHON_MINIO_ENDPOINT }}
-            MINIO_ACCESS_KEY=${{ secrets.MINIO_ACCESS_KEY }}
-            MINIO_SECRET_KEY=${{ secrets.MINIO_SECRET_KEY }}
-            MINIO_BUCKET=${{ secrets.MINIO_BUCKET }}
-            PROCESSED_VIDEO_BUCKET=${{ secrets.PROCESSED_VIDEO_BUCKET }}
+MINIO_ENDPOINT=${{ secrets.MINIO_ENDPOINT }}
+PYTHON_MINIO_ENDPOINT=${{ secrets.PYTHON_MINIO_ENDPOINT }}
+MINIO_ACCESS_KEY=${{ secrets.MINIO_ACCESS_KEY }}
+MINIO_SECRET_KEY=${{ secrets.MINIO_SECRET_KEY }}
+MINIO_BUCKET=${{ secrets.MINIO_BUCKET }}
+PROCESSED_VIDEO_BUCKET=${{ secrets.PROCESSED_VIDEO_BUCKET }}
 
-            KEYCLOAK_URL=${{ secrets.KEYCLOAK_URL }}
-            KEYCLOAK_REALM=${{ secrets.KEYCLOAK_REALM }}
-            KEYCLOAK_CLIENT_ID=${{ secrets.KEYCLOAK_CLIENT_ID }}
-            KEYCLOAK_CLIENT_SECRET=${{ secrets.KEYCLOAK_CLIENT_SECRET }}
+KEYCLOAK_URL=${{ secrets.KEYCLOAK_URL }}
+KEYCLOAK_REALM=${{ secrets.KEYCLOAK_REALM }}
+KEYCLOAK_CLIENT_ID=${{ secrets.KEYCLOAK_CLIENT_ID }}
+KEYCLOAK_CLIENT_SECRET=${{ secrets.KEYCLOAK_CLIENT_SECRET }}
 
-            STORAGE_GRPC_SERVICE_PORT=${{ secrets.STORAGE_GRPC_SERVICE_PORT }}
-            SHARING_GRPC_SERVICE_PORT=${{ secrets.SHARING_GRPC_SERVICE_PORT }}
-            PROCESSING_GRPC_SERVICE_PORT=${{ secrets.PROCESSING_GRPC_SERVICE_PORT }}
+STORAGE_GRPC_SERVICE_PORT=${{ secrets.STORAGE_GRPC_SERVICE_PORT }}
+SHARING_GRPC_SERVICE_PORT=${{ secrets.SHARING_GRPC_SERVICE_PORT }}
+PROCESSING_GRPC_SERVICE_PORT=${{ secrets.PROCESSING_GRPC_SERVICE_PORT }}
 
-            USER_DB_HOST=${{ secrets.USER_DB_HOST }}
-            USER_DB_PORT=${{ secrets.USER_DB_PORT }}
-            USER_DB_NAME=${{ secrets.USER_DB_NAME }}
-            USER_DB_USER=${{ secrets.USER_DB_USER }}
-            USER_DB_PASSWORD=${{ secrets.USER_DB_PASSWORD }}
+USER_DB_HOST=${{ secrets.USER_DB_HOST }}
+USER_DB_PORT=${{ secrets.USER_DB_PORT }}
+USER_DB_NAME=${{ secrets.USER_DB_NAME }}
+USER_DB_USER=${{ secrets.USER_DB_USER }}
+USER_DB_PASSWORD=${{ secrets.USER_DB_PASSWORD }}
 
-            STORAGE_DB_HOST=${{ secrets.STORAGE_DB_HOST }}
-            STORAGE_DB_PORT=${{ secrets.STORAGE_DB_PORT }}
-            STORAGE_DB_NAME=${{ secrets.STORAGE_DB_NAME }}
-            STORAGE_DB_USER=${{ secrets.STORAGE_DB_USER }}
-            STORAGE_DB_PASSWORD=${{ secrets.STORAGE_DB_PASSWORD }}
+STORAGE_DB_HOST=${{ secrets.STORAGE_DB_HOST }}
+STORAGE_DB_PORT=${{ secrets.STORAGE_DB_PORT }}
+STORAGE_DB_NAME=${{ secrets.STORAGE_DB_NAME }}
+STORAGE_DB_USER=${{ secrets.STORAGE_DB_USER }}
+STORAGE_DB_PASSWORD=${{ secrets.STORAGE_DB_PASSWORD }}
 
-            SHARING_DB_HOST=${{ secrets.SHARING_DB_HOST }}
-            SHARING_DB_PORT=${{ secrets.SHARING_DB_PORT }}
-            SHARING_DB_NAME=${{ secrets.SHARING_DB_NAME }}
-            SHARING_DB_USER=${{ secrets.SHARING_DB_USER }}
-            SHARING_DB_PASSWORD=${{ secrets.SHARING_DB_PASSWORD }}
+SHARING_DB_HOST=${{ secrets.SHARING_DB_HOST }}
+SHARING_DB_PORT=${{ secrets.SHARING_DB_PORT }}
+SHARING_DB_NAME=${{ secrets.SHARING_DB_NAME }}
+SHARING_DB_USER=${{ secrets.SHARING_DB_USER }}
+SHARING_DB_PASSWORD=${{ secrets.SHARING_DB_PASSWORD }}
 
-            ENCODING_TEMP_DIR=${{ secrets.ENCODING_TEMP_DIR }}
-            ENCODING_MAX_WORKERS=${{ secrets.ENCODING_MAX_WORKERS }}
+ENCODING_TEMP_DIR=${{ secrets.ENCODING_TEMP_DIR }}
+ENCODING_MAX_WORKERS=${{ secrets.ENCODING_MAX_WORKERS }}
 
-            ENCODING_DB_HOST=${{ secrets.ENCODING_DB_HOST }}
-            ENCODING_DB_PORT=${{ secrets.ENCODING_DB_PORT }}
-            ENCODING_DB_NAME=${{ secrets.ENCODING_DB_NAME }}
-            ENCODING_DB_USER=${{ secrets.ENCODING_DB_USER }}
-            ENCODING_DB_PASSWORD=${{ secrets.ENCODING_DB_PASSWORD }}
+ENCODING_DB_HOST=${{ secrets.ENCODING_DB_HOST }}
+ENCODING_DB_PORT=${{ secrets.ENCODING_DB_PORT }}
+ENCODING_DB_NAME=${{ secrets.ENCODING_DB_NAME }}
+ENCODING_DB_USER=${{ secrets.ENCODING_DB_USER }}
+ENCODING_DB_PASSWORD=${{ secrets.ENCODING_DB_PASSWORD }}
 
-            PROCESSING_DB_HOST=${{ secrets.PROCESSING_DB_HOST }}
-            PROCESSING_DB_PORT=${{ secrets.PROCESSING_DB_PORT }}
-            PROCESSING_DB_NAME=${{ secrets.PROCESSING_DB_NAME }}
-            PROCESSING_DB_USER=${{ secrets.PROCESSING_DB_USER }}
-            PROCESSING_DB_PASSWORD=${{ secrets.PROCESSING_DB_PASSWORD }}
+PROCESSING_DB_HOST=${{ secrets.PROCESSING_DB_HOST }}
+PROCESSING_DB_PORT=${{ secrets.PROCESSING_DB_PORT }}
+PROCESSING_DB_NAME=${{ secrets.PROCESSING_DB_NAME }}
+PROCESSING_DB_USER=${{ secrets.PROCESSING_DB_USER }}
+PROCESSING_DB_PASSWORD=${{ secrets.PROCESSING_DB_PASSWORD }}
 
-            ANALYSIS_TEMP_DIR=${{ secrets.ANALYSIS_TEMP_DIR }}
+ANALYSIS_TEMP_DIR=${{ secrets.ANALYSIS_TEMP_DIR }}
 
-            ANALYSIS_DB_HOST=${{ secrets.ANALYSIS_DB_HOST }}
-            ANALYSIS_DB_PORT=${{ secrets.ANALYSIS_DB_PORT }}
-            ANALYSIS_DB_NAME=${{ secrets.ANALYSIS_DB_NAME }}
-            ANALYSIS_DB_USER=${{ secrets.ANALYSIS_DB_USER }}
-            ANALYSIS_DB_PASSWORD=${{ secrets.ANALYSIS_DB_PASSWORD }}
+ANALYSIS_DB_HOST=${{ secrets.ANALYSIS_DB_HOST }}
+ANALYSIS_DB_PORT=${{ secrets.ANALYSIS_DB_PORT }}
+ANALYSIS_DB_NAME=${{ secrets.ANALYSIS_DB_NAME }}
+ANALYSIS_DB_USER=${{ secrets.ANALYSIS_DB_USER }}
+ANALYSIS_DB_PASSWORD=${{ secrets.ANALYSIS_DB_PASSWORD }}
 
-            METADATA_DB_HOST=${{ secrets.METADATA_DB_HOST }}
-            METADATA_DB_PORT=${{ secrets.METADATA_DB_PORT }}
-            METADATA_DB_NAME=${{ secrets.METADATA_DB_NAME }}
-            METADATA_DB_USER=${{ secrets.METADATA_DB_USER }}
-            METADATA_DB_PASSWORD=${{ secrets.METADATA_DB_PASSWORD }}
+METADATA_DB_HOST=${{ secrets.METADATA_DB_HOST }}
+METADATA_DB_PORT=${{ secrets.METADATA_DB_PORT }}
+METADATA_DB_NAME=${{ secrets.METADATA_DB_NAME }}
+METADATA_DB_USER=${{ secrets.METADATA_DB_USER }}
+METADATA_DB_PASSWORD=${{ secrets.METADATA_DB_PASSWORD }}
 
-            EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=${{ secrets.EUREKA_CLIENT_SERVICEURL_DEFAULTZONE }}
+EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=${{ secrets.EUREKA_CLIENT_SERVICEURL_DEFAULTZONE }}
+EOT
 
-            EOT
+            echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
             docker compose pull
             docker compose up -d --force-recreate --remove-orphans
