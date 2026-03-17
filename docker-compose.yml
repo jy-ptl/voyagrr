@@ -105,6 +105,25 @@ services:
     networks:
       - voyagrr-net
 
+  analysis-service-database:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: analysis_service_database
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5440:5432'
+    volumes:
+      - analysis-database-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - voyagrr-net
+
+
   eureka:
     build:
       context: .
@@ -364,6 +383,8 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
+      analysis-service-database:
+        condition: service_healthy
       minio:
         condition: service_healthy
     networks:
@@ -379,6 +400,7 @@ volumes:
   encoding-database-data:
   processing-database-data:
   metadata-database-data:
+  analysis-database-data:
   minio-data:
   prometheus-data:
   grafana-storage:

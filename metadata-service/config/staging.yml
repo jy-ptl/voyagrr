@@ -1,0 +1,12 @@
+kafka:
+  bootstrap_servers: kafka:9092 
+  topic_uploaded: file.uploaded.v1
+
+minio:
+  endpoint: ${PYTHON_MINIO_ENDPOINT}
+  access-key: ${MINIO_ACCESS_KEY}
+  secret-key: ${MINIO_SECRET_KEY}
+  secure: False
+
+postgres:
+  url: postgresql://postgres:${METADATA_DB_USER}@${METADATA_DB_HOST}:${METADATA_DB_PORT}/${METADATA_DB_NAME}
