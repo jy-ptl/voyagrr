@@ -9,5 +9,8 @@ minio:
   secret-key: minioadmin123
   secure: false
 
+postgres:
+  url: postgresql://postgres:postgres@localhost:5440/analysis_service_database
+
 app:
   temp_dir: /tmp/analysis

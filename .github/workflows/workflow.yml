@@ -7,7 +7,8 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAMESPACE: ${{ github.repository_owner }}/voyagrr
-  SERVICES: user-service storage-service sharing-service encoding-service api-gateway discovery-service
+  SERVICES: user-service storage-service sharing-service processing-service api-gateway discovery-service
+  PYTHON_SERVICES: encoding-service analysis-service metadata-service
 
 jobs:
   build-images:
@@ -22,6 +23,11 @@ jobs:
           java-version: 21
           cache: maven
 
+      - name: Clean Docker before build
+        run: |
+          docker builder prune -af
+          docker image prune -af
+
       - run: mvn clean package -DskipTests
 
       - uses: docker/login-action@v2
@@ -33,8 +39,14 @@ jobs:
       - name: Build images
         run: |
           for service in $SERVICES; do
-            docker build -t $service:${{ github.ref_name }} -f $service/Dockerfile .
+            docker build -t $service:${{ github.ref_name }} -f $service/Dockerfile . &
           done
+
+          for service in $PYTHON_SERVICES; do
+            docker build -t $service:${{ github.ref_name }} -f $service/Dockerfile $service &
+          done
+
+          wait
 
   push-images:
     runs-on: self-hosted
@@ -49,7 +61,7 @@ jobs:
 
       - name: Tag and push images
         run: |
-          for service in $SERVICES; do
+          for service in $SERVICES $PYTHON_SERVICES; do
             docker tag $service:${{ github.ref_name }} $REGISTRY/$IMAGE_NAMESPACE/$service:${{ github.ref_name }}
             docker push $REGISTRY/$IMAGE_NAMESPACE/$service:${{ github.ref_name }}
           done
@@ -85,75 +97,91 @@ jobs:
         run: |
           ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << "EOF"
             set -e
-            echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-            SERVICES=$(echo "$SERVICES" | xargs)
-
-            for service in $SERVICES; do
-              docker pull ghcr.io/${{ github.repository_owner }}/voyagrr/$service:${{ github.ref_name }}
-            done
-
+            mkdir -p ~/deployment/voyagrr
             cd ~/deployment/voyagrr
 
-            if [ "${{ github.ref_name }}" = "main" ]; then
-              export SPRING_PROFILES_ACTIVE=production
-            else
-              export SPRING_PROFILES_ACTIVE=staging
-            fi
+            printf "REGISTRY=${{ env.REGISTRY }}\n" > .env
+            printf "IMAGE_NAMESPACE=${{ github.repository_owner }}/voyagrr\n" >> .env
+            printf "TAG=${{ github.ref_name }}\n" >> .env
+            printf "SPRING_PROFILES_ACTIVE=${{ github.ref_name == 'main' && 'production' || 'staging' }}\n" >> .env
 
-            export IMAGE_NAMESPACE=${{ github.repository_owner }}/voyagrr
-            export TAG=${{ github.ref_name }}
+            printf "KEYCLOAK_ADMIN=${{ secrets.KEYCLOAK_ADMIN }}\n" >> .env
+            printf "KEYCLOAK_ADMIN_PASSWORD=${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}\n" >> .env
+            printf "KEYCLOAK_DB_HOST=${{ secrets.KEYCLOAK_DB_HOST }}\n" >> .env
+            printf "KEYCLOAK_DB_PORT=${{ secrets.KEYCLOAK_DB_PORT }}\n" >> .env
+            printf "KEYCLOAK_DB_NAME=${{ secrets.KEYCLOAK_DB_NAME }}\n" >> .env
+            printf "KEYCLOAK_DB_USER=${{ secrets.KEYCLOAK_DB_USER }}\n" >> .env
+            printf "KEYCLOAK_DB_PASSWORD=${{ secrets.KEYCLOAK_DB_PASSWORD }}\n" >> .env
 
-            # Export secrets
+            printf "MINIO_ENDPOINT=${{ secrets.MINIO_ENDPOINT }}\n" >> .env
+            printf "PYTHON_MINIO_ENDPOINT=${{ secrets.PYTHON_MINIO_ENDPOINT }}\n" >> .env
+            printf "MINIO_ACCESS_KEY=${{ secrets.MINIO_ACCESS_KEY }}\n" >> .env
+            printf "MINIO_SECRET_KEY=${{ secrets.MINIO_SECRET_KEY }}\n" >> .env
+            printf "MINIO_BUCKET=${{ secrets.MINIO_BUCKET }}\n" >> .env
+            printf "PROCESSED_VIDEO_BUCKET=${{ secrets.PROCESSED_VIDEO_BUCKET }}\n" >> .env
 
-            export KEYCLOAK_ADMIN="${{ secrets.KEYCLOAK_ADMIN }}"
-            export KEYCLOAK_ADMIN_PASSWORD="${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}"
+            printf "KEYCLOAK_URL=${{ secrets.KEYCLOAK_URL }}\n" >> .env
+            printf "KEYCLOAK_REALM=${{ secrets.KEYCLOAK_REALM }}\n" >> .env
+            printf "KEYCLOAK_CLIENT_ID=${{ secrets.KEYCLOAK_CLIENT_ID }}\n" >> .env
+            printf "KEYCLOAK_CLIENT_SECRET=${{ secrets.KEYCLOAK_CLIENT_SECRET }}\n" >> .env
 
-            export KEYCLOAK_DB_HOST="${{ secrets.KEYCLOAK_DB_HOST }}"
-            export KEYCLOAK_DB_PORT="${{ secrets.KEYCLOAK_DB_PORT }}"
-            export KEYCLOAK_DB_NAME="${{ secrets.KEYCLOAK_DB_NAME }}"
-            export KEYCLOAK_DB_USER="${{ secrets.KEYCLOAK_DB_USER }}"
-            export KEYCLOAK_DB_PASSWORD="${{ secrets.KEYCLOAK_DB_PASSWORD }}"
+            printf "STORAGE_GRPC_SERVICE_PORT=${{ secrets.STORAGE_GRPC_SERVICE_PORT }}\n" >> .env
+            printf "SHARING_GRPC_SERVICE_PORT=${{ secrets.SHARING_GRPC_SERVICE_PORT }}\n" >> .env
+            printf "PROCESSING_GRPC_SERVICE_PORT=${{ secrets.PROCESSING_GRPC_SERVICE_PORT }}\n" >> .env
 
-            export MINIO_ENDPOINT="${{ secrets.MINIO_ENDPOINT }}"
-            export MINIO_ACCESS_KEY="${{ secrets.MINIO_ACCESS_KEY }}"
-            export MINIO_SECRET_KEY="${{ secrets.MINIO_SECRET_KEY }}"
-            export MINIO_BUCKET="${{ secrets.MINIO_BUCKET }}"
+            printf "USER_DB_HOST=${{ secrets.USER_DB_HOST }}\n" >> .env
+            printf "USER_DB_PORT=${{ secrets.USER_DB_PORT }}\n" >> .env
+            printf "USER_DB_NAME=${{ secrets.USER_DB_NAME }}\n" >> .env
+            printf "USER_DB_USER=${{ secrets.USER_DB_USER }}\n" >> .env
+            printf "USER_DB_PASSWORD=${{ secrets.USER_DB_PASSWORD }}\n" >> .env
 
-            export KEYCLOAK_URL="${{ secrets.KEYCLOAK_URL }}"
-            export KEYCLOAK_REALM="${{ secrets.KEYCLOAK_REALM }}"
-            export KEYCLOAK_CLIENT_ID="${{ secrets.KEYCLOAK_CLIENT_ID }}"
-            export KEYCLOAK_CLIENT_SECRET="${{ secrets.KEYCLOAK_CLIENT_SECRET }}"
+            printf "STORAGE_DB_HOST=${{ secrets.STORAGE_DB_HOST }}\n" >> .env
+            printf "STORAGE_DB_PORT=${{ secrets.STORAGE_DB_PORT }}\n" >> .env
+            printf "STORAGE_DB_NAME=${{ secrets.STORAGE_DB_NAME }}\n" >> .env
+            printf "STORAGE_DB_USER=${{ secrets.STORAGE_DB_USER }}\n" >> .env
+            printf "STORAGE_DB_PASSWORD=${{ secrets.STORAGE_DB_PASSWORD }}\n" >> .env
 
-            export STORAGE_GRPC_SERVICE_PORT="${{ secrets.STORAGE_GRPC_SERVICE_PORT }}"
-            export SHARING_GRPC_SERVICE_PORT="${{ secrets.SHARING_GRPC_SERVICE_PORT }}"
+            printf "SHARING_DB_HOST=${{ secrets.SHARING_DB_HOST }}\n" >> .env
+            printf "SHARING_DB_PORT=${{ secrets.SHARING_DB_PORT }}\n" >> .env
+            printf "SHARING_DB_NAME=${{ secrets.SHARING_DB_NAME }}\n" >> .env
+            printf "SHARING_DB_USER=${{ secrets.SHARING_DB_USER }}\n" >> .env
+            printf "SHARING_DB_PASSWORD=${{ secrets.SHARING_DB_PASSWORD }}\n" >> .env
 
-            export USER_DB_HOST="${{ secrets.USER_DB_HOST }}"
-            export USER_DB_PORT="${{ secrets.USER_DB_PORT }}"
-            export USER_DB_NAME="${{ secrets.USER_DB_NAME }}"
-            export USER_DB_USER="${{ secrets.USER_DB_USER }}"
-            export USER_DB_PASSWORD="${{ secrets.USER_DB_PASSWORD }}"
+            printf "ENCODING_TEMP_DIR=${{ secrets.ENCODING_TEMP_DIR }}\n" >> .env
+            printf "ENCODING_MAX_WORKERS=${{ secrets.ENCODING_MAX_WORKERS }}\n" >> .env
 
-            export STORAGE_DB_HOST="${{ secrets.STORAGE_DB_HOST }}"
-            export STORAGE_DB_PORT="${{ secrets.STORAGE_DB_PORT }}"
-            export STORAGE_DB_NAME="${{ secrets.STORAGE_DB_NAME }}"
-            export STORAGE_DB_USER="${{ secrets.STORAGE_DB_USER }}"
-            export STORAGE_DB_PASSWORD="${{ secrets.STORAGE_DB_PASSWORD }}"
+            printf "ENCODING_DB_HOST=${{ secrets.ENCODING_DB_HOST }}\n" >> .env
+            printf "ENCODING_DB_PORT=${{ secrets.ENCODING_DB_PORT }}\n" >> .env
+            printf "ENCODING_DB_NAME=${{ secrets.ENCODING_DB_NAME }}\n" >> .env
+            printf "ENCODING_DB_USER=${{ secrets.ENCODING_DB_USER }}\n" >> .env
+            printf "ENCODING_DB_PASSWORD=${{ secrets.ENCODING_DB_PASSWORD }}\n" >> .env
 
-            export SHARING_DB_HOST="${{ secrets.SHARING_DB_HOST }}"
-            export SHARING_DB_PORT="${{ secrets.SHARING_DB_PORT }}"
-            export SHARING_DB_NAME="${{ secrets.SHARING_DB_NAME }}"
-            export SHARING_DB_USER="${{ secrets.SHARING_DB_USER }}"
-            export SHARING_DB_PASSWORD="${{ secrets.SHARING_DB_PASSWORD }}"
+            printf "PROCESSING_DB_HOST=${{ secrets.PROCESSING_DB_HOST }}\n" >> .env
+            printf "PROCESSING_DB_PORT=${{ secrets.PROCESSING_DB_PORT }}\n" >> .env
+            printf "PROCESSING_DB_NAME=${{ secrets.PROCESSING_DB_NAME }}\n" >> .env
+            printf "PROCESSING_DB_USER=${{ secrets.PROCESSING_DB_USER }}\n" >> .env
+            printf "PROCESSING_DB_PASSWORD=${{ secrets.PROCESSING_DB_PASSWORD }}\n" >> .env
 
-            export ENCODING_DB_HOST="${{ secrets.ENCODING_DB_HOST }}"
-            export ENCODING_DB_PORT="${{ secrets.ENCODING_DB_PORT }}"
-            export ENCODING_DB_NAME="${{ secrets.ENCODING_DB_NAME }}"
-            export ENCODING_DB_USER="${{ secrets.ENCODING_DB_USER }}"
-            export ENCODING_DB_PASSWORD="${{ secrets.ENCODING_DB_PASSWORD }}"
+            printf "ANALYSIS_TEMP_DIR=${{ secrets.ANALYSIS_TEMP_DIR }}\n" >> .env
 
-            export EUREKA_CLIENT_SERVICEURL_DEFAULTZONE="${{ secrets.EUREKA_CLIENT_SERVICEURL_DEFAULTZONE }}"
+            printf "ANALYSIS_DB_HOST=${{ secrets.ANALYSIS_DB_HOST }}\n" >> .env
+            printf "ANALYSIS_DB_PORT=${{ secrets.ANALYSIS_DB_PORT }}\n" >> .env
+            printf "ANALYSIS_DB_NAME=${{ secrets.ANALYSIS_DB_NAME }}\n" >> .env
+            printf "ANALYSIS_DB_USER=${{ secrets.ANALYSIS_DB_USER }}\n" >> .env
+            printf "ANALYSIS_DB_PASSWORD=${{ secrets.ANALYSIS_DB_PASSWORD }}\n" >> .env
 
-            docker compose down
-            docker compose up -d
+            printf "METADATA_DB_HOST=${{ secrets.METADATA_DB_HOST }}\n" >> .env
+            printf "METADATA_DB_PORT=${{ secrets.METADATA_DB_PORT }}\n" >> .env
+            printf "METADATA_DB_NAME=${{ secrets.METADATA_DB_NAME }}\n" >> .env
+            printf "METADATA_DB_USER=${{ secrets.METADATA_DB_USER }}\n" >> .env
+            printf "METADATA_DB_PASSWORD=${{ secrets.METADATA_DB_PASSWORD }}\n" >> .env
+
+            printf "EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=${{ secrets.EUREKA_CLIENT_SERVICEURL_DEFAULTZONE }}\n" >> .env
+
+            echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+            docker compose pull
+            docker compose up -d --force-recreate --remove-orphans
+            docker image prune -f
           EOF

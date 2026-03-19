@@ -1,0 +1,16 @@
+kafka:
+  bootstrap_servers: kafka:9092
+  topic_analyze: file.analyze.v1
+  topic_ai_result: file.analyzed.v1
+
+minio:
+  endpoint: ${PYTHON_MINIO_ENDPOINT}
+  access-key: ${MINIO_ACCESS_KEY}
+  secret-key: ${MINIO_SECRET_KEY}
+  secure: False
+
+postgres:
+  url: postgresql://${ANALYSIS_DB_USER}:${ANALYSIS_DB_PASSWORD}@${ANALYSIS_DB_HOST}:${ANALYSIS_DB_PORT}/${ANALYSIS_DB_NAME}
+
+app:
+  temp_dir: ${ANALYSIS_TEMP_DIR}

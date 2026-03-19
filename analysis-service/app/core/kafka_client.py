@@ -7,6 +7,7 @@ from app.core.logging_config import get_logger
 
 cfg = get_config()
 logger = get_logger(__name__)
+_producer = None
 
 
 def create_consumer():
@@ -26,8 +27,22 @@ def create_consumer():
             time.sleep(5)
 
 
-def create_producer():
-    return KafkaProducer(
-        bootstrap_servers=cfg["kafka"]["bootstrap_servers"],
-        value_serializer=lambda v: json.dumps(v).encode(),
-    )
+def get_producer():
+    global _producer
+
+    if _producer:
+        return _producer
+
+    while True:
+        try:
+            logger.info("connecting producer to kafka...")
+            _producer = KafkaProducer(
+                bootstrap_servers=cfg["kafka"]["bootstrap_servers"],
+                value_serializer=lambda v: json.dumps(v).encode("utf-8"),
+            )
+            logger.info("producer connected to kafka")
+            return _producer
+
+        except NoBrokersAvailable:
+            logger.info("kafka not ready for producer, retrying in 5 sec...")
+            time.sleep(5)
