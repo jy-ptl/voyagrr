@@ -29,9 +29,6 @@ public class FileMetadata extends Auditable {
     @Column(name = "minio_object_key", nullable = false, updatable = false)
     private String minioObjectKey;
 
-    @Column(name = "mime_type", nullable = false)
-    private String mimeType;
-
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "metadata", columnDefinition = "jsonb")
     private Map<String, Object> metadata;

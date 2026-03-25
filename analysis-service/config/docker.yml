@@ -8,6 +8,7 @@ minio:
   access-key: minioadmin
   secret-key: minioadmin123
   secure: false
+  bucket: voyagrr-media
 
 postgres:
   url: postgresql://postgres:postgres@analysis-service-database:5432/analysis_service_database

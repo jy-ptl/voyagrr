@@ -14,7 +14,6 @@
         <module>api-gateway</module>
         <module>user-service</module>
         <module>storage-service</module>
-        <module>sharing-service</module>
         <module>processing-service</module>
     </modules>
 </project>

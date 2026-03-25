@@ -8,6 +8,7 @@ minio:
   access-key: ${MINIO_ACCESS_KEY}
   secret-key: ${MINIO_SECRET_KEY}
   secure: False
+  bucket: ${MINIO_BUCKET}
 
 postgres:
   url: postgresql://${ANALYSIS_DB_USER}:${ANALYSIS_DB_PASSWORD}@${ANALYSIS_DB_HOST}:${ANALYSIS_DB_PORT}/${ANALYSIS_DB_NAME}

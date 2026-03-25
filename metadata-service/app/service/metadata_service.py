@@ -1,6 +1,7 @@
 import os
 import tempfile
 
+from app.core.config import get_config
 from app.core.minio_client import client
 from app.core.extractor import extract_metadata
 from app.repository.db import SessionLocal
@@ -8,12 +9,13 @@ from app.core.logging_config import get_logger
 from app.producer.metadata_producer import get_producer
 
 logger = get_logger(__name__)
+cfg = get_config()
+bucket = cfg["minio"]["bucket"]
 
 
 def process_event(event):
 
-    bucket = event["bucket"]
-    key = event["objectKey"]
+    key = event["minioObjectKey"]
     fileId = event["fileId"]
 
     response = client.get_object(bucket, key)
@@ -34,13 +36,12 @@ def process_event(event):
             "fileId": fileId,
             "minioObjectKey": key,
             "metadata": meta,
-            "mime": meta["mime"],
         }
 
         producer = get_producer()
 
         producer.send(
-            "file.metadata.extracted.v1",
+            "file.metadata.v1",
             metadata_event,
         )
 

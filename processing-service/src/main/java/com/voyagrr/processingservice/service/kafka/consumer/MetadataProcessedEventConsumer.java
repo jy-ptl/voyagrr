@@ -1,16 +1,20 @@
 package com.voyagrr.processingservice.service.kafka.consumer;
 
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
-import com.voyagrr.processingservice.dto.FileUploadedEvent;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.voyagrr.common.enumeration.FileStatus;
+import com.voyagrr.processingservice.dto.FileProcessingEvent;
 import com.voyagrr.processingservice.dto.MetadataProcessedEvent;
 import com.voyagrr.processingservice.model.FileMetadata;
 import com.voyagrr.processingservice.repository.FileMetadataRepository;
-import com.voyagrr.processingservice.service.kafka.producer.VideoEncodingCompletedProducer;
+import com.voyagrr.processingservice.service.grpc.client.StorageGrpcClient;
+import com.voyagrr.processingservice.service.kafka.producer.ImageAnalysisEventProducer;
 import com.voyagrr.processingservice.service.kafka.producer.VideoEncodingEventProducer;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
@@ -22,52 +26,55 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class MetadataProcessedEventConsumer {
 
-    @Value("${minio.bucket}")
-    private String bucket;
-
     private final FileMetadataRepository fileMetadataRepository;
     private final VideoEncodingEventProducer videoEncodingEventProducer;
-    private final VideoEncodingCompletedProducer videoEncodingCompletedProducer;
+    private final ImageAnalysisEventProducer imageAnalysisEventProducer;
+    private final StorageGrpcClient storageGrpcClient;
 
-    @KafkaListener(topics = "file.metadata.extracted.v1", groupId = "metadata-processing-response-handles")
+    @KafkaListener(topics = "file.metadata.v1", groupId = "metadata-processing-response-handles", containerFactory = "metadataKafkaListenerContainerFactory")
     public void consume(MetadataProcessedEvent event) {
 
         log.info("received metadata for file {}", event.getFileId());
+        Long fileId = Long.parseLong(event.getFileId());
 
-        if (fileMetadataRepository.findByFileId(Long.parseLong(event.getFileId())).isPresent())
-            return;
+        FileMetadata fileMetadata = fileMetadataRepository
+                .findByFileId(fileId)
+                .orElseGet(() -> FileMetadata.builder()
+                        .fileId(fileId)
+                        .minioObjectKey(event.getMinioObjectKey())
+                        .metadata(new HashMap<>())
+                        .build());
 
-        if (event.getMime().contains("video")) {
+        @SuppressWarnings("unchecked")
+        Map<String, Object> metadataMap = new ObjectMapper().convertValue(event.getMetadata(), Map.class);
+        fileMetadata.getMetadata().put("file", metadataMap);
+
+        String mime = metadataMap.getOrDefault("mime", "").toString();
+
+        fileMetadataRepository.save(fileMetadata);
+        if (mime.contains("video")) {
             log.info("calling encoding for file {}", event.getFileId());
             videoEncodingEventProducer.sendEncodingEvent(
-                    FileUploadedEvent.builder()
+                    FileProcessingEvent.builder()
                             .eventId(UUID.randomUUID().toString())
-                            .eventType("FILE_ENCODE")
-                            .bucket(bucket)
                             .timestamp(Instant.now())
                             .fileId(event.getFileId())
-                            .objectKey(event.getMinioObjectKey())
-                            .status("UPLOADED")
+                            .minioObjectKey(event.getMinioObjectKey())
                             .build());
-        } else if (event.getMime().contains("image")) {
-            videoEncodingCompletedProducer.sendEncodingCompletedEvent(
-                    FileUploadedEvent.builder()
+            storageGrpcClient.updateFileProcessingStatus(Long.parseLong(event.getFileId()),
+                    FileStatus.IN_ENCODING_PROCESS.toString());
+        } else if (mime.contains("image")) {
+            log.info("calling analysis for file {}", event.getFileId());
+            imageAnalysisEventProducer.sendImageAnalysisEvent(
+                    FileProcessingEvent.builder()
                             .eventId(UUID.randomUUID().toString())
-                            .eventType("FILE_ENCODE_COMPLETE")
-                            .bucket(bucket)
                             .timestamp(Instant.now())
                             .fileId(event.getFileId())
-                            .objectKey(event.getMinioObjectKey())
-                            .status("ENCODED")
+                            .minioObjectKey(event.getMinioObjectKey())
                             .build());
+            storageGrpcClient.updateFileProcessingStatus(Long.parseLong(event.getFileId()),
+                    FileStatus.IN_ANALYSIS_PROCESS.toString());
         }
-
-        fileMetadataRepository.save(FileMetadata.builder()
-                .mimeType(event.getMime())
-                .minioObjectKey(event.getMinioObjectKey())
-                .fileId(Long.parseLong(event.getFileId()))
-                .metadata(event.getMetadata())
-                .build());
 
     }
 

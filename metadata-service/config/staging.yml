@@ -7,6 +7,7 @@ minio:
   access-key: ${MINIO_ACCESS_KEY}
   secret-key: ${MINIO_SECRET_KEY}
   secure: False
+  bucket: voyagrr-media
 
 postgres:
   url: postgresql://${METADATA_DB_USER}:${METADATA_DB_PASSWORD}@${METADATA_DB_HOST}:${METADATA_DB_PORT}/${METADATA_DB_NAME}

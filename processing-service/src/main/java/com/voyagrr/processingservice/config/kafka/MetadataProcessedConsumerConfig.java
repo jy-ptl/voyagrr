@@ -24,7 +24,7 @@ public class MetadataProcessedConsumerConfig {
     private String BOOTSTARP_SERVERS;
 
     @Bean
-    public ConsumerFactory<String, MetadataProcessedEvent> consumerFactory() {
+    public ConsumerFactory<String, MetadataProcessedEvent> metadataConsumerFactory() {
 
         JsonDeserializer<MetadataProcessedEvent> deserializer = new JsonDeserializer<>(MetadataProcessedEvent.class);
         deserializer.addTrustedPackages("*");
@@ -39,10 +39,10 @@ public class MetadataProcessedConsumerConfig {
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, MetadataProcessedEvent> kafkaListenerContainerFactory() {
+    public ConcurrentKafkaListenerContainerFactory<String, MetadataProcessedEvent> metadataKafkaListenerContainerFactory() {
 
         ConcurrentKafkaListenerContainerFactory<String, MetadataProcessedEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(consumerFactory());
+        factory.setConsumerFactory(metadataConsumerFactory());
         return factory;
 
     }

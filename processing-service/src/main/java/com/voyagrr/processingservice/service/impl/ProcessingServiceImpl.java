@@ -3,14 +3,13 @@ package com.voyagrr.processingservice.service.impl;
 import java.time.Instant;
 import java.util.UUID;
 
-import com.voyagrr.processingservice.dto.FileUploadedEvent;
-import com.voyagrr.processingservice.dto.ProcessRequest;
+import com.voyagrr.common.enumeration.FileStatus;
+import com.voyagrr.common.proto.ProcessFileRequest;
+import com.voyagrr.processingservice.dto.FileProcessingEvent;
 import com.voyagrr.processingservice.service.ProcessingService;
 import com.voyagrr.processingservice.service.grpc.client.StorageGrpcClient;
-import com.voyagrr.processingservice.service.kafka.producer.FileEventProducer;
+import com.voyagrr.processingservice.service.kafka.producer.FileMetadataEventProducer;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -21,35 +20,19 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ProcessingServiceImpl implements ProcessingService {
 
-    @Value("${minio.bucket}")
-    private String bucket;
-
+    private final FileMetadataEventProducer fileMetadataEventProducer;
     private final StorageGrpcClient storageGrpcClient;
 
-    private final FileEventProducer fileEventProducer;
-
-    @Async
     @Override
-    public void extractMetadata(ProcessRequest processRequest, String keycloakUserId) {
-
-        String minioObjectKey = storageGrpcClient.getMinioObjectKeyFromFileId(processRequest.fileId(),
-                keycloakUserId);
-
-        if (minioObjectKey.equals(""))
-            return;
-
-        fileEventProducer.sendUploadedEvent(
-                FileUploadedEvent.builder()
-                        .eventId(UUID.randomUUID().toString())
-                        .eventType("FILE_UPLOADED")
-                        .bucket(bucket)
-                        .timestamp(Instant.now())
-                        .fileId(String.valueOf(processRequest.fileId()))
-                        .ownerId(keycloakUserId)
-                        .objectKey(minioObjectKey)
-                        .status("UPLOADED")
-                        .build());
-
+    public boolean processFile(ProcessFileRequest request) {
+        fileMetadataEventProducer.sendFileUploadedEvent(FileProcessingEvent.builder()
+                .eventId(UUID.randomUUID().toString())
+                .fileId(String.valueOf(request.getFileId()))
+                .minioObjectKey(request.getMinioObjectKey())
+                .timestamp(Instant.now())
+                .build());
+        storageGrpcClient.updateFileProcessingStatus(request.getFileId(), FileStatus.IN_METADATA_PROCESS.toString());
+        return true;
     }
 
 }

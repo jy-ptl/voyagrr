@@ -7,7 +7,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAMESPACE: ${{ github.repository_owner }}/voyagrr
-  SERVICES: user-service storage-service sharing-service processing-service api-gateway discovery-service
+  SERVICES: user-service storage-service processing-service api-gateway discovery-service
   PYTHON_SERVICES: encoding-service analysis-service metadata-service
 
 jobs:
@@ -127,7 +127,6 @@ jobs:
             printf "KEYCLOAK_CLIENT_SECRET=${{ secrets.KEYCLOAK_CLIENT_SECRET }}\n" >> .env
 
             printf "STORAGE_GRPC_SERVICE_PORT=${{ secrets.STORAGE_GRPC_SERVICE_PORT }}\n" >> .env
-            printf "SHARING_GRPC_SERVICE_PORT=${{ secrets.SHARING_GRPC_SERVICE_PORT }}\n" >> .env
             printf "PROCESSING_GRPC_SERVICE_PORT=${{ secrets.PROCESSING_GRPC_SERVICE_PORT }}\n" >> .env
 
             printf "USER_DB_HOST=${{ secrets.USER_DB_HOST }}\n" >> .env
@@ -141,12 +140,6 @@ jobs:
             printf "STORAGE_DB_NAME=${{ secrets.STORAGE_DB_NAME }}\n" >> .env
             printf "STORAGE_DB_USER=${{ secrets.STORAGE_DB_USER }}\n" >> .env
             printf "STORAGE_DB_PASSWORD=${{ secrets.STORAGE_DB_PASSWORD }}\n" >> .env
-
-            printf "SHARING_DB_HOST=${{ secrets.SHARING_DB_HOST }}\n" >> .env
-            printf "SHARING_DB_PORT=${{ secrets.SHARING_DB_PORT }}\n" >> .env
-            printf "SHARING_DB_NAME=${{ secrets.SHARING_DB_NAME }}\n" >> .env
-            printf "SHARING_DB_USER=${{ secrets.SHARING_DB_USER }}\n" >> .env
-            printf "SHARING_DB_PASSWORD=${{ secrets.SHARING_DB_PASSWORD }}\n" >> .env
 
             printf "ENCODING_TEMP_DIR=${{ secrets.ENCODING_TEMP_DIR }}\n" >> .env
             printf "ENCODING_MAX_WORKERS=${{ secrets.ENCODING_MAX_WORKERS }}\n" >> .env
