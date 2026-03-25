@@ -48,8 +48,8 @@ minio:
 
 grpc:
   client:
-    sharing-service:
-      address: static://sharing-service:9090
+    processing-service:
+      address: static://processing-service:9092
       negotiationType: plaintext
   server:
     port: 9091

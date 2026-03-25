@@ -5,3 +5,6 @@ databaseChangeLog:
   - include:
       file: db/changelog/migrations/18-add-analysis-service.sql
       relativeToChangelogFile: false
+  - include:
+      file: db/changelog/migrations/49-restructure-project.sql
+      relativeToChangelogFile: false

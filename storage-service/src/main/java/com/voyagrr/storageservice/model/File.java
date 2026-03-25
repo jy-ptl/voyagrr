@@ -1,7 +1,7 @@
 package com.voyagrr.storageservice.model;
 
+import com.voyagrr.common.enumeration.FileStatus;
 import com.voyagrr.storageservice.config.entity.Auditable;
-import com.voyagrr.storageservice.enumeration.EncodingStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -36,7 +36,7 @@ public class File extends Auditable {
 
     @Builder.Default
     @Enumerated(EnumType.STRING)
-    @Column(name = "encoding_status", nullable = false)
-    private EncodingStatus encodingStatus = EncodingStatus.PENDING;
+    @Column(name = "file_status", nullable = false)
+    private FileStatus fileStatus = FileStatus.PENDING;
 
 }

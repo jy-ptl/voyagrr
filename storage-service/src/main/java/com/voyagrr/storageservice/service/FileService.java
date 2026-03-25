@@ -12,4 +12,6 @@ public interface FileService {
     List<File> findByDirectory(Directory directory);
 
     void deleteAll(List<File> files);
+
+    boolean updateFileStatus(long fileId, String status);
 }

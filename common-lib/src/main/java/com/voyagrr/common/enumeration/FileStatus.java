@@ -1,0 +1,11 @@
+package com.voyagrr.common.enumeration;
+
+public enum FileStatus {
+    PENDING,
+    IN_METADATA_PROCESS,
+    METADATA_PROCESS_COMPLETED,
+    IN_ENCODING_PROCESS,
+    ENCODING_PROCESS_COMPLETED,
+    IN_ANALYSIS_PROCESS,
+    ANALYSIS_PROCESS_COMPLETED
+}

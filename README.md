@@ -30,12 +30,12 @@ Core features:
                         API Gateway
                             │
                             ▼
-      ----------------------------------------------------------
-      │         │        |        |         │        │         │
-    User     Storage  Sharing  Metadata  Encoding  Analysis  Future
-    Service  Service  Service  Service   Services  Service   Services
-                │                 |         |
-                ▼                 |         |
+      ------------------------------------------------
+      │         │        │        │         │        │
+    User     Storage  Metadata  Encoding  Analysis  Future
+    Service  Service  Service   Services  Service   Services
+                │                 │         │
+                ▼                 │         │
               MinIO ◀------------------------
 ```
 
@@ -125,7 +125,6 @@ voyagrr/
 ├── encoding-service/
 ├── metadata-service/
 ├── processing-service/
-├── sharing-service/
 ├── storage-service/
 ├── user-service/
 ├── docker-compose.yml

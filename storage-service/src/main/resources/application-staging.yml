@@ -48,8 +48,8 @@ minio:
 
 grpc:
   client:
-    sharing-service:
-      address: static://sharing-service:${SHARING_GRPC_SERVICE_PORT}
+    processing-service:
+      address: static://processing-service:${PROCESSING_GRPC_SERVICE_PORT}
       negotiationType: plaintext
   server:
     port: ${STORAGE_GRPC_SERVICE_PORT}

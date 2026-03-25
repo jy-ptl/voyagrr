@@ -5,14 +5,13 @@ import com.voyagrr.common.exception.AccessDeniedException;
 import com.voyagrr.common.exception.EntityNotFoundException;
 import com.voyagrr.storageservice.dto.DirectoryFlatResponse;
 import com.voyagrr.storageservice.dto.FileUploadRequest;
-import com.voyagrr.storageservice.dto.FileUploadedEvent;
 import com.voyagrr.storageservice.model.Directory;
 import com.voyagrr.storageservice.model.File;
 import com.voyagrr.storageservice.repository.DirectoryRepository;
 import com.voyagrr.storageservice.repository.FileRepository;
+import com.voyagrr.storageservice.service.MediaShareService;
 import com.voyagrr.storageservice.service.StorageService;
-import com.voyagrr.storageservice.service.grpc.client.SharingGrpcClient;
-import com.voyagrr.storageservice.service.kafka.producer.FileEventProducer;
+import com.voyagrr.storageservice.service.grpc.client.ProcessingGrpcClient;
 import com.voyagrr.storageservice.utility.FileUtility;
 import io.minio.*;
 import io.minio.messages.DeleteError;
@@ -29,7 +28,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,12 +41,12 @@ public class MinioStorageService implements StorageService {
     private final FileUtility fileUtility;
     private final MinioClient minioClient;
 
-    private final SharingGrpcClient sharingGrpcClient;
+    private final MediaShareService mediaShareService;
 
     private final FileRepository fileRepository;
     private final DirectoryRepository directoryRepository;
 
-    private final FileEventProducer fileEventProducer;
+    private final ProcessingGrpcClient processingGrpcClient;
 
     @Value("${minio.bucket}")
     private String bucket;
@@ -85,7 +83,7 @@ public class MinioStorageService implements StorageService {
 
         try (InputStream input = file.getInputStream()) {
 
-            boolean allowed = sharingGrpcClient.hasPermissionForDirectories(
+            boolean allowed = mediaShareService.hasPermissionForDirectories(
                     keycloakUserId, directoryRepository.getAllAncestorsIncludingSelf(request.directoryId()).stream()
                             .mapToLong(DirectoryFlatResponse::id).boxed().toList(),
                     Permission.UPLOAD.name());
@@ -113,17 +111,7 @@ public class MinioStorageService implements StorageService {
                             .ownerId(keycloakUserId)
                             .build());
 
-            fileEventProducer.sendUploadedEvent(
-                    FileUploadedEvent.builder()
-                            .eventId(UUID.randomUUID().toString())
-                            .eventType("FILE_UPLOADED")
-                            .bucket(bucket)
-                            .timestamp(Instant.now())
-                            .fileId(String.valueOf(savedFile.getId()))
-                            .ownerId(savedFile.getOwnerId())
-                            .objectKey(savedFile.getMinioObjectKey())
-                            .status("UPLOADED")
-                            .build());
+            processingGrpcClient.startFileProcessing(savedFile.getId(), savedFile.getMinioObjectKey());
 
             return "Success";
         } catch (Exception e) {
@@ -231,7 +219,7 @@ public class MinioStorageService implements StorageService {
      *         {@code false} otherwise.
      */
     private boolean hasPermissionForFile(File file, String keycloakUserId, String permission) {
-        boolean hasPermissionForAnyDir = sharingGrpcClient.hasPermissionForDirectories(keycloakUserId,
+        boolean hasPermissionForAnyDir = mediaShareService.hasPermissionForDirectories(keycloakUserId,
                 directoryRepository.getAllAncestorsIncludingSelf(file.getDirectory().getId()).stream()
                         .mapToLong(DirectoryFlatResponse::id).boxed().toList(),
                 permission);
@@ -239,7 +227,7 @@ public class MinioStorageService implements StorageService {
         if (hasPermissionForAnyDir)
             return true;
 
-        return sharingGrpcClient.hasPermissionForFile(keycloakUserId, file.getId(), permission);
+        return mediaShareService.hasPermissionForFile(keycloakUserId, file.getId(), permission);
     }
 
 }

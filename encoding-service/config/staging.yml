@@ -15,3 +15,4 @@ minio:
   access-key: ${MINIO_ACCESS_KEY}
   secret-key: ${MINIO_SECRET_KEY}
   secure: False
+  bucket: ${MINIO_BUCKET}

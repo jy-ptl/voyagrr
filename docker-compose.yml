@@ -38,19 +38,6 @@ services:
     networks:
       - voyagrr-net
 
-  sharing-service-database:
-    image: postgres:17
-    environment:
-      POSTGRES_DB: sharing_service_database
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - '5436:5432'
-    volumes:
-      - sharing-database-data:/var/lib/postgresql/data
-    networks:
-      - voyagrr-net
-
   encoding-service-database:
     image: postgres:17
     environment:
@@ -298,29 +285,6 @@ services:
     networks:
       - voyagrr-net
 
-  sharing-service:
-    build:
-      context: .
-      dockerfile: sharing-service/Dockerfile
-    deploy:
-      mode: replicated
-      replicas: 2
-    expose:
-      - '8083'
-      - '9091'
-
-    depends_on:
-      - eureka
-      - api-gateway
-      - sharing-service-database
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
-      SPRING_DATASOURCE_URL: jdbc:postgresql://sharing-service-database:5432/sharing_service_database
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-    networks:
-      - voyagrr-net
-
   encoding-service:
     build: ./encoding-service
     environment:
@@ -396,7 +360,6 @@ volumes:
   keycloak-database-data:
   user-database-data:
   storage-database-data:
-  sharing-database-data:
   encoding-database-data:
   processing-database-data:
   metadata-database-data:

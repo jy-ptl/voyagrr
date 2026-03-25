@@ -12,10 +12,12 @@ public class StorageGrpcClient {
     @GrpcClient("storage-service")
     private StorageServiceGrpc.StorageServiceBlockingStub stub;
 
-    public String getMinioObjectKeyFromFileId(long fileId, String keycloakUserId) {
-        return stub.getMinioObjectKeyFromFileId(MinioObjectKeyRequest.newBuilder()
-                .setFileId(fileId)
-                .setKeycloakUserId(keycloakUserId)
-                .build()).getMinioObjectKey();
+    public boolean updateFileProcessingStatus(long fileId, String status) {
+        return stub
+                .updateFileProcessingStatus(
+                        UpdateFileProcessingStatusRequest.newBuilder().setFileId(fileId).setStatus(status).build())
+                .getSuccess();
+
     }
+
 }

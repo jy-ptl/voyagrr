@@ -9,12 +9,12 @@ from app.producer.video_processed_producer import get_producer
 
 cfg = get_config()
 logger = get_logger(__name__)
+bucket = cfg["minio"]["bucket"]
 
 
 def process_event(event):
     file_id = event["fileId"]
-    bucket = event["bucket"]
-    object_key = event["objectKey"]
+    object_key = event["minioObjectKey"]
 
     temp_dir = cfg.get("app", {}).get("temp_dir", "/tmp/encoding")
     os.makedirs(temp_dir, exist_ok=True)
@@ -45,7 +45,7 @@ def process_event(event):
 
         producer = get_producer()
         producer.send(
-            "file.encoding.processed.v1",
+            "file.encoded.v1",
             encoded_event,
         )
         producer.flush()
