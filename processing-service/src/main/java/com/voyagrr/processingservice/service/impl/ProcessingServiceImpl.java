@@ -31,7 +31,7 @@ public class ProcessingServiceImpl implements ProcessingService {
                 .minioObjectKey(request.getMinioObjectKey())
                 .timestamp(Instant.now())
                 .build());
-        storageGrpcClient.updateFileProcessingStatus(request.getFileId(), FileStatus.IN_METADATA_PROCESS.toString());
+        storageGrpcClient.updateFileProcessingStatus(request.getFileId(), FileStatus.IN_METADATA_PROCESS.name());
         return true;
     }
 

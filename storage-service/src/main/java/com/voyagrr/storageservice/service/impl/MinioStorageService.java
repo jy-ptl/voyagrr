@@ -156,7 +156,7 @@ public class MinioStorageService implements StorageService {
     public Resource download(long fileId, String keycloakUserId) {
         File file = fileRepository.findById(fileId)
                 .orElseThrow(() -> new EntityNotFoundException(ENTITY_DOES_NOT_EXISTS.formatted(RESOURCES.FILE)));
-        if (hasPermissionForFile(file, keycloakUserId, Permission.DOWNLOAD.name())) {
+        if (mediaShareService.hasPermissionForFile(keycloakUserId, fileId, Permission.DOWNLOAD.name())) {
             try {
                 InputStream inputStream = minioClient.getObject(GetObjectArgs.builder()
                         .bucket(bucket)
@@ -177,7 +177,7 @@ public class MinioStorageService implements StorageService {
     public String deleteFile(long fileId, String keycloakUserId) {
         File file = fileRepository.findById(fileId)
                 .orElseThrow(() -> new EntityNotFoundException(ENTITY_DOES_NOT_EXISTS.formatted(RESOURCES.FILE)));
-        if (hasPermissionForFile(file, keycloakUserId, Permission.DELETE.name())) {
+        if (mediaShareService.hasPermissionForFile(keycloakUserId, fileId, Permission.DELETE.name())) {
             deleteFiles(List.of(file));
             fileRepository.delete(file);
             return "Success";
@@ -191,43 +191,10 @@ public class MinioStorageService implements StorageService {
     public String getMinioObjectKey(Long fileId, String keycloakUserId) {
         File file = fileRepository.findById(fileId)
                 .orElseThrow(() -> new EntityNotFoundException(ENTITY_DOES_NOT_EXISTS.formatted(RESOURCES.FILE)));
-        if (hasPermissionForFile(file, keycloakUserId, Permission.VIEW.name())) {
+        if (mediaShareService.hasPermissionForFile(keycloakUserId, fileId, Permission.VIEW.name())) {
             return file.getMinioObjectKey();
         }
         return "";
-    }
-
-    /**
-     * Checks if a user has the specified permission on a given file, either via any
-     * ancestor directory (including its own directory)
-     * or directly on the file itself.
-     * <p>
-     * This method first checks if the user has the given permission on any ancestor
-     * directory of the file
-     * (including the directory the file resides in). If such permission exists, it
-     * returns {@code true} immediately.
-     * Otherwise, it checks if the user has the permission directly on the file.
-     * </p>
-     *
-     * @param file           The {@link File} entity to check.
-     * @param keycloakUserId The Keycloak user ID for whom the permission is being
-     *                       checked.
-     * @param permission     The permission to verify (e.g., "UPLOAD", "DOWNLOAD",
-     *                       "DELETE").
-     * @return {@code true} if the user has the specified permission on any ancestor
-     *         directory or directly on the file;
-     *         {@code false} otherwise.
-     */
-    private boolean hasPermissionForFile(File file, String keycloakUserId, String permission) {
-        boolean hasPermissionForAnyDir = mediaShareService.hasPermissionForDirectories(keycloakUserId,
-                directoryRepository.getAllAncestorsIncludingSelf(file.getDirectory().getId()).stream()
-                        .mapToLong(DirectoryFlatResponse::id).boxed().toList(),
-                permission);
-
-        if (hasPermissionForAnyDir)
-            return true;
-
-        return mediaShareService.hasPermissionForFile(keycloakUserId, file.getId(), permission);
     }
 
 }

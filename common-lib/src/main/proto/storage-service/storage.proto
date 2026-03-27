@@ -8,6 +8,8 @@ option java_string_check_utf8 = true;
 
 service StorageService {
   rpc UpdateFileProcessingStatus(UpdateFileProcessingStatusRequest) returns (UpdateFileProcessingStatusResponse);
+  rpc HasPermissionForFile(HasPermissionForFileRequest) returns (HasPermissionForFileResponse);
+  rpc GetFileIdsOfDirectory(GetFileIdsOfDirectoryRequest) returns (GetFileIdsOfDirectoryResponse);
 }
 
 message UpdateFileProcessingStatusRequest {
@@ -17,4 +19,25 @@ message UpdateFileProcessingStatusRequest {
 
 message UpdateFileProcessingStatusResponse {
   bool success = 1;
+}
+
+message HasPermissionForFileRequest {
+  int64 file_id = 1;
+  string keycloak_user_id = 2;
+  string permission = 3;
+}
+
+message HasPermissionForFileResponse {
+  bool allowed = 1;
+}
+
+message GetFileIdsOfDirectoryRequest {
+  int64 directory_id = 1;
+  string keycloak_user_id = 2;
+  string permission = 3;
+}
+
+message GetFileIdsOfDirectoryResponse {
+  repeated int64 file_id = 1;
+
 }

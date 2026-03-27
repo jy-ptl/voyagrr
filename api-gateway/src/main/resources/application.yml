@@ -40,7 +40,7 @@ spring:
             - id: processing-service
               uri: lb://processing-service
               predicates:
-                - Path=/api/process/**
+                - Path=/api/metadata/**
 
             - id: user-service-prometheus
               uri: lb://user-service
