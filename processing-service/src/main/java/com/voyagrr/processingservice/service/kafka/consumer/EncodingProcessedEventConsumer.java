@@ -21,7 +21,7 @@ public class EncodingProcessedEventConsumer {
     public void consume(EncodingProcessedEvent event) {
         log.info("encoding process completed for file {}", event.getFileId());
         storageGrpcClient.updateFileProcessingStatus(Long.parseLong(event.getFileId()),
-                FileStatus.ENCODING_PROCESS_COMPLETED.toString());
+                FileStatus.ENCODING_PROCESS_COMPLETED.name());
     }
 
 }

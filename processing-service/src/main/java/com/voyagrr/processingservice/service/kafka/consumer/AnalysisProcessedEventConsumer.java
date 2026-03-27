@@ -44,7 +44,7 @@ public class AnalysisProcessedEventConsumer {
         }
 
         storageGrpcClient.updateFileProcessingStatus(Long.parseLong(event.getFileId()),
-                FileStatus.ANALYSIS_PROCESS_COMPLETED.toString());
+                FileStatus.ANALYSIS_PROCESS_COMPLETED.name());
     }
 
 }

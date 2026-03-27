@@ -62,7 +62,7 @@ public class MetadataProcessedEventConsumer {
                             .minioObjectKey(event.getMinioObjectKey())
                             .build());
             storageGrpcClient.updateFileProcessingStatus(Long.parseLong(event.getFileId()),
-                    FileStatus.IN_ENCODING_PROCESS.toString());
+                    FileStatus.IN_ENCODING_PROCESS.name());
         } else if (mime.contains("image")) {
             log.info("calling analysis for file {}", event.getFileId());
             imageAnalysisEventProducer.sendImageAnalysisEvent(
@@ -73,7 +73,7 @@ public class MetadataProcessedEventConsumer {
                             .minioObjectKey(event.getMinioObjectKey())
                             .build());
             storageGrpcClient.updateFileProcessingStatus(Long.parseLong(event.getFileId()),
-                    FileStatus.IN_ANALYSIS_PROCESS.toString());
+                    FileStatus.IN_ANALYSIS_PROCESS.name());
         }
 
     }

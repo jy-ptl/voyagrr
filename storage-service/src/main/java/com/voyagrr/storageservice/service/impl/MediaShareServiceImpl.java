@@ -1,8 +1,10 @@
 package com.voyagrr.storageservice.service.impl;
 
+import com.voyagrr.common.constant.ExceptionConstant;
 import com.voyagrr.common.exception.AccessDeniedException;
 import com.voyagrr.common.exception.EntityNotFoundException;
 import com.voyagrr.storageservice.dto.*;
+import com.voyagrr.storageservice.model.File;
 import com.voyagrr.storageservice.model.Group;
 import com.voyagrr.storageservice.model.Permission;
 import com.voyagrr.storageservice.repository.*;
@@ -164,8 +166,19 @@ public class MediaShareServiceImpl implements MediaShareService {
     }
 
     @Override
-    public boolean hasPermissionForFile(String userId, long fileId, String permission) {
-        return mediaShareRepository.existsByUserIdAndFileIdAndPermission(userId, fileId, permission);
+    public boolean hasPermissionForFile(String keycloakUserId, long fileId, String permission) {
+        File file = fileRepository.findById(fileId)
+                .orElseThrow(() -> new EntityNotFoundException(ENTITY_DOES_NOT_EXISTS.formatted(RESOURCES.FILE)));
+
+        boolean hasPermissionForAnyDir = hasPermissionForDirectories(keycloakUserId,
+                directoryRepository.getAllAncestorsIncludingSelf(file.getDirectory().getId()).stream()
+                        .mapToLong(DirectoryFlatResponse::id).boxed().toList(),
+                permission);
+
+        if (hasPermissionForAnyDir)
+            return true;
+
+        return hasPermissionForFileByUserId(keycloakUserId, fileId, permission);
     }
 
     @Override
@@ -220,6 +233,22 @@ public class MediaShareServiceImpl implements MediaShareService {
 
     public boolean hasPermissionForDirectory(Long directoryId, String keycloakUserId, String permission) {
         return mediaShareRepository.hasPermission(directoryId, keycloakUserId, permission);
+    }
+
+    @Override
+    public List<Long> getFileIdsOfDirectory(String keycloakUserId, long direcotryId, String permission) {
+        if (!mediaShareRepository.hasPermission(direcotryId, keycloakUserId, permission))
+            throw new AccessDeniedException(ExceptionConstant.ACCESS_DENIED_FOR_RESOURCE.formatted(permission,
+                    ExceptionConstant.RESOURCES.DIRECTORY));
+        return fileRepository
+                .findByDirectory(directoryRepository.findById(direcotryId)
+                        .orElseThrow(() -> new EntityNotFoundException(ExceptionConstant.ENTITY_DOES_NOT_EXISTS
+                                .formatted(ExceptionConstant.RESOURCES.DIRECTORY))))
+                .stream().map(file -> file.getId()).toList();
+    }
+
+    private boolean hasPermissionForFileByUserId(String keycloakUserId, long fileId, String permission) {
+        return mediaShareRepository.existsByUserIdAndFileIdAndPermission(keycloakUserId, fileId, permission);
     }
 
     private void deleteMediaShares(List<MediaShare> mediaShares) {
