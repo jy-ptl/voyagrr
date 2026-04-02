@@ -87,9 +87,10 @@ def _extract_image_exif(
 # =========================================================
 # VIDEO META
 # =========================================================
-def _extract_video_meta(path: str) -> Tuple[Optional[str], Optional[str]]:
+def _extract_video_meta(path: str) -> Tuple[Optional[str], Optional[str], GPSDict]:
     created_on: Optional[str] = None
     device: Optional[str] = None
+    gps: GPSDict = {"lat": None, "lon": None}
 
     try:
         probe = ffmpeg.probe(path)
@@ -99,10 +100,28 @@ def _extract_video_meta(path: str) -> Tuple[Optional[str], Optional[str]]:
         created_on = tags.get("creation_time")
         device = tags.get("encoder") or tags.get("com.apple.quicktime.make")
 
+        # ----------------- GPS -----------------
+
+        location_str = tags.get("com.apple.quicktime.location.ISO6709") or tags.get(
+            "location"
+        )
+
+        if location_str:
+            # Example format: "+37.3317-122.0307+000.000/"
+            import re
+
+            match = re.match(r"([+-]\d+\.\d+)([+-]\d+\.\d+)", location_str)
+            if match:
+                lat = float(match.group(1))
+                lon = float(match.group(2))
+
+                gps["lat"] = round(lat, 6)
+                gps["lon"] = round(lon, 6)
+
     except Exception:
         pass
 
-    return created_on, device
+    return created_on, device, gps
 
 
 # =========================================================
@@ -134,7 +153,7 @@ def extract_metadata(file_path: str) -> dict:
                 width = stream.get("width")
                 height = stream.get("height")
 
-        created_on, device = _extract_video_meta(file_path)
+        created_on, device, gps = _extract_video_meta(file_path)
 
     # Optional: return None instead of empty GPS
     location = gps if gps["lat"] is not None else None

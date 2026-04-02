@@ -1,7 +1,9 @@
 package com.voyagrr.storageservice.service.impl;
 
 import com.voyagrr.common.constant.ExceptionConstant;
+import com.voyagrr.common.enumeration.FileStatus;
 import com.voyagrr.common.exception.EntityNotFoundException;
+import com.voyagrr.storageservice.enumeration.EncodingStatus;
 import com.voyagrr.storageservice.model.Directory;
 import com.voyagrr.storageservice.model.File;
 import com.voyagrr.storageservice.repository.FileRepository;
@@ -35,5 +37,14 @@ public class FileServiceImpl implements FileService {
     @Override
     public void deleteAll(List<File> files) {
         fileRepository.deleteAll(files);
+    }
+
+    @Override
+    public boolean updateFileStatus(long fileId, String status) {
+        File file = fileRepository.findById(fileId).orElseThrow(
+                () -> new EntityNotFoundException(ENTITY_DOES_NOT_EXISTS.formatted(ExceptionConstant.RESOURCES.FILE)));
+        file.setFileStatus(FileStatus.valueOf(status));
+        fileRepository.save(file);
+        return true;
     }
 }

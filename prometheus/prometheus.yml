@@ -9,16 +9,6 @@ scrape_configs:
     static_configs:
       - targets: ['api-gateway:8080']
 
-  - job_name: 'sharing-service'
-    metrics_path: '/sharing-service/actuator/prometheus'
-    static_configs:
-      - targets: ['api-gateway:8080']
-
-  - job_name: 'encoding-service'
-    metrics_path: '/encoding-service/actuator/prometheus'
-    static_configs:
-      - targets: ['api-gateway:8080']
-
   - job_name: 'processing-service'
     metrics_path: '/processing-service/actuator/prometheus'
     static_configs:

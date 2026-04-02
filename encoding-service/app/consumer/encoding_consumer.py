@@ -38,7 +38,7 @@ def handle_message(consumer, msg):
     try:
         process_event(msg.value)
         consumer.commit()
-        logger.info("encoding complete: %s", msg.value["objectKey"])
+        logger.info("encoding complete: %s", msg.value["minioObjectKey"])
     except Exception as e:
         logger.exception("processing failed: %s", e)
 
@@ -52,4 +52,3 @@ def start_consumer():
         for tp, messages in records.items():
             for msg in messages:
                 executor.submit(handle_message, consumer, msg)
-

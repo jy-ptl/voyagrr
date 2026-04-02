@@ -7,28 +7,37 @@ option java_generate_equals_and_hash = true;
 option java_string_check_utf8 = true;
 
 service StorageService {
-  rpc GetAllAncestorsIncludingSelf(AncestorsIncludingSelfRequest) returns (AncestorsIncludingSelfResponse);
-  rpc GetAllAncestorsIncludingSelfFromFileId(AncestorsIncludingSelfRequestForFile) returns (AncestorsIncludingSelfResponse);
-  rpc GetMinioObjectKeyFromFileId(MinioObjectKeyRequest) returns (MinioObjectKeyResponse);
+  rpc UpdateFileProcessingStatus(UpdateFileProcessingStatusRequest) returns (UpdateFileProcessingStatusResponse);
+  rpc HasPermissionForFile(HasPermissionForFileRequest) returns (HasPermissionForFileResponse);
+  rpc GetFileIdsOfDirectory(GetFileIdsOfDirectoryRequest) returns (GetFileIdsOfDirectoryResponse);
 }
 
-message AncestorsIncludingSelfRequestForFile {
+message UpdateFileProcessingStatusRequest {
   int64 file_id = 1;
+  string status = 2;
 }
 
-message AncestorsIncludingSelfRequest {
-  int64 directory_id = 1;
+message UpdateFileProcessingStatusResponse {
+  bool success = 1;
 }
 
-message AncestorsIncludingSelfResponse {
-  repeated int64 directory_id = 1;
-}
-
-message MinioObjectKeyRequest {
+message HasPermissionForFileRequest {
   int64 file_id = 1;
   string keycloak_user_id = 2;
+  string permission = 3;
 }
 
-message MinioObjectKeyResponse {
-  string minio_object_key = 1;
+message HasPermissionForFileResponse {
+  bool allowed = 1;
+}
+
+message GetFileIdsOfDirectoryRequest {
+  int64 directory_id = 1;
+  string keycloak_user_id = 2;
+  string permission = 3;
+}
+
+message GetFileIdsOfDirectoryResponse {
+  repeated int64 file_id = 1;
+
 }

@@ -3,15 +3,14 @@ package com.voyagrr.storageservice.service.impl;
 import com.voyagrr.common.enumeration.Permission;
 import com.voyagrr.common.exception.AccessDeniedException;
 import com.voyagrr.common.exception.EntityNotFoundException;
-import com.voyagrr.common.proto.*;
 import com.voyagrr.storageservice.dto.*;
 import com.voyagrr.storageservice.model.Directory;
 import com.voyagrr.storageservice.model.File;
 import com.voyagrr.storageservice.repository.DirectoryRepository;
 import com.voyagrr.storageservice.service.DirectoryService;
 import com.voyagrr.storageservice.service.FileService;
+import com.voyagrr.storageservice.service.MediaShareService;
 import com.voyagrr.storageservice.service.StorageService;
-import com.voyagrr.storageservice.service.grpc.client.SharingGrpcClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,8 +21,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.voyagrr.common.constant.ExceptionConstant.*;
-import static com.voyagrr.common.proto.PermissionDeletionType.DIRECTORY;
-import static com.voyagrr.common.proto.PermissionDeletionType.FILE;
 
 @Slf4j
 @Service
@@ -31,9 +28,9 @@ import static com.voyagrr.common.proto.PermissionDeletionType.FILE;
 public class DirectoryServiceImpl implements DirectoryService {
 
     private final DirectoryRepository directoryRepository;
-    private final SharingGrpcClient sharingGrpcClient;
     private final FileService fileService;
     private final StorageService storageService;
+    private final MediaShareService mediaShareService;
 
     @Override
     public Directory findDirectoryById(Long directoryId) {
@@ -51,9 +48,7 @@ public class DirectoryServiceImpl implements DirectoryService {
         directory.setName(request.name());
         directory.setOwnerId(keycloakUserId);
         Long directoryId = directoryRepository.save(directory).getId();
-        boolean defaultPermissionsGenerated = sharingGrpcClient.createDefaultPermissions(keycloakUserId, directoryId);
-        if (!defaultPermissionsGenerated)
-            log.error("Unable to create default permissions for directory with id {}", directoryId);
+        mediaShareService.createDefaultPermissions(directoryId, keycloakUserId);
         return directoryId;
     }
 
@@ -72,7 +67,7 @@ public class DirectoryServiceImpl implements DirectoryService {
     public String deleteDirectoryById(Long directoryId, String keycloakUserId) {
         Directory directory = findDirectoryById(directoryId);
 
-        boolean allowed = sharingGrpcClient.hasPermissionForDirectories(
+        boolean allowed = mediaShareService.hasPermissionForDirectories(
                 keycloakUserId, directoryRepository.getAllAncestorsIncludingSelf(directoryId).stream()
                         .mapToLong(DirectoryFlatResponse::id).boxed().toList(),
                 Permission.DELETE.name());
@@ -94,26 +89,25 @@ public class DirectoryServiceImpl implements DirectoryService {
         List<File> files = fileService.findByDirectory(directory);
         List<Directory> directories = directoryRepository.findByParentDirectory(directory);
 
-        ContentAccessResponse accessResponse = sharingGrpcClient
-                .contentAccessOfDirectory(ContentAccessRequest.newBuilder()
-                        .setUserId(keycloakUserId)
-                        .addAllDirectoryId(directoryRepository.getAllAncestorsIncludingSelf(directoryId).stream()
-                                .mapToLong(DirectoryFlatResponse::id).boxed().toList())
-                        .addAllChildDirectoryId(directories.stream().mapToLong(Directory::getId).boxed().toList())
-                        .addAllFileId(files.stream().mapToLong(File::getId).boxed().toList())
-                        .build());
+        List<Long> ancestorsIncludingSelf = directoryRepository.getAllAncestorsIncludingSelf(directoryId).stream()
+                .mapToLong(DirectoryFlatResponse::id).boxed().toList();
+        List<Long> directoryIds = directories.stream().mapToLong(Directory::getId).boxed().toList();
+        List<Long> fileIds = files.stream().mapToLong(File::getId).boxed().toList();
 
-        Map<Long, List<String>> filePermissionsMap = accessResponse.getFilesList().stream()
+        ContentAccess accessResponse = mediaShareService.contentAccessOfDirectoryByDirectoryIdAndUserId(
+                ancestorsIncludingSelf, directoryIds, fileIds, keycloakUserId);
+
+        Map<Long, List<String>> filePermissionsMap = accessResponse.getFiles().stream()
                 .collect(Collectors.toMap(
-                        FileAccessResponse::getFileId,
-                        FileAccessResponse::getPermissionList));
+                        FileAccess::getFileId,
+                        FileAccess::getPermissions));
 
-        List<String> rootDirPermissions = accessResponse.getRootDirectoryPermissionsList();
+        List<String> rootDirPermissions = accessResponse.getRootDirectoryPermissions();
 
-        Map<Long, List<String>> dirPermissionsMap = accessResponse.getDirectoriesList().stream()
+        Map<Long, List<String>> dirPermissionsMap = accessResponse.getDirectories().stream()
                 .collect(Collectors.toMap(
-                        DirectoryAccessResponse::getDirectoryId,
-                        DirectoryAccessResponse::getPermissionList));
+                        DirectoryAccess::getDirectoryId,
+                        DirectoryAccess::getPermissions));
 
         List<FileResponse> fileResponses = files.stream()
                 .map(f -> {
@@ -188,29 +182,9 @@ public class DirectoryServiceImpl implements DirectoryService {
         fileService.deleteAll(allFiles);
         directoryRepository.deleteAllById(allDirectoryIds);
 
-        List<DeletePermissionDto> permissionsForDirectories = allDirectoryIds.stream()
-                .map(id -> DeletePermissionDto.newBuilder()
-                        .setDirectoryId(id)
-                        .build())
-                .toList();
-
-        List<DeletePermissionDto> permissionsForFiles = allFiles.stream()
-                .map(file -> DeletePermissionDto.newBuilder()
-                        .setFileId(file.getId())
-                        .build())
-                .toList();
-
-        DeletePermissionRequest directoriesPermissionsDeletionRequest = DeletePermissionRequest.newBuilder()
-                .addAllDeletePermission(permissionsForDirectories)
-                .setType(DIRECTORY)
-                .build();
-
-        DeletePermissionRequest filesPermissionsDeletionRequest = DeletePermissionRequest.newBuilder()
-                .addAllDeletePermission(permissionsForFiles)
-                .setType(FILE).build();
-
-        boolean successForDirectories = sharingGrpcClient.deletePermission(directoriesPermissionsDeletionRequest);
-        boolean successForFiles = sharingGrpcClient.deletePermission(filesPermissionsDeletionRequest);
+        boolean successForDirectories = mediaShareService.deleteAllPermissionByDirectoryIds(allDirectoryIds);
+        boolean successForFiles = mediaShareService
+                .deleteAllPermissionByFileIds(allFiles.stream().map(File::getId).collect(Collectors.toList()));
 
         if (!successForDirectories)
             log.info("Failed to delete permissions for directories %s".formatted(allDirectoryIds.toString()));

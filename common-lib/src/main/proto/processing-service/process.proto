@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.voyagrr.common.proto";
+option java_outer_classname = "ProcessProto";
+option java_generate_equals_and_hash = true;
+option java_string_check_utf8 = true;
+
+service ProcessingService {
+  rpc ProcessFile(ProcessFileRequest) returns (ProcessFileResponse);
+}
+
+message ProcessFileResponse {
+  bool success = 1;
+}
+
+message ProcessFileRequest {
+  int64 file_id = 1;
+  string minio_object_key = 2;
+}

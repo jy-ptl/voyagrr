@@ -30,27 +30,17 @@ spring:
             - id: storage-service
               uri: lb://storage-service
               predicates:
-                - Path=/api/storage/**, /api/directory/**
+                - Path=/api/storage/**, /api/directory/**, /api/share/**, /api/group/**
               filters:
                 - name: RequestRateLimiter
                   args:
                     redis-rate-limiter.replenishRate: 2
                     redis-rate-limiter.burstCapacity: 5
                     key-resolver: "#{@userKeyResolver}"
-            - id: sharing-service
-              uri: lb://sharing-service
-              predicates:
-                - Path=/api/share/**, /api/group/**
-              filters:
-                - name: RequestRateLimiter
-                  args:
-                    redis-rate-limiter.replenishRate: 1
-                    redis-rate-limiter.burstCapacity: 2
-                    key-resolver: "#{@userKeyResolver}"
             - id: processing-service
               uri: lb://processing-service
               predicates:
-                - Path=/api/process/**
+                - Path=/api/metadata/**
 
             - id: user-service-prometheus
               uri: lb://user-service
@@ -62,12 +52,6 @@ spring:
               uri: lb://storage-service
               predicates:
                 - Path=/storage-service/actuator/prometheus
-              filters:
-                - StripPrefix=1
-            - id: sharing-service-prometheus
-              uri: lb://sharing-service
-              predicates:
-                - Path=/sharing-service/actuator/prometheus
               filters:
                 - StripPrefix=1
             - id: processing-service-prometheus

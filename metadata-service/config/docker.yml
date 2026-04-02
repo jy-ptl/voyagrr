@@ -10,3 +10,4 @@ minio:
   access-key: minioadmin
   secret-key: minioadmin123
   secure: False
+  bucket: voyagrr-media

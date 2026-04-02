@@ -34,6 +34,6 @@ def start_consumer():
     for msg in consumer:
         try:
             process_event(msg.value)
-            logger.info("processed: %s", msg.value["objectKey"])
+            logger.info("processed: %s", msg.value["minioObjectKey"])
         except Exception as e:
             logger.exception("processing failed : %s", e)

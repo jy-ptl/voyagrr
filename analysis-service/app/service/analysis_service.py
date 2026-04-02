@@ -11,6 +11,7 @@ cfg = get_config()
 
 TEMP_DIR = cfg["app"]["temp_dir"]
 os.makedirs(TEMP_DIR, exist_ok=True)
+bucket = cfg["minio"]["bucket"]
 
 
 def process_event(event):
@@ -18,8 +19,7 @@ def process_event(event):
     local_path = os.path.join(TEMP_DIR, f"{uuid.uuid4()}.jpg")
     try:
         file_id = event["fileId"]
-        bucket = event["bucket"]
-        object_key = event["objectKey"]
+        object_key = event["minioObjectKey"]
 
         logger.info("downloading image %s", object_key)
         download_file(bucket, object_key, local_path)
@@ -28,6 +28,7 @@ def process_event(event):
         result = analyze_image(local_path)
         result_event = {
             "fileId": file_id,
+            "minioObjectKey": object_key,
             "result": result,
         }
 

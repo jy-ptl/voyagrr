@@ -5,3 +5,6 @@ databaseChangeLog:
   - include:
       file: db/changelog/migrations/14-rewrite-metadata-service-in-python.sql
       relativeToChangelogFile: false
+  - include:
+      file: db/changelog/migrations/49-restructure-project.sql
+      relativeToChangelogFile: false
