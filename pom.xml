@@ -15,5 +15,6 @@
         <module>user-service</module>
         <module>storage-service</module>
         <module>processing-service</module>
+        <module>trip-service</module>
     </modules>
 </project>

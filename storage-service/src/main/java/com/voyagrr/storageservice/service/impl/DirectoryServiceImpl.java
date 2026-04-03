@@ -149,6 +149,12 @@ public class DirectoryServiceImpl implements DirectoryService {
                 .mapToLong(DirectoryFlatResponse::id).boxed().toList();
     }
 
+    @Override
+    public Long createDiretoryForTrip(String directoryName, String keycloakUserId) {
+        return directoryRepository.save(Directory.builder().name(directoryName).ownerId(keycloakUserId).build())
+                .getId();
+    }
+
     private List<DirectoryTreeResponse> buildDirectoryTree(List<DirectoryFlatResponse> flatList) {
         Map<Long, DirectoryTreeResponse> map = new HashMap<>();
         List<DirectoryTreeResponse> roots = new ArrayList<>();

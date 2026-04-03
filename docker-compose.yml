@@ -110,6 +110,18 @@ services:
     networks:
       - voyagrr-net
 
+  trip-service-database:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: trip_service_database
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5441:5432'
+    volumes:
+      - trip-database-data:/var/lib/postgresql/data
+    networks:
+      - voyagrr-net
 
   eureka:
     build:
@@ -285,6 +297,24 @@ services:
     networks:
       - voyagrr-net
 
+  trip-service:
+    build:
+      context: .
+      dockerfile: trip-service/Dockerfile
+    ports:
+      - '8086:8086'
+    depends_on:
+      - eureka
+      - api-gateway
+      - trip-service-database
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://trip-service-database:5432/trip_service_database
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    networks:
+      - voyagrr-net
+
   encoding-service:
     build: ./encoding-service
     environment:
@@ -364,6 +394,7 @@ volumes:
   processing-database-data:
   metadata-database-data:
   analysis-database-data:
+  trip-database-data:
   minio-data:
   prometheus-data:
   grafana-storage:

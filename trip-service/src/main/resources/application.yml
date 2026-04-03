@@ -1,0 +1,26 @@
+server:
+  port: 8086
+  forward-headers-strategy: framework
+
+spring:
+  application:
+    name: trip-service
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog.master.yaml
+
+logging:
+  level:
+    liquibase: INFO
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: trip-service
+  prometheus:
+    metrics:
+      export:
+        enabled: true

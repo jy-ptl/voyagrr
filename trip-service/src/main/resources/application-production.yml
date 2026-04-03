@@ -1,0 +1,36 @@
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog.master.yaml
+  datasource:
+    url: jdbc:postgresql://${TRIP_DB_HOST}:${TRIP_DB_PORT}/${TRIP_DB_NAME}
+    username: ${TRIP_DB_USER}
+    password: ${TRIP_DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: none
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
+
+grpc:
+  client:
+    storage-service:
+      address: static://storage-service:${STORAGE_GRPC_SERVICE_PORT}
+      negotiationType: plaintext
+  server:
+    port: ${TRIP_GRPC_SERVICE_PORT}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus

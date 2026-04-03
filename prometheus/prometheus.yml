@@ -13,3 +13,8 @@ scrape_configs:
     metrics_path: '/processing-service/actuator/prometheus'
     static_configs:
       - targets: ['api-gateway:8080']
+
+  - job_name: 'trip-service'
+    metrics_path: '/trip-service/actuator/prometheus'
+    static_configs:
+      - targets: ['api-gateway:8080']

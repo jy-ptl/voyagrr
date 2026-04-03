@@ -7,7 +7,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAMESPACE: ${{ github.repository_owner }}/voyagrr
-  SERVICES: user-service storage-service processing-service api-gateway discovery-service
+  SERVICES: user-service storage-service processing-service trip-service api-gateway discovery-service
   PYTHON_SERVICES: encoding-service analysis-service metadata-service
 
 jobs:
@@ -155,6 +155,12 @@ jobs:
             printf "PROCESSING_DB_NAME=${{ secrets.PROCESSING_DB_NAME }}\n" >> .env
             printf "PROCESSING_DB_USER=${{ secrets.PROCESSING_DB_USER }}\n" >> .env
             printf "PROCESSING_DB_PASSWORD=${{ secrets.PROCESSING_DB_PASSWORD }}\n" >> .env
+
+            printf "TRIP_DB_HOST=${{ secrets.TRIP_DB_HOST }}\n" >> .env
+            printf "TRIP_DB_PORT=${{ secrets.TRIP_DB_PORT }}\n" >> .env
+            printf "TRIP_DB_NAME=${{ secrets.TRIP_DB_NAME }}\n" >> .env
+            printf "TRIP_DB_USER=${{ secrets.TRIP_DB_USER }}\n" >> .env
+            printf "TRIP_DB_PASSWORD=${{ secrets.TRIP_DB_PASSWORD }}\n" >> .env
 
             printf "ANALYSIS_TEMP_DIR=${{ secrets.ANALYSIS_TEMP_DIR }}\n" >> .env
 

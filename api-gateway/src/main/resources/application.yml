@@ -41,6 +41,16 @@ spring:
               uri: lb://processing-service
               predicates:
                 - Path=/api/metadata/**
+            - id: trip-service
+              uri: lb://trip-service
+              predicates:
+                - Path=/api/trip/**
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 2
+                    redis-rate-limiter.burstCapacity: 5
+                    key-resolver: "#{@userKeyResolver}"
 
             - id: user-service-prometheus
               uri: lb://user-service
@@ -58,6 +68,12 @@ spring:
               uri: lb://processing-service
               predicates:
                 - Path=/processing-service/actuator/prometheus
+              filters:
+                - StripPrefix=1
+            - id: trip-service-prometheus
+              uri: lb://trip-service
+              predicates:
+                - Path=/trip-service/actuator/prometheus
               filters:
                 - StripPrefix=1
 

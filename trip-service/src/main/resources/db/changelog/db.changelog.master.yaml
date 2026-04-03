@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/migrations/28-add-trip-service.sql
+      relativeToChangelogFile: false
