@@ -30,13 +30,13 @@ Core features:
                         API Gateway
                             │
                             ▼
-      ------------------------------------------------
-      │         │        │        │         │        │
-    User     Storage  Metadata  Encoding  Analysis  Future
-    Service  Service  Service   Services  Service   Services
-                │                 │         │
-                ▼                 │         │
-              MinIO ◀------------------------
+      ----------------------------------------------------------
+      │         │        │         │        │         │        │
+    User     Storage  Trip     Metadata  Encoding  Analysis  Future
+    Service  Service  Service  Service   Services  Service   Services
+                │                  │        │         │
+                ▼                  │        │         │
+              MinIO ◀----------------------------------
 ```
 
 ## Services
@@ -67,6 +67,9 @@ Core features:
 - Stores media in MinIO
 - Generates signed URLs
 - Manages sharing logic
+
+### trip-service
+- Handles trip related operations
 
 ### metadata-service
 - Consumes metadata processing event
@@ -126,6 +129,7 @@ voyagrr/
 ├── metadata-service/
 ├── processing-service/
 ├── storage-service/
+├── trip-service/
 ├── user-service/
 ├── docker-compose.yml
 ├── pom.xml
@@ -162,9 +166,9 @@ This will start:
 
 ## Service URLs (Default)
 
-API Gateway: http://localhost:8080  
-Eureka Dashboard: http://localhost:8761  
-Keycloak: http://localhost:8081  
+API Gateway: http://localhost:8080
+Eureka Dashboard: http://localhost:8761
+Keycloak: http://localhost:8081
 MinIO Console: http://localhost:9001
 
 ---

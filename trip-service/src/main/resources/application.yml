@@ -1,0 +1,35 @@
+server:
+  port: 8086
+  forward-headers-strategy: framework
+
+spring:
+  application:
+    name: trip-service
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog.master.yaml
+
+logging:
+  level:
+    liquibase: INFO
+  pattern:
+    level: "%5p [${spring.application.name},traceId=%X{traceId},spanId=%X{spanId}]"
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: trip-service
+  tracing:
+    enabled: true
+    sampling:
+      probability: 0.1
+  otlp:
+    tracing:
+      endpoint: http://tempo:4318/v1/traces
+  prometheus:
+    metrics:
+      export:
+        enabled: true

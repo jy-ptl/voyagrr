@@ -1,7 +1,9 @@
 package com.voyagrr.storageservice.service.grpc.server;
 
 import com.voyagrr.common.proto.*;
+import com.voyagrr.storageservice.service.DirectoryService;
 import com.voyagrr.storageservice.service.FileService;
+import com.voyagrr.storageservice.service.GroupService;
 import com.voyagrr.storageservice.service.MediaShareService;
 
 import io.grpc.stub.StreamObserver;
@@ -14,6 +16,8 @@ public class GrpcStorageServiceImpl extends StorageServiceGrpc.StorageServiceImp
 
     private final FileService fileService;
     private final MediaShareService mediaShareService;
+    private final DirectoryService directoryService;
+    private final GroupService groupService;
 
     @Override
     public void updateFileProcessingStatus(UpdateFileProcessingStatusRequest request,
@@ -45,5 +49,26 @@ public class GrpcStorageServiceImpl extends StorageServiceGrpc.StorageServiceImp
                 .build());
         responseObserver.onCompleted();
     }
+
+    @Override
+    public void createDirectoryForTrip(CreateDirectoryForTripRequest request,
+            StreamObserver<CreateDirectoryForTripResponse> responseObserver) {
+
+        responseObserver.onNext(
+                CreateDirectoryForTripResponse.newBuilder().setDirectoryId(
+                        directoryService.createDiretoryForTrip(request.getDirectoryName(), request.getKeycloakUserId()))
+                        .build());
+        responseObserver.onCompleted();
+    }
+
+    public void createOrValidateGroupForTrip(CreateOrValidateGroupForTripRequest request,
+            StreamObserver<CreateOrValidateGroupForTripResponse> responseObserver) {
+
+        responseObserver.onNext(CreateOrValidateGroupForTripResponse.newBuilder()
+                .setGroupId(groupService.createOrValidateGroupForTrip(request.getGroupId(), request.getGroupName(),
+                        request.getOwnerId(), request.getKeycloakUserIdList()))
+                .build());
+        responseObserver.onCompleted();
+    };
 
 }

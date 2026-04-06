@@ -10,6 +10,8 @@ service StorageService {
   rpc UpdateFileProcessingStatus(UpdateFileProcessingStatusRequest) returns (UpdateFileProcessingStatusResponse);
   rpc HasPermissionForFile(HasPermissionForFileRequest) returns (HasPermissionForFileResponse);
   rpc GetFileIdsOfDirectory(GetFileIdsOfDirectoryRequest) returns (GetFileIdsOfDirectoryResponse);
+  rpc CreateDirectoryForTrip(CreateDirectoryForTripRequest) returns (CreateDirectoryForTripResponse);
+  rpc CreateOrValidateGroupForTrip(CreateOrValidateGroupForTripRequest) returns (CreateOrValidateGroupForTripResponse);
 }
 
 message UpdateFileProcessingStatusRequest {
@@ -40,4 +42,24 @@ message GetFileIdsOfDirectoryRequest {
 message GetFileIdsOfDirectoryResponse {
   repeated int64 file_id = 1;
 
+}
+
+message CreateDirectoryForTripRequest {
+  string keycloak_user_id = 1;
+  string directory_name = 2;
+}
+
+message CreateDirectoryForTripResponse {
+  int64 directory_id = 1;
+}
+
+message CreateOrValidateGroupForTripRequest {
+  int64 group_id = 1;
+  string group_name = 2;
+  string owner_id = 3;
+  repeated string keycloak_user_id = 4;
+}
+
+message CreateOrValidateGroupForTripResponse {
+  int64 group_id = 1;
 }

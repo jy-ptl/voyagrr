@@ -85,7 +85,7 @@ if [ "$MODE" = "full" ]; then
 elif [ "$MODE" = "infra" ]; then
   echo "Starting infrastructure services only..."
 
-  SERVICES="keycloak-database user-service-database storage-service-database encoding-service-database keycloak minio prometheus grafana"
+  SERVICES="keycloak-database user-service-database storage-service-database encoding-service-database trip-service-database keycloak minio prometheus grafana"
 
   docker compose down
   docker system prune -f
