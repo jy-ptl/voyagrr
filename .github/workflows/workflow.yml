@@ -97,11 +97,11 @@ jobs:
           contains(join(github.event.commits.*.added), 'tempo/')
         run: |
           rsync -avz -e "ssh" \
-            ./grafana \
-            ./prometheus \
-            ./loki/loki-config.yml \
-            ./promtail \
-            ./tempo/tempo.yml \
+            ./grafana/ \
+            ./prometheus/ \
+            ./loki/ \
+            ./promtail/ \
+            ./tempo/ \
             ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:~/deployment/voyagrr
 
       - name: Deploy to remote server
