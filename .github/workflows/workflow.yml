@@ -96,7 +96,7 @@ jobs:
           contains(join(github.event.commits.*.modified), 'tempo/') ||
           contains(join(github.event.commits.*.added), 'tempo/')
         run: |
-          rsync -avz -e "ssh" \
+          rsync -avz --delete -e "ssh" \
             ./grafana/ \
             ./prometheus/ \
             ./loki/ \
