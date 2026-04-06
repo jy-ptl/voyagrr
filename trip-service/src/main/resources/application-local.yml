@@ -8,7 +8,7 @@ spring:
     enabled: true
     change-log: classpath:db/changelog/db.changelog.master.yaml
   datasource:
-    url: jdbc:postgresql://localhost:5435/trip_service_database
+    url: jdbc:postgresql://localhost:5441/trip_service_database
     username: postgres
     password: postgres
   jpa:

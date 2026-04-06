@@ -88,9 +88,20 @@ jobs:
           contains(join(github.event.commits.*.modified), 'grafana/') ||
           contains(join(github.event.commits.*.added), 'grafana/') ||
           contains(join(github.event.commits.*.modified), 'prometheus/') ||
-          contains(join(github.event.commits.*.added), 'prometheus/')
+          contains(join(github.event.commits.*.added), 'prometheus/') ||
+          contains(join(github.event.commits.*.modified), 'loki/') ||
+          contains(join(github.event.commits.*.added), 'loki/') ||
+          contains(join(github.event.commits.*.modified), 'promtail/') ||
+          contains(join(github.event.commits.*.added), 'promtail/') ||
+          contains(join(github.event.commits.*.modified), 'tempo/') ||
+          contains(join(github.event.commits.*.added), 'tempo/')
         run: |
-          rsync -avz -e "ssh" ./grafana ./prometheus \
+          rsync -avz -e "ssh" \
+            ./grafana \
+            ./prometheus \
+            ./loki/loki-config.yml \
+            ./promtail \
+            ./tempo/tempo.yml \
             ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:~/deployment/voyagrr
 
       - name: Deploy to remote server
