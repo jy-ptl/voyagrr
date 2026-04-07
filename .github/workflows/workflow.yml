@@ -85,10 +85,10 @@ jobs:
 
       - name: Sync monitoring configs
         run: |
-          rsync -avz --delete -e "ssh -i ~/.ssh/id_rsa" ./prometheus/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:~/deployment/voyagrr/prometheus/
-          rsync -avz --delete -e "ssh -i ~/.ssh/id_rsa" ./loki/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:~/deployment/voyagrr/loki/
-          rsync -avz --delete -e "ssh -i ~/.ssh/id_rsa" ./promtail/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:~/deployment/voyagrr/promtail/
-          rsync -avz --delete -e "ssh -i ~/.ssh/id_rsa" ./tempo/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:~/deployment/voyagrr/tempo/
+          rsync -avz --delete -e "ssh" ./prometheus/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:~/deployment/voyagrr/prometheus/
+          rsync -avz --delete -e "ssh" ./loki/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:~/deployment/voyagrr/loki/
+          rsync -avz --delete -e "ssh" ./promtail/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:~/deployment/voyagrr/promtail/
+          rsync -avz --delete -e "ssh" ./tempo/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:~/deployment/voyagrr/tempo/
 
       - name: Deploy to remote server
         run: |
