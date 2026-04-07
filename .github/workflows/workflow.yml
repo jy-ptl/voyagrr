@@ -88,6 +88,7 @@ jobs:
 
       - name: Sync monitoring configs
         run: |
+          rsync -avz -e "ssh" ./grafana/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:~/deployment/voyagrr/grafana/
           rsync -avz -e "ssh" ./prometheus/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:~/deployment/voyagrr/prometheus/
           rsync -avz -e "ssh" ./loki/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:~/deployment/voyagrr/loki/
           rsync -avz -e "ssh" ./promtail/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:~/deployment/voyagrr/promtail/
