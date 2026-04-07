@@ -83,26 +83,12 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
 
-      - name: Rsync Grafana & Prometheus (if changed)
-        if: |
-          contains(join(github.event.commits.*.modified), 'grafana/') ||
-          contains(join(github.event.commits.*.added), 'grafana/') ||
-          contains(join(github.event.commits.*.modified), 'prometheus/') ||
-          contains(join(github.event.commits.*.added), 'prometheus/') ||
-          contains(join(github.event.commits.*.modified), 'loki/') ||
-          contains(join(github.event.commits.*.added), 'loki/') ||
-          contains(join(github.event.commits.*.modified), 'promtail/') ||
-          contains(join(github.event.commits.*.added), 'promtail/') ||
-          contains(join(github.event.commits.*.modified), 'tempo/') ||
-          contains(join(github.event.commits.*.added), 'tempo/')
+      - name: Sync monitoring configs
         run: |
-          rsync -avz --delete -e "ssh" \
-            ./grafana/ \
-            ./prometheus/ \
-            ./loki/ \
-            ./promtail/ \
-            ./tempo/ \
-            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:~/deployment/voyagrr
+          rsync -avz --delete -e "ssh -i ~/.ssh/id_rsa" ./prometheus/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:~/deployment/voyagrr/prometheus/
+          rsync -avz --delete -e "ssh -i ~/.ssh/id_rsa" ./loki/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:~/deployment/voyagrr/loki/
+          rsync -avz --delete -e "ssh -i ~/.ssh/id_rsa" ./promtail/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:~/deployment/voyagrr/promtail/
+          rsync -avz --delete -e "ssh -i ~/.ssh/id_rsa" ./tempo/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:~/deployment/voyagrr/tempo/
 
       - name: Deploy to remote server
         run: |
