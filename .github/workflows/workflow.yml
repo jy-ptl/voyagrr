@@ -7,7 +7,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAMESPACE: ${{ github.repository_owner }}/voyagrr
-  SERVICES: user-service storage-service processing-service api-gateway discovery-service
+  SERVICES: user-service storage-service processing-service trip-service api-gateway discovery-service
   PYTHON_SERVICES: encoding-service analysis-service metadata-service
 
 jobs:
@@ -16,6 +16,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          clean: true
+          fetch-depth: 0
 
       - uses: actions/setup-java@v3
         with:
@@ -83,15 +86,13 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
 
-      - name: Rsync Grafana & Prometheus (if changed)
-        if: |
-          contains(join(github.event.commits.*.modified), 'grafana/') ||
-          contains(join(github.event.commits.*.added), 'grafana/') ||
-          contains(join(github.event.commits.*.modified), 'prometheus/') ||
-          contains(join(github.event.commits.*.added), 'prometheus/')
+      - name: Sync monitoring configs
         run: |
-          rsync -avz -e "ssh" ./grafana ./prometheus \
-            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:~/deployment/voyagrr
+          rsync -avz -e "ssh" ./grafana/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:~/deployment/voyagrr/grafana/
+          rsync -avz -e "ssh" ./prometheus/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:~/deployment/voyagrr/prometheus/
+          rsync -avz -e "ssh" ./loki/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:~/deployment/voyagrr/loki/
+          rsync -avz -e "ssh" ./promtail/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:~/deployment/voyagrr/promtail/
+          rsync -avz -e "ssh" ./tempo/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:~/deployment/voyagrr/tempo/
 
       - name: Deploy to remote server
         run: |
@@ -128,6 +129,7 @@ jobs:
 
             printf "STORAGE_GRPC_SERVICE_PORT=${{ secrets.STORAGE_GRPC_SERVICE_PORT }}\n" >> .env
             printf "PROCESSING_GRPC_SERVICE_PORT=${{ secrets.PROCESSING_GRPC_SERVICE_PORT }}\n" >> .env
+            printf "TRIP_GRPC_SERVICE_PORT=${{ secrets.TRIP_GRPC_SERVICE_PORT }}\n" >> .env
 
             printf "USER_DB_HOST=${{ secrets.USER_DB_HOST }}\n" >> .env
             printf "USER_DB_PORT=${{ secrets.USER_DB_PORT }}\n" >> .env
@@ -155,6 +157,12 @@ jobs:
             printf "PROCESSING_DB_NAME=${{ secrets.PROCESSING_DB_NAME }}\n" >> .env
             printf "PROCESSING_DB_USER=${{ secrets.PROCESSING_DB_USER }}\n" >> .env
             printf "PROCESSING_DB_PASSWORD=${{ secrets.PROCESSING_DB_PASSWORD }}\n" >> .env
+
+            printf "TRIP_DB_HOST=${{ secrets.TRIP_DB_HOST }}\n" >> .env
+            printf "TRIP_DB_PORT=${{ secrets.TRIP_DB_PORT }}\n" >> .env
+            printf "TRIP_DB_NAME=${{ secrets.TRIP_DB_NAME }}\n" >> .env
+            printf "TRIP_DB_USER=${{ secrets.TRIP_DB_USER }}\n" >> .env
+            printf "TRIP_DB_PASSWORD=${{ secrets.TRIP_DB_PASSWORD }}\n" >> .env
 
             printf "ANALYSIS_TEMP_DIR=${{ secrets.ANALYSIS_TEMP_DIR }}\n" >> .env
 

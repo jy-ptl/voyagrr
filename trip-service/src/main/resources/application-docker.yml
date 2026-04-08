@@ -1,0 +1,36 @@
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://keycloak:8070/realms/voyagrr
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog.master.yaml
+  datasource:
+    url: jdbc:postgresql://trip-service-database:5432/trip_service_database
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: none 
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka:8761/eureka
+
+grpc:
+  client:
+    storage-service:
+      address: static://storage-service:9091
+      negotiationType: plaintext
+  server:
+    port: 9093
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus

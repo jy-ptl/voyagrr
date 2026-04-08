@@ -110,6 +110,18 @@ services:
     networks:
       - voyagrr-net
 
+  trip-service-database:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: trip_service_database
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5441:5432'
+    volumes:
+      - trip-database-data:/var/lib/postgresql/data
+    networks:
+      - voyagrr-net
 
   eureka:
     build:
@@ -178,6 +190,7 @@ services:
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin123
+      MINIO_PROMETHEUS_AUTH_TYPE: public
     volumes:
       - minio-data:/data
     healthcheck:
@@ -208,7 +221,46 @@ services:
       - prometheus
     volumes:
       - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
       - grafana-storage:/var/lib/grafana
+    networks:
+      - voyagrr-net
+
+  loki:
+    image: grafana/loki:2.9.0
+    container_name: loki
+    ports:
+      - '3100:3100'
+    command: -config.file=/etc/loki/loki-config.yml
+    volumes:
+      - ./loki/loki-config.yml:/etc/loki/loki-config.yml
+      - ./loki/data:/loki
+    networks:
+      - voyagrr-net
+
+  promtail:
+    image: grafana/promtail:3.0.0
+    container_name: promtail
+    volumes:
+      - /var/log:/var/log
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/containers:/var/lib/docker/containers
+      - ./promtail/promtail-config.yml:/etc/promtail/promtail-config.yml
+    command: -config.file=/etc/promtail/promtail-config.yml
+    networks:
+      - voyagrr-net
+  
+  tempo:
+    image: grafana/tempo:2.4.1
+    container_name: tempo
+    command: [ "-config.file=/etc/tempo/tempo.yml" ]
+    volumes:
+      - ./tempo/tempo.yml:/etc/tempo/tempo.yml
+      - ./tempo/data:/var/tempo
+    ports:
+      - "3200:3200"   # Tempo API
+      - "4317:4317"   # OTLP gRPC
+      - "4318:4318"   # OTLP HTTP
     networks:
       - voyagrr-net
 
@@ -250,6 +302,9 @@ services:
     build:
       context: .
       dockerfile: user-service/Dockerfile
+    labels:
+      logging: voyagrr
+      service: user-service
     ports:
       - '8081:8081'
     depends_on:
@@ -269,6 +324,9 @@ services:
     build:
       context: .
       dockerfile: storage-service/Dockerfile
+    labels:
+      logging: voyagrr
+      service: storage-service
     ports:
       - '8082:8082'
       - '9090:9090'
@@ -280,6 +338,27 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: docker
       SPRING_DATASOURCE_URL: jdbc:postgresql://storage-service-database:5432/storage_service_database
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    networks:
+      - voyagrr-net
+
+  trip-service:
+    build:
+      context: .
+      dockerfile: trip-service/Dockerfile
+    labels:
+      logging: voyagrr
+      service: trip-service
+    ports:
+      - '8086:8086'
+    depends_on:
+      - eureka
+      - api-gateway
+      - trip-service-database
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://trip-service-database:5432/trip_service_database
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
     networks:
@@ -303,6 +382,9 @@ services:
     build:
       context: .
       dockerfile: processing-service/Dockerfile
+    labels:
+      logging: voyagrr
+      service: processing-service
     ports:
       - '8085:8085'
       - '9091:9091'
@@ -364,9 +446,11 @@ volumes:
   processing-database-data:
   metadata-database-data:
   analysis-database-data:
+  trip-database-data:
   minio-data:
   prometheus-data:
   grafana-storage:
+  loki-data:
   analysis-models:
 
 networks:

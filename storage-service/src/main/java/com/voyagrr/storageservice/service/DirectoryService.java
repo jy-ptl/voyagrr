@@ -22,4 +22,6 @@ public interface DirectoryService {
     DirectoryContentResponse getDirectoryContents(Long directoryId, String keycloakUserId);
 
     List<Long> getAllAncestorsIncludingSelfFromFileId(long fileId);
+
+    Long createDiretoryForTrip(String directoryName, String keycloakUserId);
 }
