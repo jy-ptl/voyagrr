@@ -151,8 +151,23 @@ public class DirectoryServiceImpl implements DirectoryService {
 
     @Override
     public Long createDiretoryForTrip(String directoryName, String keycloakUserId) {
-        return directoryRepository.save(Directory.builder().name(directoryName).ownerId(keycloakUserId).build())
-                .getId();
+        long directoryId = directoryRepository
+                .save(Directory.builder().name(directoryName).ownerId(keycloakUserId).build()).getId();
+        mediaShareService.createDefaultPermissions(directoryId, keycloakUserId);
+        return directoryId;
+    }
+
+    @Override
+    public Long createDefaultSampleDirectoryForUser(String keycloakUserId) {
+        long directoryId = directoryRepository
+                .save(Directory.builder().name("Samples").ownerId(keycloakUserId).build()).getId();
+        mediaShareService.createDefaultPermissionsForSampleDirectory(directoryId, keycloakUserId);
+        return directoryId;
+    }
+
+    @Override
+    public Long getSampleDirectoryIdByUserId(String keycloakUserId) {
+        return directoryRepository.getSampleDirectoryIdByUserId(keycloakUserId);
     }
 
     private List<DirectoryTreeResponse> buildDirectoryTree(List<DirectoryFlatResponse> flatList) {

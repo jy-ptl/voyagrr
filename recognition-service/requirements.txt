@@ -1,0 +1,8 @@
+kafka-python
+insightface
+onnxruntime
+numpy
+opencv-python-headless
+minio
+pyyaml
+faiss-cpu

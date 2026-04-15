@@ -12,6 +12,9 @@ service StorageService {
   rpc GetFileIdsOfDirectory(GetFileIdsOfDirectoryRequest) returns (GetFileIdsOfDirectoryResponse);
   rpc CreateDirectoryForTrip(CreateDirectoryForTripRequest) returns (CreateDirectoryForTripResponse);
   rpc CreateOrValidateGroupForTrip(CreateOrValidateGroupForTripRequest) returns (CreateOrValidateGroupForTripResponse);
+  rpc CreateDefaultSampleDirectoryForUser(CreateDefaultSampleDirectoryForUserRequest) returns (CreateDefaultSampleDirectoryForUserResponse);
+  rpc GetTripProcessingData(GetTripProcessingDataRequest)
+      returns (GetTripProcessingDataResponse);
 }
 
 message UpdateFileProcessingStatusRequest {
@@ -62,4 +65,26 @@ message CreateOrValidateGroupForTripRequest {
 
 message CreateOrValidateGroupForTripResponse {
   int64 group_id = 1;
+}
+
+message CreateDefaultSampleDirectoryForUserRequest {
+  string keycloak_user_id = 1;
+}
+
+message CreateDefaultSampleDirectoryForUserResponse {
+  int64 directory_id = 1;
+}
+
+message GetTripProcessingDataRequest {
+  int64 trip_id = 1;
+  int64 group_id = 2;
+}
+
+message GroupMember {
+  string keycloak_user_id = 1;
+  string sample_directory = 2;
+}
+
+message GetTripProcessingDataResponse {
+  repeated GroupMember group_members = 2;
 }

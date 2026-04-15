@@ -20,4 +20,23 @@ public class GrpcProcessingServiceImpl extends ProcessingServiceGrpc.ProcessingS
         responseObserver.onCompleted();
     }
 
+    @Override
+    public void processTrip(ProcessTripRequest request,
+            StreamObserver<ProcessTripResponse> responseObserver) {
+
+        String jobId = processingService.processTrip(
+                request.getTripId(),
+                request.getDirectoryId(),
+                request.getGroupId(),
+                request.getRequestedBy());
+
+        responseObserver.onNext(
+                ProcessTripResponse.newBuilder()
+                        .setJobId(jobId)
+                        .setStatus("QUEUED")
+                        .build());
+
+        responseObserver.onCompleted();
+    }
+
 }

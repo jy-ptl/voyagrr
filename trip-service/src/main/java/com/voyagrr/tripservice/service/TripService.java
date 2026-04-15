@@ -5,4 +5,6 @@ import com.voyagrr.tripservice.dto.TripCreateResponse;
 
 public interface TripService {
     TripCreateResponse createTrip(TripCreateRequest request, String keycloakUserId);
+
+    String proccessTrip(long tripId, String keycloakUserId);
 }

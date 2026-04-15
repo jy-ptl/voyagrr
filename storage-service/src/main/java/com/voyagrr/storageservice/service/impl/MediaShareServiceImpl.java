@@ -247,6 +247,18 @@ public class MediaShareServiceImpl implements MediaShareService {
                 .stream().map(file -> file.getId()).toList();
     }
 
+    @Override
+    public void createDefaultPermissionsForSampleDirectory(Long directoryId, String keycloakUserId) {
+        List<Permission> allPermissions = permissionRepository.findAll();
+        allPermissions.removeIf(permission -> permission.getName() == com.voyagrr.common.enumeration.Permission.SHARE);
+
+        mediaShareRepository.save(MediaShare.builder()
+                .userId(keycloakUserId)
+                .directoryId(directoryId)
+                .permissions(allPermissions)
+                .build());
+    }
+
     private boolean hasPermissionForFileByUserId(String keycloakUserId, long fileId, String permission) {
         return mediaShareRepository.existsByUserIdAndFileIdAndPermission(keycloakUserId, fileId, permission);
     }

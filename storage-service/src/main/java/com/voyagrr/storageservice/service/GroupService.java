@@ -10,4 +10,6 @@ public interface GroupService {
 
     Long createOrValidateGroupForTrip(long groupId, String groupName, String keycloakUserId, List<String> members);
 
+    List<String> findUserIdsByGroupId(long groupId);
+
 }

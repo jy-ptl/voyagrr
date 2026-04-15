@@ -75,4 +75,7 @@ public interface DirectoryRepository extends JpaRepository<Directory, Long> {
             """, nativeQuery = true)
     List<DirectoryFlatResponse> getAllAncestorsIncludingSelf(@Param("directoryId") long directoryId);
 
+    @Query(value = "select id from directories where name='Samples' and owner_id = :keycloakUserId", nativeQuery = true)
+    Long getSampleDirectoryIdByUserId(String keycloakUserId);
+
 }
