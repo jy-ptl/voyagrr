@@ -39,4 +39,16 @@ public class GrpcProcessingServiceImpl extends ProcessingServiceGrpc.ProcessingS
         responseObserver.onCompleted();
     }
 
+    @Override
+    public void embeddSampleImages(EmbeddSampleImagesRequest request,
+            StreamObserver<EmbeddSampleImagesResponse> responseObserver) {
+
+        responseObserver.onNext(EmbeddSampleImagesResponse.newBuilder()
+                .setSuccess(
+                        processingService.embeddSampleImages(request.getKeycloakUserId(), request.getSampleDirectory()))
+                .build());
+
+        responseObserver.onCompleted();
+    }
+
 }

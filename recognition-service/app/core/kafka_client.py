@@ -14,11 +14,16 @@ def create_consumer():
     while True:
         try:
             consumer = KafkaConsumer(
-                cfg["kafka"]["topic_analyze"],
                 bootstrap_servers=cfg["kafka"]["bootstrap_servers"],
-                group_id="recognition-workers",
+                group_id="recognition-service",
                 value_deserializer=lambda m: json.loads(m.decode()),
                 auto_offset_reset="earliest",
+            )
+            consumer.subscribe(
+                [
+                    cfg["kafka"]["topic_analyze"],
+                    cfg["kafka"]["topic_embedding"],
+                ]
             )
             logger.info("connected to kafka ")
             return consumer

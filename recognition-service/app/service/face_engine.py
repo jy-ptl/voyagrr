@@ -13,7 +13,6 @@ def extract_faces(img_bytes):
     faces = app.get(image)
 
     results = []
-
     for face in faces:
         results.append(
             {
@@ -29,3 +28,4 @@ def extract_faces(img_bytes):
         )
 
     return results
+

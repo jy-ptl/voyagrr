@@ -316,6 +316,15 @@ services:
     networks:
       - voyagrr-net
 
+  qdrant:
+    image: qdrant/qdrant
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    networks:
+      - voyagrr-net
+
   user-service:
     build:
       context: .
@@ -486,6 +495,7 @@ volumes:
   grafana-storage:
   loki-data:
   analysis-models:
+  qdrant_data:
 
 networks:
   voyagrr-net:

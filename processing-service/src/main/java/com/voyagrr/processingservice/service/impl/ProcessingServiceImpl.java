@@ -8,10 +8,12 @@ import com.voyagrr.common.enumeration.FileStatus;
 import com.voyagrr.common.proto.*;
 import com.voyagrr.processingservice.dto.FileProcessingEvent;
 import com.voyagrr.processingservice.dto.GroupMember;
+import com.voyagrr.processingservice.dto.ImageEmbeddingEvent;
 import com.voyagrr.processingservice.dto.TripAnalyzeEvent;
 import com.voyagrr.processingservice.service.ProcessingService;
 import com.voyagrr.processingservice.service.grpc.client.StorageGrpcClient;
 import com.voyagrr.processingservice.service.kafka.producer.FileMetadataEventProducer;
+import com.voyagrr.processingservice.service.kafka.producer.ImageEmbeddingEventProducer;
 import com.voyagrr.processingservice.service.kafka.producer.TripFacialRecognitionEventProducer;
 
 import org.springframework.stereotype.Service;
@@ -28,6 +30,7 @@ public class ProcessingServiceImpl implements ProcessingService {
     private final StorageGrpcClient storageGrpcClient;
 
     private final TripFacialRecognitionEventProducer tripFacialRecognitionEventProducer;
+    private final ImageEmbeddingEventProducer imageEmbeddingEventProducer;
 
     @Override
     public boolean processFile(ProcessFileRequest request) {
@@ -64,6 +67,13 @@ public class ProcessingServiceImpl implements ProcessingService {
         tripFacialRecognitionEventProducer.sendTripAnalysisEvent(event);
 
         return jobId;
+    }
+
+    @Override
+    public boolean embeddSampleImages(String keycloakUserId, String sampleDirectory) {
+        imageEmbeddingEventProducer.sendImageEmbeddingEvent(
+                ImageEmbeddingEvent.builder().keycloakUserId(keycloakUserId).sampleDirectory(sampleDirectory).build());
+        return true;
     }
 
 }

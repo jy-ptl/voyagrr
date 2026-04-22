@@ -1,85 +1,72 @@
-from collections import defaultdict
 from app.core.minio_client import list_objects, get_object_bytes
 from app.service.face_engine import extract_faces
-from app.service.matcher import average_embedding
+from app.vector.factory import get_vector_store
 from app.core.kafka_client import get_producer
 from app.core.logging_config import get_logger
-from app.service.faiss_service import build_faiss_index, match_face_faiss
 
 logger = get_logger(__name__)
-producer = get_producer()
+vector_store = get_vector_store()
 
 
-def process_event(event):
+def process_trip_event(event):
     trip_id = event["tripId"]
     trip_dir = event["tripDirectory"]
     group_members = event["groupMembers"]
 
-    user_embeddings = {}
+    allowed_users = set(member["keycloakUserId"] for member in group_members)
 
-    for member in group_members:
-        user_id = member["keycloakUserId"]
-        face_dir = member["sampleDirectory"]
-
-        face_images = list_objects(face_dir)
-        embeddings = []
-
-        for img_path in face_images:
-            img_bytes = get_object_bytes(img_path)
-            faces = extract_faces(img_bytes)
-
-            for f in faces:
-                embeddings.append(f["embedding"])
-
-        if embeddings:
-            user_embeddings[user_id] = average_embedding(embeddings)
-
-    index, user_ids = build_faiss_index(user_embeddings)
-
+    producer = get_producer()
     trip_images = list_objects(trip_dir)
 
     for img_path in trip_images:
-        process_image(trip_id, img_path, index, user_ids)
+        process_image(trip_id, img_path, allowed_users, producer)
+
+    logger.info("Completed trip %s", trip_id)
 
 
-def process_image(trip_id, img_path, index, user_ids):
+def process_image(trip_id, img_path, allowed_users, producer):
+    try:
+        img_bytes = get_object_bytes(img_path)
+        faces = extract_faces(img_bytes)
 
-    img_bytes = get_object_bytes(img_path)
-    faces = extract_faces(img_bytes)
+        if not faces:
+            result = {"tripId": trip_id, "imagePath": img_path, "faces": []}
+            producer.send("trip.analyzed.v1", result)
+            return
 
-    votes = defaultdict(list)
+        embeddings = [face["embedding"] for face in faces]
 
-    for face in faces:
-        user_id, confidence = match_face_faiss(face["embedding"], index, user_ids)
+        batch_results = vector_store.search_batch(embeddings, top_k=5)
 
-        if user_id:
-            votes[user_id].append(confidence)
+        result_faces = []
 
-    final_user = None
-    final_confidence = None
+        for face, matches in zip(faces, batch_results):
+            user_id = None
+            confidence = None
 
-    if votes:
-        best_user = max(votes.items(), key=lambda x: len(x[1]))
-        final_user = best_user[0]
-        final_confidence = float(sum(best_user[1]) / len(best_user[1]))
+            if matches:
+                best_per_user = {}
 
-    result_faces = []
+                for uid, score in matches:
+                    if uid not in best_per_user or score > best_per_user[uid]:
+                        best_per_user[uid] = score
 
-    for face in faces:
-        result_faces.append(
-            {
-                "userId": final_user,
-                "confidence": final_confidence,
-                "bbox": face["bbox"],
-            }
-        )
+                sorted_users = sorted(best_per_user.items(), key=lambda x: -x[1])
 
-    result = {
-        "tripId": trip_id,
-        "imagePath": img_path,
-        "faces": result_faces,
-    }
+                for uid, score in sorted_users:
+                    if uid in allowed_users:
+                        user_id = uid
+                        confidence = score
+                        break
 
-    logger.info("%s", result)
+            result_faces.append(
+                {"userId": user_id, "confidence": confidence, "bbox": face["bbox"]}
+            )
 
-    producer.send("trip.analyzed.v1", result)
+        result = {"tripId": trip_id, "imagePath": img_path, "faces": result_faces}
+
+        logger.info("result %s", result)
+        producer.send("trip.analyzed.v1", result)
+
+    except Exception as e:
+        logger.error("Error processing %s: %s", img_path, str(e))

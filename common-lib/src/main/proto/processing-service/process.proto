@@ -9,6 +9,7 @@ option java_string_check_utf8 = true;
 service ProcessingService {
   rpc ProcessFile(ProcessFileRequest) returns (ProcessFileResponse);
   rpc ProcessTrip(ProcessTripRequest) returns (ProcessTripResponse);
+  rpc EmbeddSampleImages(EmbeddSampleImagesRequest) returns (EmbeddSampleImagesResponse);
 }
 
 message ProcessFileResponse {
@@ -30,4 +31,13 @@ message ProcessTripRequest {
 message ProcessTripResponse {
   string job_id = 1;
   string status = 2;
+}
+
+message EmbeddSampleImagesRequest {
+  string keycloak_user_id = 1;
+  string sample_directory = 2;
+}
+
+message EmbeddSampleImagesResponse {
+  bool success = 1;
 }
