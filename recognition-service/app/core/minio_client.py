@@ -11,11 +11,15 @@ client = Minio(
 )
 
 
-def list_objects(prefix: str):
-    return [
-        obj.object_name
-        for obj in client.list_objects(cfg["minio"]["bucket"], prefix, recursive=True)
-    ]
+def list_objects(prefix: str, extensions: list[str] = []):
+    objects = client.list_objects(cfg["minio"]["bucket"], prefix, recursive=True)
+    if extensions:
+        return [
+            obj.object_name
+            for obj in objects
+            if any(obj.object_name.lower().endswith(ext) for ext in extensions)
+        ]
+    return [obj.object_name for obj in objects]
 
 
 def get_object_bytes(object_name: str):

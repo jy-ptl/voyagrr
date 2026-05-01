@@ -18,3 +18,4 @@ app:
   temp_dir: ${RECOGNITION_TEMP_DIR}
   match_threshold: ${RECOGNITION_MATCH_THRESHOLD}
   max_workers: ${RECOGNITION_MAX_WORKERS}
+  min_face_size: ${RECOGNITION_MIN_FACE_SIZE}

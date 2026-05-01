@@ -22,3 +22,7 @@ class VectorStore(ABC):
     @abstractmethod
     def delete_user(self, user_id: str):
         pass
+
+    @abstractmethod
+    def get_count(self) -> int:
+        pass

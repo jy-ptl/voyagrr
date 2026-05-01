@@ -20,4 +20,6 @@ public interface FileMetadataRepository extends JpaRepository<FileMetadata, Long
 
     @Query("SELECT f FROM FileMetadata f WHERE f.fileId IN (:fileIds)")
     List<FileMetadata> getFileMetadataByFileIds(@Param("fileIds") List<Long> fileIds);
+
+    Optional<FileMetadata> findByMinioObjectKey(String minioObjectKey);
 }

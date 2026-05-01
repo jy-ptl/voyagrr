@@ -17,4 +17,5 @@ postgres:
 app:
   temp_dir: /tmp/recognition
   match_threshold: 0.6
+  min_face_size: 80
   max_workers: 4

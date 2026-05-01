@@ -10,6 +10,9 @@ def extract_faces(img_bytes):
     np_arr = np.frombuffer(img_bytes, np.uint8)
     image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
 
+    if image is None:
+        return []
+
     faces = app.get(image)
 
     results = []
@@ -28,4 +31,3 @@ def extract_faces(img_bytes):
         )
 
     return results
-
