@@ -8,6 +8,8 @@ option java_string_check_utf8 = true;
 
 service ProcessingService {
   rpc ProcessFile(ProcessFileRequest) returns (ProcessFileResponse);
+  rpc ProcessTrip(ProcessTripRequest) returns (ProcessTripResponse);
+  rpc EmbeddSampleImages(EmbeddSampleImagesRequest) returns (EmbeddSampleImagesResponse);
 }
 
 message ProcessFileResponse {
@@ -17,4 +19,25 @@ message ProcessFileResponse {
 message ProcessFileRequest {
   int64 file_id = 1;
   string minio_object_key = 2;
+}
+
+message ProcessTripRequest {
+  int64 trip_id = 1;
+  int64 directory_id = 2;
+  int64 group_id = 3;
+  string requested_by = 4;
+}
+
+message ProcessTripResponse {
+  string job_id = 1;
+  string status = 2;
+}
+
+message EmbeddSampleImagesRequest {
+  string keycloak_user_id = 1;
+  string sample_directory = 2;
+}
+
+message EmbeddSampleImagesResponse {
+  bool success = 1;
 }

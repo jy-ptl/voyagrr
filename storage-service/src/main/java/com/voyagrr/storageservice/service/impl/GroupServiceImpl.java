@@ -62,4 +62,9 @@ public class GroupServiceImpl implements GroupService {
 
     }
 
+    @Override
+    public List<String> findUserIdsByGroupId(long groupId) {
+        return groupMemberRepository.findUserIdsByGroupId(groupId);
+    }
+
 }

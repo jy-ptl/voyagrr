@@ -7,10 +7,7 @@ import com.voyagrr.tripservice.service.TripService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -34,6 +31,13 @@ public class TripController {
     public ResponseEntity<TripCreateResponse> createTrip(@Valid @RequestBody TripCreateRequest request,
             @AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.ok(tripService.createTrip(request, jwt.getSubject()));
+    }
+
+    @Operation(summary = "Process trip", description = "Process trip metadata")
+    @RequestMapping(value = "analyze/{tripId}", method = RequestMethod.POST)
+    public ResponseEntity<String> processTrip(@PathVariable(name = "tripId") long tripId,
+            @AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(tripService.proccessTrip(tripId, jwt.getSubject()));
     }
 
 }

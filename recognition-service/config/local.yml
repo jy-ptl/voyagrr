@@ -1,0 +1,21 @@
+kafka:
+  bootstrap_servers: localhost:9092
+  topic_analyze: trip.analyze.v1
+  topic_ai_result: file.analyzed.v1
+  topic_embedding: image.embedding.v1
+
+minio:
+  endpoint: localhost:9000
+  access-key: minioadmin
+  secret-key: minioadmin123
+  secure: false
+  bucket: voyagrr-media
+
+postgres:
+  url: postgresql://postgres:postgres@localhost:5442/recognition_service_database
+
+app:
+  temp_dir: /tmp/recognition
+  match_threshold: 0.6
+  min_face_size: 80
+  max_workers: 4

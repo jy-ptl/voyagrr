@@ -52,4 +52,6 @@ public interface MediaShareService {
     String updateFilePermission(FilePermissionRequest request, String keycloakUserId);
 
     List<Long> getFileIdsOfDirectory(String keycloakUserId, long direcotryId, String permission);
+
+    void createDefaultPermissionsForSampleDirectory(Long directoryId, String keycloakUserId);
 }

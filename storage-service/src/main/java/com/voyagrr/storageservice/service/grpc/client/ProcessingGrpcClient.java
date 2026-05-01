@@ -16,4 +16,10 @@ public class ProcessingGrpcClient {
         return stub.processFile(ProcessFileRequest.newBuilder().setFileId(fileId).setMinioObjectKey(minioObjectKey)
                 .build()).getSuccess();
     }
+
+    public boolean startSampleImageEmbedding(String keycloakUserId, String sampleDirectory) {
+        return stub.embeddSampleImages(EmbeddSampleImagesRequest.newBuilder().setKeycloakUserId(keycloakUserId)
+                .setSampleDirectory(sampleDirectory).build()).getSuccess();
+    }
+
 }

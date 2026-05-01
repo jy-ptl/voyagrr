@@ -111,6 +111,8 @@ public class MinioStorageService implements StorageService {
                             .ownerId(keycloakUserId)
                             .build());
 
+            if (directory.getName().equals("Samples"))
+                processingGrpcClient.startSampleImageEmbedding(savedFile.getOwnerId(), "dir_" + directory.getId());
             processingGrpcClient.startFileProcessing(savedFile.getId(), savedFile.getMinioObjectKey());
 
             return "Success";

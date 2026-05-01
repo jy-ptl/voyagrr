@@ -26,6 +26,10 @@ grpc:
     storage-service:
       address: static://storage-service:9091
       negotiationType: plaintext
+    processing-service:
+      address: static://processing-service:9092
+      negotiationType: plaintext
+
   server:
     port: 9093
 

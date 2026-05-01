@@ -8,7 +8,7 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAMESPACE: ${{ github.repository_owner }}/voyagrr
   SERVICES: user-service storage-service processing-service trip-service api-gateway discovery-service
-  PYTHON_SERVICES: encoding-service analysis-service metadata-service
+  PYTHON_SERVICES: encoding-service analysis-service metadata-service recognition-service
 
 jobs:
   build-images:
@@ -171,6 +171,17 @@ jobs:
             printf "ANALYSIS_DB_NAME=${{ secrets.ANALYSIS_DB_NAME }}\n" >> .env
             printf "ANALYSIS_DB_USER=${{ secrets.ANALYSIS_DB_USER }}\n" >> .env
             printf "ANALYSIS_DB_PASSWORD=${{ secrets.ANALYSIS_DB_PASSWORD }}\n" >> .env
+
+            printf "RECOGNITION_TEMP_DIR=${{ secrets.RECOGNITION_TEMP_DIR }}\n" >> .env
+            printf "RECPGNITION_MATCH_THRESHOLD=${{ secrets.RECPGNITION_MATCH_THRESHOLD }}\n" >> .env
+            printf "RECOGNITION_MAX_WORKERS"=${{ secrets.RECOGNITION_MAX_WORKERS }}\n" >> .env
+            printf "RECOGNITION_MIN_FACE_SIZE"=${{ secrets.RECOGNITION_MIN_FACE_SIZE }}\n" >> .env
+
+            printf "RECOGNITION_DB_HOST=${{ secrets.RECOGNITION_DB_HOST }}\n" >> .env
+            printf "RECOGNITION_DB_PORT=${{ secrets.RECOGNITION_DB_PORT }}\n" >> .env
+            printf "RECOGNITION_DB_NAME=${{ secrets.RECOGNITION_DB_NAME }}\n" >> .env
+            printf "RECOGNITION_DB_USER=${{ secrets.RECOGNITION_DB_USER }}\n" >> .env
+            printf "RECOGNITION_DB_PASSWORD=${{ secrets.RECOGNITION_DB_PASSWORD }}\n" >> .env
 
             printf "METADATA_DB_HOST=${{ secrets.METADATA_DB_HOST }}\n" >> .env
             printf "METADATA_DB_PORT=${{ secrets.METADATA_DB_PORT }}\n" >> .env

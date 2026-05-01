@@ -10,7 +10,8 @@ public final class ExceptionConstant {
         FILE,
         DIRECTORY,
         GROUP,
-        USER
+        USER,
+        TRIP
     }
 
     public static final String ENTITY_DOES_NOT_EXISTS = "%s does not exist";

@@ -11,6 +11,7 @@ import com.voyagrr.userservice.dto.UserLoginRequest;
 import com.voyagrr.userservice.model.User;
 import com.voyagrr.userservice.service.AuthenticationService;
 import com.voyagrr.userservice.service.UserService;
+import com.voyagrr.userservice.service.grpc.client.StorageGrpcClient;
 import com.voyagrr.userservice.utility.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +45,8 @@ public class KeycloakAuthenticationService implements AuthenticationService {
     private final UserService userService;
 
     private final UserMapper userMapper;
+
+    private final StorageGrpcClient storageGrpcClient;
 
     @Override
     public String register(UserCreateRequest request) {
@@ -81,7 +84,7 @@ public class KeycloakAuthenticationService implements AuthenticationService {
                         User user = userMapper.userCreateRequestToUser(request);
                         user.setKeycloakUserId(keycloakUserId);
                         userService.save(user);
-
+                        storageGrpcClient.createDefaultSampleDirectoryForUser(keycloakUserId);
                         return keycloakUserId;
                     }
                     throw new KeycloakAuthException();

@@ -123,6 +123,24 @@ services:
     networks:
       - voyagrr-net
 
+  recognition-service-database:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: recognition_service_database
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5442:5432'
+    volumes:
+      - recognition-database-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - voyagrr-net
+
   eureka:
     build:
       context: .
@@ -298,6 +316,15 @@ services:
     networks:
       - voyagrr-net
 
+  qdrant:
+    image: qdrant/qdrant
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    networks:
+      - voyagrr-net
+
   user-service:
     build:
       context: .
@@ -438,6 +465,21 @@ services:
     volumes:
       - analysis-models:/models
 
+  recognition-service:
+    build:
+      context: ./recognition-service
+    environment:
+      ENV: docker
+    depends_on:
+      kafka:
+        condition: service_healthy
+      recognition-service-database:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - voyagrr-net
+
 volumes:
   keycloak-database-data:
   user-database-data:
@@ -446,12 +488,14 @@ volumes:
   processing-database-data:
   metadata-database-data:
   analysis-database-data:
+  recognition-database-data:
   trip-database-data:
   minio-data:
   prometheus-data:
   grafana-storage:
   loki-data:
   analysis-models:
+  qdrant_data:
 
 networks:
   voyagrr-net:

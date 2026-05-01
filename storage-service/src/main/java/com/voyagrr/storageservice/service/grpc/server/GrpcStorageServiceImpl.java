@@ -1,5 +1,7 @@
 package com.voyagrr.storageservice.service.grpc.server;
 
+import java.util.List;
+
 import com.voyagrr.common.proto.*;
 import com.voyagrr.storageservice.service.DirectoryService;
 import com.voyagrr.storageservice.service.FileService;
@@ -69,6 +71,40 @@ public class GrpcStorageServiceImpl extends StorageServiceGrpc.StorageServiceImp
                         request.getOwnerId(), request.getKeycloakUserIdList()))
                 .build());
         responseObserver.onCompleted();
-    };
+    }
+
+    @Override
+    public void createDefaultSampleDirectoryForUser(CreateDefaultSampleDirectoryForUserRequest request,
+            StreamObserver<CreateDefaultSampleDirectoryForUserResponse> responseObserver) {
+
+        responseObserver.onNext(CreateDefaultSampleDirectoryForUserResponse.newBuilder()
+                .setDirectoryId(directoryService.createDefaultSampleDirectoryForUser(request.getKeycloakUserId()))
+                .build());
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getTripProcessingData(
+            GetTripProcessingDataRequest request,
+            StreamObserver<GetTripProcessingDataResponse> responseObserver) {
+
+        List<String> userIds = groupService.findUserIdsByGroupId(request.getGroupId());
+        List<GroupMember> groupMembers = userIds.stream()
+                .map(userId -> {
+                    String sampleDirectory = "dir_" + directoryService.getSampleDirectoryIdByUserId(userId);
+                    return GroupMember.newBuilder()
+                            .setKeycloakUserId(userId)
+                            .setSampleDirectory(sampleDirectory)
+                            .build();
+                })
+                .toList();
+
+        GetTripProcessingDataResponse response = GetTripProcessingDataResponse.newBuilder()
+                .addAllGroupMembers(groupMembers)
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
 
 }

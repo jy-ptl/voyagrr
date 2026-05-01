@@ -1,0 +1,21 @@
+kafka:
+  bootstrap_servers: kafka:9092
+  topic_analyze: trip.analyze.v1
+  topic_ai_result: trip.analyzed.v1
+  topic_embedding: image.embedding.v1
+
+minio:
+  endpoint: ${PYTHON_MINIO_ENDPOINT}
+  access-key: ${MINIO_ACCESS_KEY}
+  secret-key: ${MINIO_SECRET_KEY}
+  secure: False
+  bucket: ${MINIO_BUCKET}
+
+postgres:
+  url: postgresql://${RECOGNITION_DB_USER}:${RECOGNITION_DB_PASSWORD}@${RECOGNITIION_DB_HOST}:${RECOGNITION_DB_PORT}/${RECOGNITION_DB_NAME}
+
+app:
+  temp_dir: ${RECOGNITION_TEMP_DIR}
+  match_threshold: ${RECOGNITION_MATCH_THRESHOLD}
+  max_workers: ${RECOGNITION_MAX_WORKERS}
+  min_face_size: ${RECOGNITION_MIN_FACE_SIZE}

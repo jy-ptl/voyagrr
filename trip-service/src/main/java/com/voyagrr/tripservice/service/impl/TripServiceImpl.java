@@ -1,11 +1,18 @@
 package com.voyagrr.tripservice.service.impl;
 
+import static com.voyagrr.common.constant.ExceptionConstant.ACCESS_DENIED_FOR_RESOURCE;
+import static com.voyagrr.common.constant.ExceptionConstant.ENTITY_DOES_NOT_EXISTS;
+
+import com.voyagrr.common.constant.ExceptionConstant.RESOURCES;
 import com.voyagrr.common.enumeration.TripVisibility;
+import com.voyagrr.common.exception.AccessDeniedException;
+import com.voyagrr.common.exception.EntityNotFoundException;
 import com.voyagrr.tripservice.dto.TripCreateRequest;
 import com.voyagrr.tripservice.dto.TripCreateResponse;
 import com.voyagrr.tripservice.model.Trip;
 import com.voyagrr.tripservice.repository.TripRepository;
 import com.voyagrr.tripservice.service.TripService;
+import com.voyagrr.tripservice.service.grpc.client.ProcessingGrpcClient;
 import com.voyagrr.tripservice.service.grpc.client.StorageGrpcClient;
 import com.voyagrr.tripservice.utility.TripMapper;
 
@@ -23,6 +30,7 @@ public class TripServiceImpl implements TripService {
     private final TripMapper tripMapper;
 
     private final StorageGrpcClient storageGrpcClient;
+    private final ProcessingGrpcClient processingGrpcClient;
 
     @Override
     public TripCreateResponse createTrip(TripCreateRequest request, String keycloakUserId) {
@@ -38,6 +46,19 @@ public class TripServiceImpl implements TripService {
         trip.setGroupId(groupId);
         trip.setOwnerId(keycloakUserId);
         return tripMapper.TripToTripCreateResponse(tripRepository.save(trip));
+    }
+
+    @Override
+    public String proccessTrip(long tripId, String keycloakUserId) {
+        Trip trip = tripRepository.findById(tripId).orElseThrow(
+                () -> new EntityNotFoundException(ENTITY_DOES_NOT_EXISTS.formatted(RESOURCES.TRIP)));
+        if (trip.getOwnerId().equals(keycloakUserId)) {
+            processingGrpcClient.processTrip(tripId, trip
+                    .getDirectoryId(), trip.getGroupId(), keycloakUserId);
+            return "success";
+        }
+        throw new AccessDeniedException(
+                ACCESS_DENIED_FOR_RESOURCE.formatted(RESOURCES.TRIP, "PROCESS"));
     }
 
 }

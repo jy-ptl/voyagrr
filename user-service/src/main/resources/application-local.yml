@@ -27,6 +27,14 @@ keycloak:
   client-id: voyagrr-client
   client-secret: ulB2DYKDZTAsy5eSKX1KCoPnrDVOw9BD
 
+grpc:
+  client:
+    storage-service:
+      address: static://localhost:9091
+      negotiationType: plaintext
+  server:
+    port: 9094
+
 management:
   endpoints:
     web:

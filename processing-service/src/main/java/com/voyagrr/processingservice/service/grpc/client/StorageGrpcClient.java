@@ -37,4 +37,12 @@ public class StorageGrpcClient {
                 .setKeycloakUserId(keycloakUserId).setPermission(permission).build()).getFileIdList();
     }
 
+    public GetTripProcessingDataResponse getTripData(Long tripId, Long groupId) {
+        return stub.getTripProcessingData(
+                GetTripProcessingDataRequest.newBuilder()
+                        .setTripId(tripId)
+                        .setGroupId(groupId)
+                        .build());
+    }
+
 }
