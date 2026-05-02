@@ -3,7 +3,12 @@ package com.voyagrr.storageservice.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.voyagrr.common.constant.ExceptionConstant;
+import com.voyagrr.common.exception.AccessDeniedException;
+import com.voyagrr.common.exception.EntityNotFoundException;
 import com.voyagrr.storageservice.dto.GroupCreateRequest;
+import com.voyagrr.storageservice.dto.GroupResponse;
+import com.voyagrr.storageservice.dto.GroupUpdateRequest;
 import com.voyagrr.storageservice.model.Group;
 import com.voyagrr.storageservice.model.GroupMember;
 import com.voyagrr.storageservice.model.GroupMemberId;
@@ -65,6 +70,67 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public List<String> findUserIdsByGroupId(long groupId) {
         return groupMemberRepository.findUserIdsByGroupId(groupId);
+    }
+    
+    @Override
+    public List<Long> findGroupIdsByUserId(String userId) {
+        return groupMemberRepository.findGroupIdsByUserId(userId);
+    }
+
+    @Override
+    public List<GroupResponse> getGroupsForUser(String keycloakUserId) {
+        List<Long> groupIds = findGroupIdsByUserId(keycloakUserId);
+        return groupRepository.findAllById(groupIds).stream()
+                .map(group -> GroupResponse.builder()
+                        .groupId(group.getId())
+                        .name(group.getName())
+                        .ownerId(group.getOwnerId())
+                        .members(findUserIdsByGroupId(group.getId()))
+                        .build())
+                .toList();
+    }
+
+    @Override
+    public GroupResponse getGroupById(long groupId, String keycloakUserId) {
+        Group group = groupRepository.findById(groupId).orElseThrow(
+                () -> new EntityNotFoundException(ExceptionConstant.ENTITY_DOES_NOT_EXISTS
+                        .formatted(ExceptionConstant.RESOURCES.GROUP)));
+
+        List<String> members = findUserIdsByGroupId(groupId);
+        if (!members.contains(keycloakUserId)) {
+            throw new AccessDeniedException(ExceptionConstant.ACCESS_DENIED_FOR_RESOURCE
+                    .formatted("VIEW", ExceptionConstant.RESOURCES.GROUP));
+        }
+
+        return GroupResponse.builder()
+                .groupId(group.getId())
+                .name(group.getName())
+                .ownerId(group.getOwnerId())
+                .members(members)
+                .build();
+    }
+
+    @Override
+    public void updateGroup(long groupId, GroupUpdateRequest request, String keycloakUserId) {
+        Group group = groupRepository.findById(groupId).orElseThrow(
+                () -> new EntityNotFoundException(ExceptionConstant.ENTITY_DOES_NOT_EXISTS
+                        .formatted(ExceptionConstant.RESOURCES.GROUP)));
+
+        if (!group.getOwnerId().equals(keycloakUserId)) {
+            throw new AccessDeniedException(ExceptionConstant.ACCESS_DENIED_FOR_RESOURCE
+                    .formatted("UPDATE", ExceptionConstant.RESOURCES.GROUP));
+        }
+
+        if (request.name() != null) {
+            group.setName(request.name());
+        }
+
+        if (request.members() != null) {
+            groupMemberRepository.deleteByGroupId(groupId);
+            addGroupMembers(group, keycloakUserId, request.members());
+        }
+
+        groupRepository.save(group);
     }
 
 }

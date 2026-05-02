@@ -2,6 +2,7 @@ package com.voyagrr.tripservice.service.impl;
 
 import static com.voyagrr.common.constant.ExceptionConstant.ACCESS_DENIED_FOR_RESOURCE;
 import static com.voyagrr.common.constant.ExceptionConstant.ENTITY_DOES_NOT_EXISTS;
+import java.util.List;
 
 import com.voyagrr.common.constant.ExceptionConstant.RESOURCES;
 import com.voyagrr.common.enumeration.TripVisibility;
@@ -9,6 +10,7 @@ import com.voyagrr.common.exception.AccessDeniedException;
 import com.voyagrr.common.exception.EntityNotFoundException;
 import com.voyagrr.tripservice.dto.TripCreateRequest;
 import com.voyagrr.tripservice.dto.TripCreateResponse;
+import com.voyagrr.tripservice.dto.TripResponse;
 import com.voyagrr.tripservice.model.Trip;
 import com.voyagrr.tripservice.repository.TripRepository;
 import com.voyagrr.tripservice.service.TripService;
@@ -59,6 +61,40 @@ public class TripServiceImpl implements TripService {
         }
         throw new AccessDeniedException(
                 ACCESS_DENIED_FOR_RESOURCE.formatted(RESOURCES.TRIP, "PROCESS"));
+    }
+
+    @Override
+    public List<TripResponse> getTripsForUser(String keycloakUserId) {
+        List<Long> groupIds = storageGrpcClient.getGroupIdsForUser(keycloakUserId);
+        if (groupIds.isEmpty()) {
+            groupIds = List.of(-1L); // Use a non-existent group ID to avoid issues with IN clause if needed, 
+            // though most DBs handle empty IN differently. 
+            // Actually, let's just use an empty list if supported, but some versions of Spring Data JPA might struggle.
+            // Better to handle it explicitly or use a more robust query.
+        }
+        return tripRepository.findAllByOwnerIdOrGroupIdInAndDeletedFalse(keycloakUserId, groupIds).stream()
+                .map(tripMapper::tripToTripResponse)
+                .toList();
+    }
+
+    @Override
+    public TripResponse getTripById(long tripId, String keycloakUserId) {
+        Trip trip = tripRepository.findById(tripId).orElseThrow(
+                () -> new EntityNotFoundException(ENTITY_DOES_NOT_EXISTS.formatted(RESOURCES.TRIP)));
+
+        if (trip.getOwnerId().equals(keycloakUserId)) {
+            return tripMapper.tripToTripResponse(trip);
+        }
+
+        if (trip.getGroupId() > 0) {
+            List<Long> groupIds = storageGrpcClient.getGroupIdsForUser(keycloakUserId);
+            if (groupIds.contains(trip.getGroupId())) {
+                return tripMapper.tripToTripResponse(trip);
+            }
+        }
+
+        throw new AccessDeniedException(
+                ACCESS_DENIED_FOR_RESOURCE.formatted(RESOURCES.TRIP, "VIEW"));
     }
 
 }

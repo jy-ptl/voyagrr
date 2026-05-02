@@ -2,7 +2,10 @@ package com.voyagrr.tripservice.controller;
 
 import com.voyagrr.tripservice.dto.TripCreateRequest;
 import com.voyagrr.tripservice.dto.TripCreateResponse;
+import com.voyagrr.tripservice.dto.TripResponse;
 import com.voyagrr.tripservice.service.TripService;
+
+import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -38,6 +41,19 @@ public class TripController {
     public ResponseEntity<String> processTrip(@PathVariable(name = "tripId") long tripId,
             @AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.ok(tripService.proccessTrip(tripId, jwt.getSubject()));
+    }
+
+    @Operation(summary = "Get user trips", description = "Get all trips of the authenticated user (owned or shared)")
+    @RequestMapping(value = "", method = RequestMethod.GET)
+    public ResponseEntity<List<TripResponse>> getUserTrips(@AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(tripService.getTripsForUser(jwt.getSubject()));
+    }
+
+    @Operation(summary = "Get trip by id", description = "Get trip details by trip id")
+    @RequestMapping(value = "{tripId}", method = RequestMethod.GET)
+    public ResponseEntity<TripResponse> getTripById(@PathVariable(name = "tripId") long tripId,
+            @AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(tripService.getTripById(tripId, jwt.getSubject()));
     }
 
 }

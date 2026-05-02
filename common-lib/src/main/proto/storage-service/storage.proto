@@ -15,6 +15,7 @@ service StorageService {
   rpc CreateDefaultSampleDirectoryForUser(CreateDefaultSampleDirectoryForUserRequest) returns (CreateDefaultSampleDirectoryForUserResponse);
   rpc GetTripProcessingData(GetTripProcessingDataRequest)
       returns (GetTripProcessingDataResponse);
+  rpc GetGroupIdsForUser(GetGroupIdsForUserRequest) returns (GetGroupIdsForUserResponse);
 }
 
 message UpdateFileProcessingStatusRequest {
@@ -87,4 +88,12 @@ message GroupMember {
 
 message GetTripProcessingDataResponse {
   repeated GroupMember group_members = 2;
+}
+
+message GetGroupIdsForUserRequest {
+  string keycloak_user_id = 1;
+}
+
+message GetGroupIdsForUserResponse {
+  repeated int64 group_id = 1;
 }

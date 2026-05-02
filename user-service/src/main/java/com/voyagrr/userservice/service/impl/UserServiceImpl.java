@@ -5,6 +5,7 @@ import com.voyagrr.common.exception.EntityNotFoundException;
 import com.voyagrr.common.exception.KeycloakAuthException;
 import com.voyagrr.userservice.config.keycloak.KeycloakProperties;
 import com.voyagrr.userservice.dto.UserResponse;
+import com.voyagrr.userservice.dto.UserSearchResponse;
 import com.voyagrr.userservice.dto.UserUpdateRequest;
 import com.voyagrr.userservice.model.User;
 import com.voyagrr.userservice.repository.UserRepository;
@@ -12,6 +13,8 @@ import com.voyagrr.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -74,6 +77,11 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
 
         return userRepository.getUserResponseByKeycloakUserId(keycloakUserId);
+    }
+
+    @Override
+    public List<UserSearchResponse> searchUsers(String query) {
+        return userRepository.searchUsers(query);
     }
 
 }
