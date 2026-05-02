@@ -133,4 +133,16 @@ public class GroupServiceImpl implements GroupService {
         groupRepository.save(group);
     }
 
+    @Override
+    public List<GroupResponse> searchGroups(String query, String keycloakUserId) {
+        return groupRepository.searchGroupsByNameAndUserId(query, keycloakUserId).stream()
+                .map(group -> GroupResponse.builder()
+                        .groupId(group.getId())
+                        .name(group.getName())
+                        .ownerId(group.getOwnerId())
+                        .members(findUserIdsByGroupId(group.getId()))
+                        .build())
+                .toList();
+    }
+
 }

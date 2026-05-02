@@ -22,4 +22,6 @@ public interface GroupService {
 
     void updateGroup(long groupId, GroupUpdateRequest request, String keycloakUserId);
 
+    List<GroupResponse> searchGroups(String query, String keycloakUserId);
+
 }

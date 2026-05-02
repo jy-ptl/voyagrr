@@ -56,4 +56,11 @@ public class GroupController {
         return ResponseEntity.ok().body("Group updated successfully");
     }
 
+    @Operation(summary = "Search groups", description = "Search groups by name for the authenticated user")
+    @RequestMapping(value = "search", method = RequestMethod.GET)
+    public ResponseEntity<List<GroupResponse>> searchGroups(@RequestParam("query") String query,
+            @AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok().body(groupService.searchGroups(query, jwt.getSubject()));
+    }
+
 }
