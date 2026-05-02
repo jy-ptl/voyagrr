@@ -20,7 +20,7 @@ public interface GroupService {
 
     GroupResponse getGroupById(long groupId, String keycloakUserId);
 
-    void updateGroup(long groupId, GroupUpdateRequest request, String keycloakUserId);
+    GroupResponse updateGroup(long groupId, GroupUpdateRequest request, String keycloakUserId);
 
     List<GroupResponse> searchGroups(String query, String keycloakUserId);
 

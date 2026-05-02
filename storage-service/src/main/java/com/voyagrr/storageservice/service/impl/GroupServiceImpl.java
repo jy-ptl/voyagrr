@@ -29,13 +29,14 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Long create(GroupCreateRequest request, String keycloakUserId) {
-        return groupRepository
+        Group group = groupRepository
                 .save(Group
                         .builder()
                         .name(request.name())
                         .ownerId(keycloakUserId)
-                        .build())
-                .getId();
+                        .build());
+        addGroupMembers(group, keycloakUserId, request.members());
+        return group.getId();
     }
 
     @Override
@@ -111,7 +112,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public void updateGroup(long groupId, GroupUpdateRequest request, String keycloakUserId) {
+    public GroupResponse updateGroup(long groupId, GroupUpdateRequest request, String keycloakUserId) {
         Group group = groupRepository.findById(groupId).orElseThrow(
                 () -> new EntityNotFoundException(ExceptionConstant.ENTITY_DOES_NOT_EXISTS
                         .formatted(ExceptionConstant.RESOURCES.GROUP)));
@@ -130,7 +131,20 @@ public class GroupServiceImpl implements GroupService {
             addGroupMembers(group, keycloakUserId, request.members());
         }
 
+        if (request.addMembers() != null) {
+            addGroupMembers(group, keycloakUserId, request.addMembers());
+        }
+
+        if (request.removeMembers() != null) {
+            for (String userId : request.removeMembers()) {
+                if (userId.equals(keycloakUserId))
+                    continue;
+                groupMemberRepository.deleteById(new GroupMemberId(userId, groupId));
+            }
+        }
+
         groupRepository.save(group);
+        return getGroupById(groupId, keycloakUserId);
     }
 
     @Override

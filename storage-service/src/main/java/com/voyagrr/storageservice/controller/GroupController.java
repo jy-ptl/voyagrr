@@ -49,11 +49,10 @@ public class GroupController {
 
     @Operation(summary = "Update group", description = "Update group details (only by owner)")
     @RequestMapping(value = "{groupId}", method = RequestMethod.PUT)
-    public ResponseEntity<String> updateGroup(@PathVariable(name = "groupId") long groupId,
+    public ResponseEntity<GroupResponse> updateGroup(@PathVariable(name = "groupId") long groupId,
             @RequestBody GroupUpdateRequest request,
             @AuthenticationPrincipal Jwt jwt) {
-        groupService.updateGroup(groupId, request, jwt.getSubject());
-        return ResponseEntity.ok().body("Group updated successfully");
+        return ResponseEntity.ok().body(groupService.updateGroup(groupId, request, jwt.getSubject()));
     }
 
     @Operation(summary = "Search groups", description = "Search groups by name for the authenticated user")
