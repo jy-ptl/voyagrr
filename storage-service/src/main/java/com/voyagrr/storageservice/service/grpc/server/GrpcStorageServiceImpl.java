@@ -107,4 +107,13 @@ public class GrpcStorageServiceImpl extends StorageServiceGrpc.StorageServiceImp
         responseObserver.onCompleted();
     }
 
+    @Override
+    public void getGroupIdsForUser(GetGroupIdsForUserRequest request,
+            StreamObserver<GetGroupIdsForUserResponse> responseObserver) {
+        responseObserver.onNext(GetGroupIdsForUserResponse.newBuilder()
+                .addAllGroupId(groupService.findGroupIdsByUserId(request.getKeycloakUserId()))
+                .build());
+        responseObserver.onCompleted();
+    }
+
 }

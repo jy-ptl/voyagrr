@@ -25,4 +25,9 @@ public class StorageGrpcClient {
                 .setOwnerId(ownerId).addAllKeycloakUserId(keycloakUserIds).build()).getGroupId();
     }
 
+    public List<Long> getGroupIdsForUser(String keycloakUserId) {
+        return stub.getGroupIdsForUser(GetGroupIdsForUserRequest.newBuilder()
+                .setKeycloakUserId(keycloakUserId).build()).getGroupIdList();
+    }
+
 }

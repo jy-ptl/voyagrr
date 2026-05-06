@@ -18,4 +18,12 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
             """, nativeQuery = true)
     Long findByGroupIdAndOwnerId(@Param("groupId") long groupId, @Param("ownerId") String ownerId);
 
+    @Query(value = """
+            SELECT g.* FROM groups g 
+            JOIN group_members gm ON g.id = gm.group_id 
+            WHERE gm.user_id = :userId 
+            AND g.name ILIKE %:query%
+            """, nativeQuery = true)
+    java.util.List<Group> searchGroupsByNameAndUserId(@Param("query") String query, @Param("userId") String userId);
+
 }

@@ -174,8 +174,8 @@ jobs:
 
             printf "RECOGNITION_TEMP_DIR=${{ secrets.RECOGNITION_TEMP_DIR }}\n" >> .env
             printf "RECPGNITION_MATCH_THRESHOLD=${{ secrets.RECPGNITION_MATCH_THRESHOLD }}\n" >> .env
-            printf "RECOGNITION_MAX_WORKERS"=${{ secrets.RECOGNITION_MAX_WORKERS }}\n" >> .env
-            printf "RECOGNITION_MIN_FACE_SIZE"=${{ secrets.RECOGNITION_MIN_FACE_SIZE }}\n" >> .env
+            printf "RECOGNITION_MAX_WORKERS=${{ secrets.RECOGNITION_MAX_WORKERS }}\n" >> .env
+            printf "RECOGNITION_MIN_FACE_SIZE=${{ secrets.RECOGNITION_MIN_FACE_SIZE }}\n" >> .env
 
             printf "RECOGNITION_DB_HOST=${{ secrets.RECOGNITION_DB_HOST }}\n" >> .env
             printf "RECOGNITION_DB_PORT=${{ secrets.RECOGNITION_DB_PORT }}\n" >> .env

@@ -28,4 +28,15 @@ public class TripMapper {
                 .build();
     }
 
+    public com.voyagrr.tripservice.dto.TripResponse tripToTripResponse(Trip trip) {
+        return com.voyagrr.tripservice.dto.TripResponse.builder()
+                .id(trip.getId())
+                .title(trip.getTitle())
+                .description(trip.getDescription())
+                .visibility(trip.getVisibility().name())
+                .status(trip.getStatus().name())
+                .ownerId(trip.getOwnerId())
+                .build();
+    }
+
 }
