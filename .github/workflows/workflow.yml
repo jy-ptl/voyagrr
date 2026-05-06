@@ -174,7 +174,7 @@ jobs:
             printf "ANALYSIS_DB_PASSWORD=${{ secrets.ANALYSIS_DB_PASSWORD }}\n" >> .env
 
             printf "RECOGNITION_TEMP_DIR=${{ secrets.RECOGNITION_TEMP_DIR }}\n" >> .env
-            printf "RECPGNITION_MATCH_THRESHOLD=${{ secrets.RECPGNITION_MATCH_THRESHOLD }}\n" >> .env
+            printf "RECOGNITION_MATCH_THRESHOLD=${{ secrets.RECOGNITION_MATCH_THRESHOLD }}\n" >> .env
             printf "RECOGNITION_MAX_WORKERS=${{ secrets.RECOGNITION_MAX_WORKERS }}\n" >> .env
             printf "RECOGNITION_MIN_FACE_SIZE=${{ secrets.RECOGNITION_MIN_FACE_SIZE }}\n" >> .env
 
