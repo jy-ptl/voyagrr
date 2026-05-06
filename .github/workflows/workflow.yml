@@ -127,6 +127,7 @@ jobs:
             printf "KEYCLOAK_CLIENT_ID=${{ secrets.KEYCLOAK_CLIENT_ID }}\n" >> .env
             printf "KEYCLOAK_CLIENT_SECRET=${{ secrets.KEYCLOAK_CLIENT_SECRET }}\n" >> .env
 
+            printf "USER_GRPC_SERVICE_PORT=${{ secrets.USER_GRPC_SERVICE_PORT }}\n" >> .env
             printf "STORAGE_GRPC_SERVICE_PORT=${{ secrets.STORAGE_GRPC_SERVICE_PORT }}\n" >> .env
             printf "PROCESSING_GRPC_SERVICE_PORT=${{ secrets.PROCESSING_GRPC_SERVICE_PORT }}\n" >> .env
             printf "TRIP_GRPC_SERVICE_PORT=${{ secrets.TRIP_GRPC_SERVICE_PORT }}\n" >> .env
