@@ -64,12 +64,25 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 
     @SuppressWarnings("unchecked")
     private void enrichWithUserInfo(List<FileMetadataResponse> responses) {
-        Set<String> userIds = responses.stream()
-                .filter(r -> r.getMetadata() != null && r.getMetadata().containsKey("faces"))
-                .flatMap(r -> ((List<Map<String, Object>>) r.getMetadata().get("faces")).stream())
-                .map(face -> (String) face.get("userId"))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
+        Set<String> userIds = new HashSet<>();
+
+        responses.forEach(r -> {
+            if (r.getMetadata() == null)
+                return;
+
+            // Check top-level faces
+            if (r.getMetadata().get("faces") instanceof List) {
+                userIds.addAll(extractUserIdsFromFaces((List<Map<String, Object>>) r.getMetadata().get("faces")));
+            }
+
+            // Check recognition.faces
+            if (r.getMetadata().get("recognition") instanceof Map) {
+                Map<String, Object> recognition = (Map<String, Object>) r.getMetadata().get("recognition");
+                if (recognition.get("faces") instanceof List) {
+                    userIds.addAll(extractUserIdsFromFaces((List<Map<String, Object>>) recognition.get("faces")));
+                }
+            }
+        });
 
         if (userIds.isEmpty())
             return;
@@ -77,20 +90,40 @@ public class FileMetadataServiceImpl implements FileMetadataService {
         Map<String, UserInfo> userInfoMap = userGrpcClient.getUsersInfo(new ArrayList<>(userIds));
 
         responses.forEach(r -> {
-            if (r.getMetadata() != null && r.getMetadata().containsKey("faces")) {
-                List<Map<String, Object>> faces = (List<Map<String, Object>>) r.getMetadata().get("faces");
-                faces.forEach(face -> {
-                    String uid = (String) face.get("userId");
-                    if (uid != null && userInfoMap.containsKey(uid)) {
-                        UserInfo info = userInfoMap.get(uid);
-                        Map<String, Object> uInfoMap = new HashMap<>();
-                        uInfoMap.put("username", info.getUsername());
-                        uInfoMap.put("firstName", info.getFirstName());
-                        uInfoMap.put("lastName", info.getLastName());
-                        uInfoMap.put("email", info.getEmail());
-                        face.put("user", uInfoMap);
-                    }
-                });
+            if (r.getMetadata() == null)
+                return;
+
+            if (r.getMetadata().get("faces") instanceof List) {
+                enrichFaces((List<Map<String, Object>>) r.getMetadata().get("faces"), userInfoMap);
+            }
+
+            if (r.getMetadata().get("recognition") instanceof Map) {
+                Map<String, Object> recognition = (Map<String, Object>) r.getMetadata().get("recognition");
+                if (recognition.get("faces") instanceof List) {
+                    enrichFaces((List<Map<String, Object>>) recognition.get("faces"), userInfoMap);
+                }
+            }
+        });
+    }
+
+    private Set<String> extractUserIdsFromFaces(List<Map<String, Object>> faces) {
+        return faces.stream()
+                .map(face -> (String) face.get("userId"))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+    }
+
+    private void enrichFaces(List<Map<String, Object>> faces, Map<String, UserInfo> userInfoMap) {
+        faces.forEach(face -> {
+            String uid = (String) face.get("userId");
+            if (uid != null && userInfoMap.containsKey(uid)) {
+                UserInfo info = userInfoMap.get(uid);
+                Map<String, Object> uInfoMap = new HashMap<>();
+                uInfoMap.put("username", info.getUsername());
+                uInfoMap.put("firstName", info.getFirstName());
+                uInfoMap.put("lastName", info.getLastName());
+                uInfoMap.put("email", info.getEmail());
+                face.put("user", uInfoMap);
             }
         });
     }
