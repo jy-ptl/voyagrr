@@ -3,6 +3,7 @@ package com.voyagrr.storageservice.controller;
 import com.voyagrr.storageservice.dto.DirectoryCreateRequest;
 import com.voyagrr.storageservice.dto.DirectoryContentResponse;
 import com.voyagrr.storageservice.dto.DirectoryTreeResponse;
+import com.voyagrr.storageservice.dto.FileThumbnailResponse;
 import com.voyagrr.storageservice.service.DirectoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
