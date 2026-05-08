@@ -54,4 +54,11 @@ public class DirectoryController {
         return ResponseEntity.ok().body(directoryService.getDirectoryContents(directoryId, jwt.getSubject()));
     }
 
+    @Operation(summary = "Get directory thumbnails", description = "Retrieves the thumbnails for all files in a directory")
+    @RequestMapping(value = "{directoryId}/thumbnails", method = RequestMethod.GET)
+    public ResponseEntity<List<FileThumbnailResponse>> getThumbnailsForDirectory(
+            @PathVariable(name = "directoryId") Long directoryId, @AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok().body(directoryService.getThumbnailsForDirectory(directoryId, jwt.getSubject()));
+    }
+
 }

@@ -15,6 +15,7 @@ public class MetadataProcessedEvent {
 
     private String fileId;
     private String minioObjectKey;
+    private String thumbnailKey;
     private Map<String, Object> metadata;
 
 }

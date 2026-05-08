@@ -29,4 +29,5 @@ public interface DirectoryService {
 
     Long getSampleDirectoryIdByUserId(String keycloakUserId);
 
+    List<FileThumbnailResponse> getThumbnailsForDirectory(long directoryId, String keycloakUserId);
 }

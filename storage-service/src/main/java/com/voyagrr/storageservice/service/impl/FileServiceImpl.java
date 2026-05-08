@@ -47,4 +47,13 @@ public class FileServiceImpl implements FileService {
         fileRepository.save(file);
         return true;
     }
+
+    @Override
+    public boolean updateFileThumbnail(long fileId, String thumbnailKey) {
+        File file = fileRepository.findById(fileId).orElseThrow(
+                () -> new EntityNotFoundException(ENTITY_DOES_NOT_EXISTS.formatted(ExceptionConstant.RESOURCES.FILE)));
+        file.setThumbnailKey(thumbnailKey);
+        fileRepository.save(file);
+        return true;
+    }
 }

@@ -16,6 +16,7 @@ service StorageService {
   rpc GetTripProcessingData(GetTripProcessingDataRequest)
       returns (GetTripProcessingDataResponse);
   rpc GetGroupIdsForUser(GetGroupIdsForUserRequest) returns (GetGroupIdsForUserResponse);
+  rpc UpdateFileThumbnail(UpdateFileThumbnailRequest) returns (UpdateFileThumbnailResponse);
 }
 
 message UpdateFileProcessingStatusRequest {
@@ -96,4 +97,13 @@ message GetGroupIdsForUserRequest {
 
 message GetGroupIdsForUserResponse {
   repeated int64 group_id = 1;
+}
+
+message UpdateFileThumbnailRequest {
+  int64 file_id = 1;
+  string thumbnail_key = 2;
+}
+
+message UpdateFileThumbnailResponse {
+  bool success = 1;
 }

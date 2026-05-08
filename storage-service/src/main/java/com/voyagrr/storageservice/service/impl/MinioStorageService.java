@@ -199,4 +199,28 @@ public class MinioStorageService implements StorageService {
         return "";
     }
 
+    @Override
+    public Resource downloadThumbnail(long fileId, String keycloakUserId) {
+        File file = fileRepository.findById(fileId)
+                .orElseThrow(() -> new EntityNotFoundException(ENTITY_DOES_NOT_EXISTS.formatted(RESOURCES.FILE)));
+        if (mediaShareService.hasPermissionForFile(keycloakUserId, fileId, Permission.VIEW.name())) {
+            if (file.getThumbnailKey() == null) {
+                return null;
+            }
+            try {
+                InputStream inputStream = minioClient.getObject(GetObjectArgs.builder()
+                        .bucket(bucket)
+                        .object(file.getThumbnailKey())
+                        .build());
+                return new InputStreamResource(inputStream);
+            } catch (Exception exception) {
+                log.error(exception.getMessage());
+            }
+        } else {
+            throw new AccessDeniedException(
+                    ACCESS_DENIED_FOR_RESOURCE.formatted(Permission.VIEW.name(), RESOURCES.FILE));
+        }
+        return null;
+    }
+
 }
