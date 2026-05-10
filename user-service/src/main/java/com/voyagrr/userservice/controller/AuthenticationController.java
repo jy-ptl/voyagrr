@@ -2,6 +2,7 @@ package com.voyagrr.userservice.controller;
 
 import com.voyagrr.userservice.dto.UserCreateRequest;
 import com.voyagrr.userservice.dto.UserLoginRequest;
+import com.voyagrr.userservice.dto.RefreshTokenRequest;
 import com.voyagrr.userservice.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,12 @@ public class AuthenticationController {
     @RequestMapping(value = "login", method = RequestMethod.POST)
     public ResponseEntity<String> login(@Valid @RequestBody UserLoginRequest request) {
         return ResponseEntity.ok().body(authenticationService.login(request));
+    }
+
+    @Operation(summary = "Refresh a token", description = "Refresh an access token using a refresh token")
+    @RequestMapping(value = "refresh", method = RequestMethod.POST)
+    public ResponseEntity<String> refresh(@Valid @RequestBody RefreshTokenRequest request) {
+        return ResponseEntity.ok().body(authenticationService.refreshToken(request.refreshToken()));
     }
 
 }

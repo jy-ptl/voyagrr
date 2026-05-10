@@ -129,4 +129,34 @@ public class KeycloakAuthenticationService implements AuthenticationService {
                 .block();
     }
 
+    @Override
+    public String refreshToken(String refreshToken) {
+
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("refresh_token", refreshToken);
+        formData.add("grant_type", "refresh_token");
+        formData.add("client_id", keycloakProperties.getClientId());
+        formData.add("client_secret", keycloakProperties.getClientSecret());
+
+        return keycloakWebClient.post()
+                .uri("/realms/{realm}/protocol/openid-connect/token", keycloakProperties.getRealm())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue(formData)
+                .retrieve()
+                .onStatus(HttpStatusCode::isError,
+                        response -> response.bodyToMono(String.class)
+                                .flatMap(errorBody -> {
+                                    try {
+                                        ObjectMapper mapper = new ObjectMapper();
+                                        JsonNode errorJson = mapper.readTree(errorBody);
+                                        String description = errorJson.path("error_description").asText();
+                                        return Mono.error(new KeycloakAuthException("token refresh failed: " + description));
+                                    } catch (Exception exception) {
+                                        return Mono.error(new KeycloakAuthException("token refresh failed: " + errorBody));
+                                    }
+                                }))
+                .bodyToMono(String.class)
+                .block();
+    }
+
 }
