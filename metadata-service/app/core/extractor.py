@@ -125,6 +125,46 @@ def _extract_video_meta(path: str) -> Tuple[Optional[str], Optional[str], GPSDic
 
 
 # =========================================================
+# THUMBNAIL GENERATION
+# =========================================================
+def generate_thumbnail(file_path: str, thumbnail_path: str):
+    mime = magic.from_file(file_path, mime=True)
+
+    if mime.startswith("image"):
+        try:
+            with Image.open(file_path) as img:
+                # Handle orientation
+                try:
+                    from PIL import ImageOps
+                    img = ImageOps.exif_transpose(img)
+                except Exception:
+                    pass
+                
+                img.thumbnail((400, 400))
+                img.convert("RGB").save(thumbnail_path, "JPEG", quality=85)
+                return True
+        except Exception as e:
+            logger.warning("Image thumbnail generation failed: %s", e)
+            return False
+
+    elif mime.startswith("video"):
+        try:
+            (
+                ffmpeg
+                .input(file_path, ss=1)
+                .filter('scale', 400, -1)
+                .output(thumbnail_path, vframes=1)
+                .run(quiet=True, overwrite_output=True)
+            )
+            return True
+        except Exception as e:
+            logger.warning("Video thumbnail generation failed: %s", e)
+            return False
+    
+    return False
+
+
+# =========================================================
 # PUBLIC API
 # =========================================================
 def extract_metadata(file_path: str) -> dict:

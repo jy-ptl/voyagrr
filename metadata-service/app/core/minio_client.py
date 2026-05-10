@@ -9,3 +9,7 @@ client = Minio(
     secret_key=cfg["minio"]["secret-key"],
     secure=cfg["minio"].get("secure", False),
 )
+
+
+def upload_file(bucket_name, object_name, file_path, content_type="application/octet-stream"):
+    client.fput_object(bucket_name, object_name, file_path, content_type=content_type)

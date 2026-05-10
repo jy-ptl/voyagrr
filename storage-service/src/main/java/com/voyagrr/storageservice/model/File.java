@@ -39,4 +39,7 @@ public class File extends Auditable {
     @Column(name = "file_status", nullable = false)
     private FileStatus fileStatus = FileStatus.PENDING;
 
+    @Column(name = "thumbnail_key")
+    private String thumbnailKey;
+
 }

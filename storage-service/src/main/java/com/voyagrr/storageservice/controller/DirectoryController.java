@@ -3,6 +3,7 @@ package com.voyagrr.storageservice.controller;
 import com.voyagrr.storageservice.dto.DirectoryCreateRequest;
 import com.voyagrr.storageservice.dto.DirectoryContentResponse;
 import com.voyagrr.storageservice.dto.DirectoryTreeResponse;
+import com.voyagrr.storageservice.dto.FileThumbnailResponse;
 import com.voyagrr.storageservice.service.DirectoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,6 +53,13 @@ public class DirectoryController {
     public ResponseEntity<DirectoryContentResponse> getDirectoryContents(
             @PathVariable(name = "directoryId") Long directoryId, @AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.ok().body(directoryService.getDirectoryContents(directoryId, jwt.getSubject()));
+    }
+
+    @Operation(summary = "Get directory thumbnails", description = "Retrieves the thumbnails for all files in a directory")
+    @RequestMapping(value = "{directoryId}/thumbnails", method = RequestMethod.GET)
+    public ResponseEntity<List<FileThumbnailResponse>> getThumbnailsForDirectory(
+            @PathVariable(name = "directoryId") Long directoryId, @AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok().body(directoryService.getThumbnailsForDirectory(directoryId, jwt.getSubject()));
     }
 
 }

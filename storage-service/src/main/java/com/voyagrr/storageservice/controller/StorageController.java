@@ -67,4 +67,17 @@ public class StorageController {
         return ResponseEntity.ok().body(storageService.deleteFile(fileId, jwt.getSubject()));
     }
 
+    @Operation(summary = "Download a file thumbnail", description = "Download a file thumbnail by fileId")
+    @RequestMapping(value = "{fileId}/thumbnail", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
+    public ResponseEntity<Resource> downloadThumbnail(@PathVariable(name = "fileId") long fileId,
+            @AuthenticationPrincipal Jwt jwt) {
+        Resource resource = storageService.downloadThumbnail(fileId, jwt.getSubject());
+        if (resource == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(resource);
+    }
+
 }

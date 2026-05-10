@@ -116,4 +116,12 @@ public class GrpcStorageServiceImpl extends StorageServiceGrpc.StorageServiceImp
         responseObserver.onCompleted();
     }
 
+    @Override
+    public void updateFileThumbnail(UpdateFileThumbnailRequest request,
+            StreamObserver<UpdateFileThumbnailResponse> responseObserver) {
+        responseObserver.onNext(UpdateFileThumbnailResponse.newBuilder()
+                .setSuccess(fileService.updateFileThumbnail(request.getFileId(), request.getThumbnailKey())).build());
+        responseObserver.onCompleted();
+    }
+
 }

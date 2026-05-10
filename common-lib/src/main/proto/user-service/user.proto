@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.voyagrr.common.proto";
+option java_outer_classname = "UserProto";
+
+service UserService {
+  rpc GetUsersInfo(GetUsersInfoRequest) returns (GetUsersInfoResponse);
+}
+
+message GetUsersInfoRequest {
+  repeated string keycloak_user_id = 1;
+}
+
+message UserInfo {
+  string keycloak_user_id = 1;
+  string username = 2;
+  string first_name = 3;
+  string last_name = 4;
+  string email = 5;
+}
+
+message GetUsersInfoResponse {
+  repeated UserInfo users = 1;
+}

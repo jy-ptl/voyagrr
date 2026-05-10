@@ -52,6 +52,7 @@ public class MetadataProcessedEventConsumer {
         String mime = metadataMap.getOrDefault("mime", "").toString();
 
         fileMetadataRepository.save(fileMetadata);
+        storageGrpcClient.updateFileThumbnail(fileId, event.getThumbnailKey());
         if (mime.contains("video")) {
             log.info("calling encoding for file {}", event.getFileId());
             videoEncodingEventProducer.sendEncodingEvent(

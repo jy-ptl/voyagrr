@@ -14,4 +14,5 @@ public interface FileService {
     void deleteAll(List<File> files);
 
     boolean updateFileStatus(long fileId, String status);
+    boolean updateFileThumbnail(long fileId, String thumbnailKey);
 }

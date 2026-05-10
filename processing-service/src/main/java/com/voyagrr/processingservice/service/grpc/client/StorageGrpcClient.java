@@ -45,4 +45,12 @@ public class StorageGrpcClient {
                         .build());
     }
 
+    public boolean updateFileThumbnail(long fileId, String thumbnailKey) {
+        if (thumbnailKey == null)
+            return false;
+        return stub.updateFileThumbnail(
+                UpdateFileThumbnailRequest.newBuilder().setFileId(fileId).setThumbnailKey(thumbnailKey).build())
+                .getSuccess();
+    }
+
 }

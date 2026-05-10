@@ -42,6 +42,9 @@ grpc:
     storage-service:
       address: static://storage-service:${STORAGE_GRPC_SERVICE_PORT}
       negotiationType: plaintext
+    user-service:
+      address: static://user-service:${USER_GRPC_SERVICE_PORT}
+      negotiationType: plaintext
   server:
     port: ${PROCESSING_GRPC_SERVICE_PORT}
 

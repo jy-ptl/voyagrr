@@ -7,4 +7,6 @@ public interface AuthenticationService {
     String register(UserCreateRequest request);
 
     String login(UserLoginRequest request);
+
+    String refreshToken(String refreshToken);
 }

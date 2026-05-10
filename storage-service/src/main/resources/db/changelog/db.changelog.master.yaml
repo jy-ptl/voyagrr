@@ -8,3 +8,6 @@ databaseChangeLog:
   - include:
       file: db/changelog/migrations/49-restructure-project.sql
       relativeToChangelogFile: false
+  - include:
+      file: db/changelog/migrations/64-add-thumbnail-key-to-files.sql
+      relativeToChangelogFile: false

@@ -227,4 +227,27 @@ public class DirectoryServiceImpl implements DirectoryService {
             collectDirectoriesAndFiles(child, directoryIds, allFiles);
         }
     }
+
+    @Override
+    public List<FileThumbnailResponse> getThumbnailsForDirectory(long directoryId, String keycloakUserId) {
+        Directory directory = findDirectoryById(directoryId);
+
+        // Check view permission for directory
+        boolean allowed = mediaShareService.hasPermissionForDirectories(
+                keycloakUserId, directoryRepository.getAllAncestorsIncludingSelf(directoryId).stream()
+                        .mapToLong(DirectoryFlatResponse::id).boxed().toList(),
+                Permission.VIEW.name());
+
+        if (!allowed)
+            throw new AccessDeniedException(
+                    ACCESS_DENIED_FOR_RESOURCE.formatted(Permission.VIEW.name(), RESOURCES.DIRECTORY));
+
+        List<File> files = fileService.findByDirectory(directory);
+
+        return files.stream()
+                .filter(f -> f.getThumbnailKey() != null)
+                .map(f -> new FileThumbnailResponse(f.getId(), "/api/storage/" + f.getId() + "/thumbnail"))
+                .toList();
+    }
+
 }
