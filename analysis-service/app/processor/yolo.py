@@ -5,15 +5,18 @@ model = YOLO("yolov8m.pt")
 
 
 def detect_objects(image_path, confidence_threshold=0.3):
+    try:
+        results = model(image_path, conf=confidence_threshold)
 
-    results = model(image_path, conf=confidence_threshold)
+        objects = []
 
-    objects = []
+        for r in results:
+            for box in r.boxes:
+                label = r.names[int(box.cls)]
+                confidence = float(box.conf)
+                objects.append({"label": label, "confidence": confidence})
 
-    for r in results:
-        for box in r.boxes:
-            label = r.names[int(box.cls)]
-            confidence = float(box.conf)
-            objects.append({"label": label, "confidence": confidence})
-
-    return objects
+        return objects
+    except Exception as e:
+        print(f"Error in YOLO processing: {e}")
+        return []
