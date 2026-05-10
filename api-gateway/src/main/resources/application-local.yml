@@ -13,6 +13,7 @@ spring:
               '[/**]':
                 allowed-origins:
                   - http://localhost:5173
+                  - https://staging.voyagrr.com
                 allowed-methods:
                   - GET
                   - POST
