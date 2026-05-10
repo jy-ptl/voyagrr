@@ -1,6 +1,9 @@
+# Nature & Landscapes
+nature
 sunset
 sunrise
-nature
+sunlight
+golden hour
 river
 lake
 waterfall
@@ -18,41 +21,87 @@ sand dunes
 snow
 glacier
 island
+canyon
+volcano
+cave
+coast
+meadow
+
+# Urban & Architecture
+city skyline
+night city
+street
+market
+bridge
+skyscraper
+monument
 temple
 church
 mosque
+cathedral
 pagoda
-monument
 palace
 castle
 fort
-city skyline
-street
-market
-food
-restaurant
-cafe
-street food
-bridge
+ruins
+museum
+statue
+lighthouse
+
+# Transportation
+airport
+airplane
+train station
+train
+bus
+ferry
+port
 road trip
+
+# Activities & Travel
+travel
+vacation
 hiking
 camping
 backpacking
-travel
-vacation
+sightseeing
+shopping
+swimming
+skiing
+surfing
+festival
+concert
+
+# People & Social
 friends
 family
 selfie
 portrait
 group photo
+
+# Food & Dining
+food
+restaurant
+cafe
+street food
+
+# Wildlife & Plants
 wildlife
-birds
 animals
+birds
 tree
 flowers
 garden
 park
-festival
-night city
-sunlight
-golden hour
+
+# Atmosphere & Weather
+cloudy
+rainy
+foggy
+starry night
+
+# Interiors
+hotel room
+lobby
+cabin
+airport lounge
