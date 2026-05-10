@@ -25,6 +25,7 @@ public class SecurityConfig {
 
                         .pathMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
                         .pathMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/api/auth/refresh").permitAll()
                         .anyExchange().authenticated())
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .oauth2ResourceServer(oauth -> oauth.jwt(Customizer.withDefaults()));
