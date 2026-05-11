@@ -70,13 +70,25 @@ public class MinioStorageService implements StorageService {
 
     @Override
     public String upload(FileUploadRequest request, MultipartFile file, String keycloakUserId) {
+        return performUpload(request.directoryId(), file, request.name(), keycloakUserId);
+    }
+
+    @Override
+    public String uploadBatch(long directoryId, List<MultipartFile> files, String keycloakUserId) {
+        for (MultipartFile file : files) {
+            performUpload(directoryId, file, file.getOriginalFilename(), keycloakUserId);
+        }
+        return "Success";
+    }
+
+    private String performUpload(long directoryId, MultipartFile file, String name, String keycloakUserId) {
 
         String mimeType = fileUtility.getMimeType(file);
 
-        Directory directory = directoryRepository.findById(request.directoryId())
+        Directory directory = directoryRepository.findById(directoryId)
                 .orElseThrow(() -> new EntityNotFoundException(ENTITY_DOES_NOT_EXISTS.formatted(RESOURCES.DIRECTORY)));
 
-        String minioObjectKey = directoryRepository.buildMinioObjectPathFromDirectoryId(request.directoryId());
+        String minioObjectKey = directoryRepository.buildMinioObjectPathFromDirectoryId(directoryId);
 
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
         String uuidFilename = UUID.randomUUID() + (StringUtils.hasText(extension) ? "." + extension : "");
@@ -84,7 +96,7 @@ public class MinioStorageService implements StorageService {
         try (InputStream input = file.getInputStream()) {
 
             boolean allowed = mediaShareService.hasPermissionForDirectories(
-                    keycloakUserId, directoryRepository.getAllAncestorsIncludingSelf(request.directoryId()).stream()
+                    keycloakUserId, directoryRepository.getAllAncestorsIncludingSelf(directoryId).stream()
                             .mapToLong(DirectoryFlatResponse::id).boxed().toList(),
                     Permission.UPLOAD.name());
 
@@ -104,7 +116,7 @@ public class MinioStorageService implements StorageService {
             File savedFile = fileRepository
                     .save(File
                             .builder()
-                            .name(file.getOriginalFilename())
+                            .name(name)
                             .directory(directory)
                             .minioObjectKey(minioObjectKey + "/" + uuidFilename)
                             .mimeType(mimeType)

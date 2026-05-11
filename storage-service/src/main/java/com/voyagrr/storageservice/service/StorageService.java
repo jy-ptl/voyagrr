@@ -10,6 +10,7 @@ import java.util.List;
 public interface StorageService {
 
     String upload(FileUploadRequest request, MultipartFile file, String keycloakUserId);
+    String uploadBatch(long directoryId, List<MultipartFile> files, String keycloakUserId);
 
     void deleteFiles(List<File> files);
 

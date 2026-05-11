@@ -20,6 +20,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
@@ -44,6 +45,15 @@ public class StorageController {
         String keycloakUserId = jwt.getSubject();
         FileUploadRequest request = new FileUploadRequest(name, directoryId);
         return ResponseEntity.ok().body(storageService.upload(request, file, keycloakUserId));
+    }
+
+    @Operation(summary = "Upload multiple files", description = "Upload multiple files to a specified directory")
+    @RequestMapping(value = "upload/batch", method = RequestMethod.POST)
+    public ResponseEntity<String> uploadBatch(@RequestParam("files") List<MultipartFile> files,
+            @RequestParam("directoryId") long directoryId,
+            @AuthenticationPrincipal Jwt jwt) {
+        String keycloakUserId = jwt.getSubject();
+        return ResponseEntity.ok().body(storageService.uploadBatch(directoryId, files, keycloakUserId));
     }
 
     @Operation(summary = "Download a file", description = "Download a file by fileId")
