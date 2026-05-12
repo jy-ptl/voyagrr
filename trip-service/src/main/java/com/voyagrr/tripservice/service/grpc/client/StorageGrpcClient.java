@@ -30,4 +30,8 @@ public class StorageGrpcClient {
                 .setKeycloakUserId(keycloakUserId).build()).getGroupIdList();
     }
 
+    public void addMediaShare(long directoryId, long groupId) {
+        stub.addMediaShare(AddMediaShareRequest.newBuilder().setDirectoryId(directoryId).setGroupId(groupId).build());
+    }
+
 }

@@ -54,4 +54,6 @@ public interface MediaShareService {
     List<Long> getFileIdsOfDirectory(String keycloakUserId, long direcotryId, String permission);
 
     void createDefaultPermissionsForSampleDirectory(Long directoryId, String keycloakUserId);
+
+    void addMediaShareForGroup(Long directoryId, Long groupId);
 }

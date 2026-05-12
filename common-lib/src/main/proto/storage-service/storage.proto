@@ -17,6 +17,16 @@ service StorageService {
       returns (GetTripProcessingDataResponse);
   rpc GetGroupIdsForUser(GetGroupIdsForUserRequest) returns (GetGroupIdsForUserResponse);
   rpc UpdateFileThumbnail(UpdateFileThumbnailRequest) returns (UpdateFileThumbnailResponse);
+  rpc AddMediaShare(AddMediaShareRequest) returns (AddMediaShareResponse);
+}
+
+message AddMediaShareRequest {
+  int64 directory_id = 1;
+  int64 group_id = 2;
+}
+
+message AddMediaShareResponse {
+  bool success = 1;
 }
 
 message UpdateFileProcessingStatusRequest {
