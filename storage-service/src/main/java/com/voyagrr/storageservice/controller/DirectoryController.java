@@ -2,6 +2,7 @@ package com.voyagrr.storageservice.controller;
 
 import com.voyagrr.storageservice.dto.DirectoryCreateRequest;
 import com.voyagrr.storageservice.dto.DirectoryContentResponse;
+import com.voyagrr.storageservice.dto.DirectoryResponse;
 import com.voyagrr.storageservice.dto.DirectoryTreeResponse;
 import com.voyagrr.storageservice.dto.FileThumbnailResponse;
 import com.voyagrr.storageservice.service.DirectoryService;
@@ -39,6 +40,12 @@ public class DirectoryController {
     @RequestMapping(value = "", method = RequestMethod.GET)
     public ResponseEntity<List<DirectoryTreeResponse>> getAllDirectoriesOfUser(@AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.ok().body(directoryService.getAllDirectoriesOfUser(jwt.getSubject()));
+    }
+
+    @Operation(summary = "Get sample directory", description = "Retrieves the sample directory belonging to the authenticated user")
+    @RequestMapping(value = "sample", method = RequestMethod.GET)
+    public ResponseEntity<DirectoryResponse> getSampleDirectoryOfUser(@AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok().body(directoryService.getSampleDirectory(jwt.getSubject()));
     }
 
     @Operation(summary = "Delete directory", description = "Deletes a directory by ID if it belongs to the authenticated user")

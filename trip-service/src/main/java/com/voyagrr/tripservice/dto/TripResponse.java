@@ -19,5 +19,6 @@ public class TripResponse {
     private String visibility;
     private String status;
     private String ownerId;
+    private Long directoryId;
 
 }

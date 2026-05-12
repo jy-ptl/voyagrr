@@ -36,9 +36,11 @@ public interface DirectoryRepository extends JpaRepository<Directory, Long> {
                 SELECT
                     d.id,
                     d.name,
-                    d.parent_directory_id
+                    d.parent_directory_id,
+                    d.type
                 FROM directories d
                 WHERE d.parent_directory_id IS NULL
+                  AND d.type = 2
                   AND d.owner_id = :keycloakUserId
 
                 UNION ALL
@@ -46,31 +48,33 @@ public interface DirectoryRepository extends JpaRepository<Directory, Long> {
                 SELECT
                     child.id,
                     child.name,
-                    child.parent_directory_id
+                    child.parent_directory_id,
+                    child.type
                 FROM directories child
                 INNER JOIN dir_tree dt ON child.parent_directory_id = dt.id
             )
             SELECT
                 id,
                 name,
-                parent_directory_id
+                parent_directory_id,
+                type
             FROM dir_tree
             """, nativeQuery = true)
     List<DirectoryFlatResponse> getAllDirectoriesRecursivelyForUserId(@Param("keycloakUserId") String keycloakUserId);
 
     @Query(value = """
             WITH RECURSIVE ancestors AS (
-                SELECT id, name, parent_directory_id
+                SELECT id, name, parent_directory_id, type
                 FROM directories
                 WHERE id = :directoryId
 
                 UNION ALL
 
-                SELECT d.id, d.name, d.parent_directory_id
+                SELECT d.id, d.name, d.parent_directory_id, d.type
                 FROM directories d
                 INNER JOIN ancestors a ON d.id = a.parent_directory_id
             )
-            SELECT id, name, parent_directory_id
+            SELECT id, name, parent_directory_id, type
             FROM ancestors
             """, nativeQuery = true)
     List<DirectoryFlatResponse> getAllAncestorsIncludingSelf(@Param("directoryId") long directoryId);

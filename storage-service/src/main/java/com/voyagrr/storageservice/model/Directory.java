@@ -27,4 +27,7 @@ public class Directory extends Auditable {
     @JoinColumn(name = "parent_directory_id")
     private Directory parentDirectory;
 
+    @Column(nullable = false)
+    private short type;
+
 }
