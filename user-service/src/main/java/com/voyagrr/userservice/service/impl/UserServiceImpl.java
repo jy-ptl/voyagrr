@@ -88,5 +88,10 @@ public class UserServiceImpl implements UserService {
     public List<UserSearchResponse> searchUsers(String query) {
         return userRepository.searchUsers(query);
     }
+    
+    @Override
+    public List<UserSearchResponse> getUsersInfo(List<String> userIds) {
+        return userRepository.getUserSearchResponsesByKeycloakUserIds(userIds);
+    }
 
 }

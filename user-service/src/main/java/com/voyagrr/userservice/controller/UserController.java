@@ -57,4 +57,10 @@ public class UserController {
         return ResponseEntity.ok().body(userService.searchUsers(query));
     }
 
+    @Operation(summary = "Get basic user info by IDs", description = "Get basic user info by list of keycloak user IDs")
+    @RequestMapping(value = "info/batch", method = RequestMethod.POST)
+    public ResponseEntity<List<UserSearchResponse>> getUsersInfo(@RequestBody List<String> userIds) {
+        return ResponseEntity.ok().body(userService.getUsersInfo(userIds));
+    }
+
 }

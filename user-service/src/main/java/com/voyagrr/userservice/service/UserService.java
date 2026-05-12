@@ -19,4 +19,6 @@ public interface UserService {
 
     List<UserSearchResponse> searchUsers(String query);
 
+    List<UserSearchResponse> getUsersInfo(List<String> userIds);
+
 }
