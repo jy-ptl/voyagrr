@@ -28,10 +28,18 @@ public class GroupController {
 
     @Operation(summary = "Create a group", description = "Create a new group")
     @RequestMapping(value = "create", method = RequestMethod.POST)
-    public ResponseEntity<Long> create(@RequestBody GroupCreateRequest request,
+    public ResponseEntity<GroupResponse> create(@RequestBody GroupCreateRequest request,
             @AuthenticationPrincipal Jwt jwt) {
         String keycloakUserId = jwt.getSubject();
         return ResponseEntity.ok().body(groupService.create(request, keycloakUserId));
+    }
+
+    @Operation(summary = "Delete group", description = "Delete a group (only by owner)")
+    @RequestMapping(value = "{groupId}", method = RequestMethod.DELETE)
+    public ResponseEntity<Void> deleteGroup(@PathVariable(name = "groupId") long groupId,
+            @AuthenticationPrincipal Jwt jwt) {
+        groupService.deleteGroup(groupId, jwt.getSubject());
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "Get groups for user", description = "Get all groups the authenticated user belongs to")

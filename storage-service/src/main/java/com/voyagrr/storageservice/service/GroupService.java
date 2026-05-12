@@ -8,7 +8,9 @@ import com.voyagrr.storageservice.dto.GroupUpdateRequest;
 
 public interface GroupService {
 
-    Long create(GroupCreateRequest request, String keycloakUserId);
+    GroupResponse create(GroupCreateRequest request, String keycloakUserId);
+
+    void deleteGroup(long groupId, String keycloakUserId);
 
     Long createOrValidateGroupForTrip(long groupId, String groupName, String keycloakUserId, List<String> members);
 
