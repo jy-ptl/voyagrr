@@ -2,6 +2,7 @@ package com.voyagrr.storageservice.service;
 
 import com.voyagrr.storageservice.dto.DirectoryCreateRequest;
 import com.voyagrr.storageservice.dto.DirectoryContentResponse;
+import com.voyagrr.storageservice.dto.DirectoryResponse;
 import com.voyagrr.storageservice.dto.DirectoryTreeResponse;
 import com.voyagrr.storageservice.dto.FileThumbnailResponse;
 import com.voyagrr.storageservice.model.Directory;
@@ -24,11 +25,12 @@ public interface DirectoryService {
 
     List<Long> getAllAncestorsIncludingSelfFromFileId(long fileId);
 
-    Long createDiretoryForTrip(String directoryName, String keycloakUserId);
+    Long createDirectoryForTrip(String directoryName, String keycloakUserId);
 
     Long createDefaultSampleDirectoryForUser(String keycloakUserId);
 
     Long getSampleDirectoryIdByUserId(String keycloakUserId);
 
     List<FileThumbnailResponse> getThumbnailsForDirectory(long directoryId, String keycloakUserId);
+    DirectoryResponse getSampleDirectory(String keycloakUserId);
 }

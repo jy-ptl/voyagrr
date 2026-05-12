@@ -58,7 +58,7 @@ public class GrpcStorageServiceImpl extends StorageServiceGrpc.StorageServiceImp
 
         responseObserver.onNext(
                 CreateDirectoryForTripResponse.newBuilder().setDirectoryId(
-                        directoryService.createDiretoryForTrip(request.getDirectoryName(), request.getKeycloakUserId()))
+                        directoryService.createDirectoryForTrip(request.getDirectoryName(), request.getKeycloakUserId()))
                         .build());
         responseObserver.onCompleted();
     }

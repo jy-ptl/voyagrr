@@ -1,5 +1,7 @@
 package com.voyagrr.storageservice.service.impl;
 
+import com.voyagrr.storageservice.enumeration.DirectoryType;
+
 import com.voyagrr.common.enumeration.Permission;
 import com.voyagrr.common.exception.AccessDeniedException;
 import com.voyagrr.common.exception.EntityNotFoundException;
@@ -47,6 +49,7 @@ public class DirectoryServiceImpl implements DirectoryService {
         }
         directory.setName(request.name());
         directory.setOwnerId(keycloakUserId);
+        directory.setType(DirectoryType.USER_CREATED.getValue());
         Long directoryId = directoryRepository.save(directory).getId();
         mediaShareService.createDefaultPermissions(directoryId, keycloakUserId);
         return directoryId;
@@ -137,6 +140,7 @@ public class DirectoryServiceImpl implements DirectoryService {
                         .map(f -> new DirectoryResponse(
                                 f.getId(),
                                 f.getName(),
+                                f.getType(),
                                 dirPermissionsMap.get(f.getId())))
                         .toList())
                 .build();
@@ -150,9 +154,11 @@ public class DirectoryServiceImpl implements DirectoryService {
     }
 
     @Override
-    public Long createDiretoryForTrip(String directoryName, String keycloakUserId) {
+    public Long createDirectoryForTrip(String directoryName, String keycloakUserId) {
         long directoryId = directoryRepository
-                .save(Directory.builder().name(directoryName).ownerId(keycloakUserId).build()).getId();
+                .save(Directory.builder().name(directoryName).ownerId(keycloakUserId).type(DirectoryType.TRIP.getValue())
+                        .build())
+                .getId();
         mediaShareService.createDefaultPermissions(directoryId, keycloakUserId);
         return directoryId;
     }
@@ -160,7 +166,9 @@ public class DirectoryServiceImpl implements DirectoryService {
     @Override
     public Long createDefaultSampleDirectoryForUser(String keycloakUserId) {
         long directoryId = directoryRepository
-                .save(Directory.builder().name("Samples").ownerId(keycloakUserId).build()).getId();
+                .save(Directory.builder().name("Samples").ownerId(keycloakUserId).type(DirectoryType.SAMPLE.getValue())
+                        .build())
+                .getId();
         mediaShareService.createDefaultPermissionsForSampleDirectory(directoryId, keycloakUserId);
         return directoryId;
     }
@@ -175,7 +183,7 @@ public class DirectoryServiceImpl implements DirectoryService {
         List<DirectoryTreeResponse> roots = new ArrayList<>();
 
         for (DirectoryFlatResponse flat : flatList) {
-            map.put(flat.id(), new DirectoryTreeResponse(flat.id(), flat.name()));
+            map.put(flat.id(), new DirectoryTreeResponse(flat.id(), flat.name(), flat.type()));
         }
 
         for (DirectoryFlatResponse flat : flatList) {
@@ -248,6 +256,16 @@ public class DirectoryServiceImpl implements DirectoryService {
                 .filter(f -> f.getThumbnailKey() != null)
                 .map(f -> new FileThumbnailResponse(f.getId(), "/api/storage/" + f.getId() + "/thumbnail"))
                 .toList();
+    }
+
+    @Override
+    public DirectoryResponse getSampleDirectory(String keycloakUserId) {
+        Long directoryId = directoryRepository.getSampleDirectoryIdByUserId(keycloakUserId);
+        if (directoryId == null) {
+            directoryId = createDefaultSampleDirectoryForUser(keycloakUserId);
+        }
+        Directory directory = findDirectoryById(directoryId);
+        return new DirectoryResponse(directory.getId(), directory.getName(), directory.getType(), new ArrayList<>());
     }
 
 }

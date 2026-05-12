@@ -36,6 +36,7 @@ public class TripMapper {
                 .visibility(trip.getVisibility().name())
                 .status(trip.getStatus().name())
                 .ownerId(trip.getOwnerId())
+                .directoryId(trip.getDirectoryId())
                 .build();
     }
 
