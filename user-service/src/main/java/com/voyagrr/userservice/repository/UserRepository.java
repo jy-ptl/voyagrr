@@ -14,11 +14,13 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
+    UserResponse getUserResponseByKeycloakUserId(@Param("keycloakUserId") String keycloakUserId);
+
     @Query(value = """
-            select username as username, first_name as firstName, last_name as lastName, email as email
+            select keycloak_user_id as keycloakUserId, username as username, first_name as firstName, last_name as lastName, email as email
                 from users where keycloak_user_id = :keycloakUserId and is_deleted = false
                  """, nativeQuery = true)
-    UserResponse getUserResponseByKeycloakUserId(@Param("keycloakUserId") String keycloakUserId);
+    UserSearchResponse getUserSearchResponseByKeycloakUserId(@Param("keycloakUserId") String keycloakUserId);
 
     @Query(value = """
             select keycloak_user_id as keycloakUserId, username as username, first_name as firstName, last_name as lastName, email as email

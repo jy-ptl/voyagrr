@@ -51,6 +51,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserSearchResponse getUserSearchResponseByKeycloakUserId(String keycloakUserId) {
+        return userRepository.getUserSearchResponseByKeycloakUserId(keycloakUserId);
+    }
+
+    @Override
     public UserResponse updateUserInfo(UserUpdateRequest userUpdateRequest, String keycloakUserId) {
         User user = userRepository.getUserByKeycloakUserId(keycloakUserId)
                 .orElseThrow(() -> new EntityNotFoundException(
