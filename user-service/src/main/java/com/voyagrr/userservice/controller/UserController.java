@@ -10,6 +10,7 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -37,6 +38,12 @@ public class UserController {
         return ResponseEntity.ok().body(userService.getUserResponseByKeycloakUserId(jwt.getSubject()));
     }
 
+    @Operation(summary = "Get user by ID", description = "Get basic user info by keycloak user ID")
+    @RequestMapping(value = "{userId}", method = RequestMethod.GET)
+    public ResponseEntity<UserSearchResponse> getUserById(@PathVariable String userId) {
+        return ResponseEntity.ok().body(userService.getUserSearchResponseByKeycloakUserId(userId));
+    }
+
     @Operation(summary = "Update user info", description = "Update user info")
     @RequestMapping(value = "update", method = RequestMethod.POST)
     public ResponseEntity<UserResponse> update(@Valid @RequestBody UserUpdateRequest userUpdateRequest,
@@ -48,6 +55,12 @@ public class UserController {
     @RequestMapping(value = "search", method = RequestMethod.GET)
     public ResponseEntity<List<UserSearchResponse>> search(@RequestParam("query") String query) {
         return ResponseEntity.ok().body(userService.searchUsers(query));
+    }
+
+    @Operation(summary = "Get basic user info by IDs", description = "Get basic user info by list of keycloak user IDs")
+    @RequestMapping(value = "info/batch", method = RequestMethod.POST)
+    public ResponseEntity<List<UserSearchResponse>> getUsersInfo(@RequestBody List<String> userIds) {
+        return ResponseEntity.ok().body(userService.getUsersInfo(userIds));
     }
 
 }

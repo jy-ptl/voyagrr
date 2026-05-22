@@ -14,11 +14,13 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
+    UserResponse getUserResponseByKeycloakUserId(@Param("keycloakUserId") String keycloakUserId);
+
     @Query(value = """
-            select username as username, first_name as firstName, last_name as lastName, email as email
+            select keycloak_user_id as keycloakUserId, username as username, first_name as firstName, last_name as lastName, email as email
                 from users where keycloak_user_id = :keycloakUserId and is_deleted = false
                  """, nativeQuery = true)
-    UserResponse getUserResponseByKeycloakUserId(@Param("keycloakUserId") String keycloakUserId);
+    UserSearchResponse getUserSearchResponseByKeycloakUserId(@Param("keycloakUserId") String keycloakUserId);
 
     @Query(value = """
             select keycloak_user_id as keycloakUserId, username as username, first_name as firstName, last_name as lastName, email as email
@@ -30,6 +32,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
                 and is_deleted = false
             """, nativeQuery = true)
     List<UserSearchResponse> searchUsers(@Param("query") String query);
+
+    @Query(value = """
+            select keycloak_user_id as keycloakUserId, username as username, first_name as firstName, last_name as lastName, email as email
+                from users where keycloak_user_id IN (:keycloakUserIds) and is_deleted = false
+                 """, nativeQuery = true)
+    List<UserSearchResponse> getUserSearchResponsesByKeycloakUserIds(@Param("keycloakUserIds") List<String> keycloakUserIds);
 
     Optional<User> getUserByKeycloakUserId(String keycloakUserId);
 }

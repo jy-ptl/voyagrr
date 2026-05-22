@@ -259,6 +259,21 @@ public class MediaShareServiceImpl implements MediaShareService {
                 .build());
     }
 
+    @Override
+    public void addMediaShareForGroup(Long directoryId, Long groupId) {
+        List<Permission> allPermissions = permissionRepository.findAll();
+        allPermissions.removeIf(permission -> permission.getName() == com.voyagrr.common.enumeration.Permission.SHARE);
+
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new EntityNotFoundException(ENTITY_DOES_NOT_EXISTS.formatted(RESOURCES.GROUP)));
+
+        mediaShareRepository.save(MediaShare.builder()
+                .directoryId(directoryId)
+                .group(group)
+                .permissions(allPermissions)
+                .build());
+    }
+
     private boolean hasPermissionForFileByUserId(String keycloakUserId, long fileId, String permission) {
         return mediaShareRepository.existsByUserIdAndFileIdAndPermission(keycloakUserId, fileId, permission);
     }

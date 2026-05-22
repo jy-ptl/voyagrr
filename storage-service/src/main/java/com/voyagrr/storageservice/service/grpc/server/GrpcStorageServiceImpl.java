@@ -124,4 +124,11 @@ public class GrpcStorageServiceImpl extends StorageServiceGrpc.StorageServiceImp
         responseObserver.onCompleted();
     }
 
+    @Override
+    public void addMediaShare(AddMediaShareRequest request, StreamObserver<AddMediaShareResponse> responseObserver) {
+        mediaShareService.addMediaShareForGroup(request.getDirectoryId(), request.getGroupId());
+        responseObserver.onNext(AddMediaShareResponse.newBuilder().setSuccess(true).build());
+        responseObserver.onCompleted();
+    }
+
 }

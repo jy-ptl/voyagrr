@@ -2,9 +2,12 @@ package com.voyagrr.storageservice.repository;
 
 import com.voyagrr.storageservice.model.MediaShare;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import jakarta.transaction.Transactional;
 
 import java.util.List;
 
@@ -40,14 +43,19 @@ public interface MediaShareRepository extends JpaRepository<MediaShare, Long> {
     List<MediaShare> findAllMediaSharesByUserIds(@Param("userIds") List<String> userIds);
 
     @Query(value = """
-            select * from media_shares where media_shares.directory_id in :fileIds
+            select * from media_shares where media_shares.file_id in :fileIds
             """, nativeQuery = true)
     List<MediaShare> findAllMediaSharesByFileIds(@Param("fileIds") List<Long> fileIds);
 
     @Query(value = """
-            select * from media_shares where media_shares.directory_id in :groupIds
+            select * from media_shares where media_shares.group_id in :groupIds
             """, nativeQuery = true)
     List<MediaShare> findAllMediaSharesByGroupIds(@Param("groupIds") List<Long> groupIds);
+
+    @Transactional
+    @Modifying
+    @Query(value = "DELETE FROM media_shares WHERE group_id = :groupId", nativeQuery = true)
+    void deleteByGroupId(@Param("groupId") Long groupId);
 
     @Query(value = """
             SELECT ms.directory_id, p.name

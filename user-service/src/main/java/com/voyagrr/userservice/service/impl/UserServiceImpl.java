@@ -51,6 +51,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserSearchResponse getUserSearchResponseByKeycloakUserId(String keycloakUserId) {
+        return userRepository.getUserSearchResponseByKeycloakUserId(keycloakUserId);
+    }
+
+    @Override
     public UserResponse updateUserInfo(UserUpdateRequest userUpdateRequest, String keycloakUserId) {
         User user = userRepository.getUserByKeycloakUserId(keycloakUserId)
                 .orElseThrow(() -> new EntityNotFoundException(
@@ -82,6 +87,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserSearchResponse> searchUsers(String query) {
         return userRepository.searchUsers(query);
+    }
+    
+    @Override
+    public List<UserSearchResponse> getUsersInfo(List<String> userIds) {
+        return userRepository.getUserSearchResponsesByKeycloakUserIds(userIds);
     }
 
 }

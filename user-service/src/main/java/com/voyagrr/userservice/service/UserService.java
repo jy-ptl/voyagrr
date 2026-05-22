@@ -13,8 +13,12 @@ public interface UserService {
 
     UserResponse getUserResponseByKeycloakUserId(String keycloakUserId);
 
+    UserSearchResponse getUserSearchResponseByKeycloakUserId(String keycloakUserId);
+
     UserResponse updateUserInfo(UserUpdateRequest userUpdateRequest, String keycloakUserId);
 
     List<UserSearchResponse> searchUsers(String query);
+
+    List<UserSearchResponse> getUsersInfo(List<String> userIds);
 
 }

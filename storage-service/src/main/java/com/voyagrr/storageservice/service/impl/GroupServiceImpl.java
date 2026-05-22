@@ -14,10 +14,13 @@ import com.voyagrr.storageservice.model.GroupMember;
 import com.voyagrr.storageservice.model.GroupMemberId;
 import com.voyagrr.storageservice.repository.GroupMemberRepository;
 import com.voyagrr.storageservice.repository.GroupRepository;
+import com.voyagrr.storageservice.repository.MediaShareRepository;
 import com.voyagrr.storageservice.service.GroupService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import jakarta.transaction.Transactional;
+
 
 @Slf4j
 @Service
@@ -26,9 +29,11 @@ public class GroupServiceImpl implements GroupService {
 
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
+    private final MediaShareRepository mediaShareRepository;
 
     @Override
-    public Long create(GroupCreateRequest request, String keycloakUserId) {
+    @Transactional
+    public GroupResponse create(GroupCreateRequest request, String keycloakUserId) {
         Group group = groupRepository
                 .save(Group
                         .builder()
@@ -36,8 +41,26 @@ public class GroupServiceImpl implements GroupService {
                         .ownerId(keycloakUserId)
                         .build());
         addGroupMembers(group, keycloakUserId, request.members());
-        return group.getId();
+        return getGroupById(group.getId(), keycloakUserId);
     }
+
+    @Override
+    @Transactional
+    public void deleteGroup(long groupId, String keycloakUserId) {
+        Group group = groupRepository.findById(groupId).orElseThrow(
+                () -> new EntityNotFoundException(ExceptionConstant.ENTITY_DOES_NOT_EXISTS
+                        .formatted(ExceptionConstant.RESOURCES.GROUP)));
+
+        if (!group.getOwnerId().equals(keycloakUserId)) {
+            throw new AccessDeniedException(ExceptionConstant.ACCESS_DENIED_FOR_RESOURCE
+                    .formatted("DELETE", ExceptionConstant.RESOURCES.GROUP));
+        }
+
+        mediaShareRepository.deleteByGroupId(groupId);
+        groupMemberRepository.deleteByGroupId(groupId);
+        groupRepository.delete(group);
+    }
+
 
     @Override
     public Long createOrValidateGroupForTrip(long groupId, String groupName, String keycloakUserId,
@@ -112,7 +135,9 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    @Transactional
     public GroupResponse updateGroup(long groupId, GroupUpdateRequest request, String keycloakUserId) {
+
         Group group = groupRepository.findById(groupId).orElseThrow(
                 () -> new EntityNotFoundException(ExceptionConstant.ENTITY_DOES_NOT_EXISTS
                         .formatted(ExceptionConstant.RESOURCES.GROUP)));

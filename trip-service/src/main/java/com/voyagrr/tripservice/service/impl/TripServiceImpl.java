@@ -47,6 +47,10 @@ public class TripServiceImpl implements TripService {
         trip.setDirectoryId(directoryId);
         trip.setGroupId(groupId);
         trip.setOwnerId(keycloakUserId);
+
+        if (groupId > 0)
+            storageGrpcClient.addMediaShare(directoryId, groupId);
+
         return tripMapper.TripToTripCreateResponse(tripRepository.save(trip));
     }
 
