@@ -7,3 +7,6 @@ minio
 pyyaml
 faiss-cpu
 qdrant-client
+opentelemetry-api
+opentelemetry-sdk
+opentelemetry-exporter-otlp-proto-http

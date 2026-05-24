@@ -4,3 +4,6 @@ sqlalchemy
 psycopg2-binary
 pydantic-settings
 pyyaml
+opentelemetry-api
+opentelemetry-sdk
+opentelemetry-exporter-otlp-proto-http

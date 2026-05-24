@@ -10,3 +10,6 @@ minio
 pyyaml
 transformers==4.41.2
 ultralytics
+opentelemetry-api
+opentelemetry-sdk
+opentelemetry-exporter-otlp-proto-http

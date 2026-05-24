@@ -19,3 +19,7 @@ app:
   match_threshold: 0.6
   min_face_size: 80
   max_workers: 4
+
+tracing:
+  endpoint: http://tempo:4318/v1/traces
+  service_name: recognition-service

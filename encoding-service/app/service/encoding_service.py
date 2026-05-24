@@ -6,6 +6,7 @@ from app.core.minio_client import download_file, upload_file
 from app.core.encoder import encode_to_hls
 from app.core.logging_config import get_logger
 from app.producer.video_processed_producer import get_producer
+from app.core.tracing import inject_trace_headers
 
 cfg = get_config()
 logger = get_logger(__name__)
@@ -47,6 +48,7 @@ def process_event(event):
         producer.send(
             "file.encoded.v1",
             encoded_event,
+            headers=inject_trace_headers(),
         )
         producer.flush()
         logger.info("published metadata event for %s", object_key)

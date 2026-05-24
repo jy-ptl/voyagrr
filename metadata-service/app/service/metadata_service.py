@@ -7,6 +7,7 @@ from app.core.extractor import extract_metadata, generate_thumbnail
 from app.repository.db import SessionLocal
 from app.core.logging_config import get_logger
 from app.producer.metadata_producer import get_producer
+from app.core.tracing import inject_trace_headers
 
 logger = get_logger(__name__)
 cfg = get_config()
@@ -54,6 +55,7 @@ def process_event(event):
         producer.send(
             "file.metadata.v1",
             metadata_event,
+            headers=inject_trace_headers(),
         )
 
         producer.flush()

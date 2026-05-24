@@ -4,6 +4,7 @@ from app.service.face_engine import extract_faces
 from app.vector.factory import get_vector_store
 from app.core.kafka_client import get_producer
 from app.core.logging_config import get_logger
+from app.core.tracing import inject_trace_headers
 
 logger = get_logger(__name__)
 vector_store = get_vector_store()
@@ -42,7 +43,7 @@ def process_image(trip_id, img_path, allowed_users, producer):
 
         if not faces:
             result = {"tripId": trip_id, "imagePath": img_path, "faces": []}
-            producer.send("trip.analyzed.v1", result)
+            producer.send("trip.analyzed.v1", result, headers=inject_trace_headers())
             return
 
         large_faces = []
@@ -101,7 +102,7 @@ def process_image(trip_id, img_path, allowed_users, producer):
             "%s: %d faces detected, %d recognized", img_path, len(faces), matched
         )
 
-        producer.send("trip.analyzed.v1", result)
+        producer.send("trip.analyzed.v1", result, headers=inject_trace_headers())
 
     except Exception as e:
         logger.error("Error processing %s: %s", img_path, str(e))
