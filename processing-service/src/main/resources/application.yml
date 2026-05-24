@@ -7,6 +7,8 @@ spring:
     name: processing-service
   kafka:
     bootstrap-servers: kafka:9092
+    template:
+      observation-enabled: true
     producer:
       properties:
         spring.json.add.type.headers: false
@@ -35,7 +37,7 @@ management:
   tracing:
     enabled: true
     sampling:
-      probability: 0.1
+      probability: 1.0
   otlp:
     tracing:
       endpoint: http://tempo:4318/v1/traces

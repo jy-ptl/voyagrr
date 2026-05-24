@@ -43,6 +43,7 @@ public class TripAnalyzedConsumerConfig {
 
         ConcurrentKafkaListenerContainerFactory<String, TripAnalyzedEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(tripAnalyzedConsumerFactory());
+        factory.getContainerProperties().setObservationEnabled(true);
         return factory;
 
     }

@@ -77,8 +77,26 @@ spring:
               filters:
                 - StripPrefix=1
 
+logging:
+  pattern:
+    level: "%5p [${spring.application.name},traceId=%X{traceId},spanId=%X{spanId}]"
+
 management:
   endpoints:
     web:
       exposure:
-        include: health
+        include: health,info,metrics,prometheus
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0
+  otlp:
+    tracing:
+      endpoint: http://tempo:4318/v1/traces
+  metrics:
+    tags:
+      application: api-gateway
+  prometheus:
+    metrics:
+      export:
+        enabled: true

@@ -43,6 +43,7 @@ public class AnalysisProcessedConsumerConfig {
 
         ConcurrentKafkaListenerContainerFactory<String, AnalysisProcessedEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(analysisConsumerFactory());
+        factory.getContainerProperties().setObservationEnabled(true);
         return factory;
 
     }

@@ -43,6 +43,7 @@ public class MetadataProcessedConsumerConfig {
 
         ConcurrentKafkaListenerContainerFactory<String, MetadataProcessedEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(metadataConsumerFactory());
+        factory.getContainerProperties().setObservationEnabled(true);
         return factory;
 
     }

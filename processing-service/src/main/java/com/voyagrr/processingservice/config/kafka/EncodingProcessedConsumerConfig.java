@@ -43,6 +43,7 @@ public class EncodingProcessedConsumerConfig {
 
         ConcurrentKafkaListenerContainerFactory<String, EncodingProcessedEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(encodingConsumerFactory());
+        factory.getContainerProperties().setObservationEnabled(true);
         return factory;
 
     }
