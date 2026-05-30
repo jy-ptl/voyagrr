@@ -3,7 +3,7 @@ from app.core.tracing import init_tracing
 from app.consumer.recognition_consumer import start_consumer
 
 setup_logging()
-init_tracing()
+init_tracing(service_name="recognition-service", endpoint="http://tempo:4318/v1/traces")
 logger = get_logger(__name__)
 
 if __name__ == "__main__":

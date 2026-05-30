@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.voyagrr.processingservice.dto.TripAnalyzedEvent;
 
+import io.micrometer.observation.ObservationRegistry;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,7 +25,7 @@ public class TripAnalyzedConsumerConfig {
     private String BOOTSTARP_SERVERS;
 
     @Bean
-    public ConsumerFactory<String, TripAnalyzedEvent> tripAnalyzedConsumerFactory() {
+    public ConsumerFactory<String, TripAnalyzedEvent> tripAnalyzedConsumerFactory(ObservationRegistry observationRegistry) {
 
         JsonDeserializer<TripAnalyzedEvent> deserializer = new JsonDeserializer<>(TripAnalyzedEvent.class);
         deserializer.addTrustedPackages("*");
@@ -34,18 +35,21 @@ public class TripAnalyzedConsumerConfig {
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "trip-analyzed-response-handler");
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
-        return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), deserializer);
-
+        DefaultKafkaConsumerFactory<String, TripAnalyzedEvent> factory =
+                new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), deserializer);
+        factory.setObservationEnabled(true);
+        return factory;
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, TripAnalyzedEvent> tripAnalyzedKafkaListenerContainerFactory() {
+    public ConcurrentKafkaListenerContainerFactory<String, TripAnalyzedEvent> tripAnalyzedKafkaListenerContainerFactory(
+            ObservationRegistry observationRegistry) {
 
-        ConcurrentKafkaListenerContainerFactory<String, TripAnalyzedEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(tripAnalyzedConsumerFactory());
+        ConcurrentKafkaListenerContainerFactory<String, TripAnalyzedEvent> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(tripAnalyzedConsumerFactory(observationRegistry));
         factory.getContainerProperties().setObservationEnabled(true);
         return factory;
-
     }
 
 }

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.voyagrr.processingservice.dto.AnalysisProcessedEvent;
 
+import io.micrometer.observation.ObservationRegistry;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,7 +25,7 @@ public class AnalysisProcessedConsumerConfig {
     private String BOOTSTARP_SERVERS;
 
     @Bean
-    public ConsumerFactory<String, AnalysisProcessedEvent> analysisConsumerFactory() {
+    public ConsumerFactory<String, AnalysisProcessedEvent> analysisConsumerFactory(ObservationRegistry observationRegistry) {
 
         JsonDeserializer<AnalysisProcessedEvent> deserializer = new JsonDeserializer<>(AnalysisProcessedEvent.class);
         deserializer.addTrustedPackages("*");
@@ -34,18 +35,21 @@ public class AnalysisProcessedConsumerConfig {
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "analysis-processed-response-handler");
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
-        return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), deserializer);
-
+        DefaultKafkaConsumerFactory<String, AnalysisProcessedEvent> factory =
+                new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), deserializer);
+        factory.setObservationEnabled(true);
+        return factory;
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, AnalysisProcessedEvent> analysisKafkaListenerContainerFactory() {
+    public ConcurrentKafkaListenerContainerFactory<String, AnalysisProcessedEvent> analysisKafkaListenerContainerFactory(
+            ObservationRegistry observationRegistry) {
 
-        ConcurrentKafkaListenerContainerFactory<String, AnalysisProcessedEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(analysisConsumerFactory());
+        ConcurrentKafkaListenerContainerFactory<String, AnalysisProcessedEvent> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(analysisConsumerFactory(observationRegistry));
         factory.getContainerProperties().setObservationEnabled(true);
         return factory;
-
     }
 
 }
