@@ -11,3 +11,7 @@ minio:
   secret-key: minioadmin123
   secure: False
   bucket: voyagrr-media
+
+tracing:
+  endpoint: http://tempo:4318/v1/traces
+  service_name: metadata-service

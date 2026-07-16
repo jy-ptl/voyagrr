@@ -15,3 +15,7 @@ postgres:
 
 app:
   temp_dir: /tmp/analysis
+
+tracing:
+  endpoint: http://tempo:4318/v1/traces
+  service_name: analysis-service

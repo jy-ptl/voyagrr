@@ -5,6 +5,7 @@ from app.core.minio_client import download_file
 from app.core.logging_config import get_logger
 from app.service.analysis_pipeline import analyze_image
 from app.core.kafka_client import get_producer
+from app.core.tracing import inject_trace_headers
 
 logger = get_logger(__name__)
 cfg = get_config()
@@ -33,7 +34,7 @@ def process_event(event):
         }
 
         producer = get_producer()
-        producer.send("file.analyzed.v1", result_event)
+        producer.send("file.analyzed.v1", result_event, headers=inject_trace_headers())
 
         logger.info("result %s", result_event)
         logger.info("analysis completed for file %s", file_id)
